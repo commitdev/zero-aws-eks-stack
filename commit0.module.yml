@@ -1,0 +1,12 @@
+name: basic-infrastructure
+description: ''
+author: ''
+icon: ''
+thumbnail: ''
+
+template:
+  strictMode: true
+  delimiters:
+    - '<%'
+    - '%>'
+  output: 'tmp/web-app'
