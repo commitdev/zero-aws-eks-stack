@@ -32,7 +32,7 @@ module "production" {
 
   # Hosting configuration
   s3_hosting_buckets = [
-    "jobs.<% .Name %>.com"
+    "<% .Name %>.com"
   ]
   s3_hosting_cert_domain = "<% .Name %>.com"
 

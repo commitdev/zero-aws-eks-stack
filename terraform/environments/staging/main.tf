@@ -33,8 +33,7 @@ module "staging" {
 
   # Hosting configuration
   s3_hosting_buckets = [
-    "jobs.<% .Name %>-staging.com",
-    "storybook.<% .Name %>-staging.com"
+    "<% .Name %>-staging.com",
   ]
   s3_hosting_cert_domain = "<% .Name %>-staging.com"
 
