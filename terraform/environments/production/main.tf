@@ -32,9 +32,9 @@ module "production" {
 
   # Hosting configuration
   s3_hosting_buckets = [
-    "<% <% .Params[`productionHost`] %> %>"
+    "<% .Params[`productionHost`] %>"
   ]
-  s3_hosting_cert_domain = "<% <% .Params[`productionHost`] %> %>"
+  s3_hosting_cert_domain = "<% .Params[`productionHost`] %>"
 
   # DB configuration
   db_instance_class = "m5.large"
