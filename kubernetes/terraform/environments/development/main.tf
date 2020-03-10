@@ -3,7 +3,7 @@ terraform {
     bucket         = "<% .Name %>-development-terraform-state"
     key            = "infrastructure/terraform/environments/development/kubernetes"
     encrypt        = true
-    region         = "<% .Params[`region`] %>"
+    region         = "<% .Params["region"] %>"
     dynamodb_table = "<% .Name %>-development-terraform-state-locks"
   }
 }
@@ -13,7 +13,7 @@ module "kubernetes" {
   source = "../../modules/kubernetes"
 
   environment = "development"
-  region      = "<% .Params[`region`] %>"
+  region      = "<% .Params["region"] %>"
 
   # Authenticate with the EKS cluster via the cluster id
   cluster_name = "<% .Name %>-dev-cluster"
@@ -21,7 +21,7 @@ module "kubernetes" {
   # Assume-role policy used by monitoring fluentd daemonset
   assume_role_policy = data.aws_iam_policy_document.assumerole_root_policy.json
 
-  external_dns_zone = "<% .Params[`stagingHost`] %>"
+  external_dns_zone = "<% .Params["stagingHost"] %>"
   external_dns_owner_id = "<% GenerateUUID %>" # randomly generated ID
   external_dns_assume_roles = [ "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/k8s-staging-workers" ]
 }
