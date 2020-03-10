@@ -17,6 +17,10 @@ prompts:
       - "eu-west-1"
       - "ap-east-1"
       - "ap-south-1"
+  - field: stagingHost  
+    label: Staging Host Name
+  - field: productionHost  
+    label: Production Host Name
 
 template:
   strictMode: true

@@ -4,7 +4,7 @@ terraform {
     bucket         = "<% .Name %>-staging-terraform-state"
     key            = "infrastructure/terraform/environments/staging/main"
     encrypt        = true
-    region         = "us-west-2"
+    region         = "<% .Region %>"
     dynamodb_table = "<% .Name %>-staging-terraform-state-locks"
   }
 }
@@ -16,11 +16,10 @@ module "staging" {
 
   # Project configuration
   project             = "<% .Name %>"
-  region              = "us-west-2"
-  allowed_account_ids = ["694969179370"]
+  region              = "<% .Region %>"
+  # allowed_account_ids = ["<% .AccountId %>"]
   # ECR configuration
-  ecr_repositories = [ "gql-server"
-  ]
+  ecr_repositories = [ "gql-server" ]
 
   # EKS configuration
   eks_worker_instance_type = "t2.small"
@@ -33,9 +32,9 @@ module "staging" {
 
   # Hosting configuration
   s3_hosting_buckets = [
-    "<% .Name %>-staging.com",
+    "<% .StagingHost %>",
   ]
-  s3_hosting_cert_domain = "<% .Name %>-staging.com"
+  s3_hosting_cert_domain = "<% .StagingHost %>"
 
   # DB configuration
   db_instance_class = "db.t3.small"
