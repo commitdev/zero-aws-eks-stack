@@ -1,5 +1,5 @@
 provider "aws" {
-  region  = "<% .Region %>"
+  region  = "<% .Params[`region`] %>"
 }
 
 resource "aws_s3_bucket" "terraform_remote_state" {

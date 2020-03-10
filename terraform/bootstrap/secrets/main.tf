@@ -1,5 +1,5 @@
 provider "aws" {
-  region  = "<% .Region %>"
+  region  = "<% .Params[`region`] %>"
 }
 
 terraform {
