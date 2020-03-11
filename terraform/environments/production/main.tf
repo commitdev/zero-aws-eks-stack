@@ -4,7 +4,7 @@ terraform {
     bucket         = "<% .Name %>-production-terraform-state"
     key            = "infrastructure/terraform/environments/production/main"
     encrypt        = true
-    region         = "<% .Params[`region`] %>"
+    region         = "<% index .Params `region` %>"
     dynamodb_table = "<% .Name %>-production-terraform-state-locks"
   }
 }
@@ -16,8 +16,8 @@ module "production" {
 
   # Project configuration
   project             = "production"
-  region              = "<% .Params[`region`] %>"
-  allowed_account_ids = ["<% .Params[`accountId`] %>"]
+  region              = "<% index .Params `region` %>"
+  allowed_account_ids = ["<% index .Params `accountId` %>"]
   # ECR configuration
   ecr_repositories = ["production"]
 
@@ -32,9 +32,9 @@ module "production" {
 
   # Hosting configuration
   s3_hosting_buckets = [
-    "<% .Params[`productionHost`] %>"
+    "<% index .Params `productionHost` %>"
   ]
-  s3_hosting_cert_domain = "<% .Params[`productionHost`] %>"
+  s3_hosting_cert_domain = "<% index .Params `productionHost` %>"
 
   # DB configuration
   db_instance_class = "m5.large"
