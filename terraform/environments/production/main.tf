@@ -15,14 +15,14 @@ module "production" {
   environment = "production"
 
   # Project configuration
-  project             = "production"
+  project             = "<% .Name %>"
   region              = "<% index .Params `region` %>"
   allowed_account_ids = ["<% index .Params `accountId` %>"]
   # ECR configuration
   ecr_repositories = ["production"]
 
   # EKS configuration
-  eks_worker_instance_type = "m4.large"
+  eks_worker_instance_type = "t2.small"
   eks_worker_asg_min_size  = 3
   eks_worker_asg_max_size  = 6
 
@@ -37,7 +37,7 @@ module "production" {
   s3_hosting_cert_domain = "<% index .Params `productionHost` %>"
 
   # DB configuration
-  db_instance_class = "m5.large"
+  db_instance_class = "db.t3.small"
   db_storage_gb = 100
 
 }
