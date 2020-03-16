@@ -2,14 +2,7 @@
 Terraform infrastructure as code
 
 ## Instructions 
-1. Setup the basic infrastructure for either staging / production environment
+To init and apply the terraform configs, simply run the makefile and specify the environment. The default environment is `staging`
 ```
-./init.sh <environment>
-```
-The supported environment values are currently `staging` and `production`
-
-2. Setup the Kubernetes utilities
-```
-cd kubernetes/terraform/environments/staging
-terraform apply
+make ENV=<environment>
 ```
