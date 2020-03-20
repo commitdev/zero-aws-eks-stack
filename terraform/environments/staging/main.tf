@@ -17,7 +17,7 @@ module "staging" {
   # Project configuration
   project             = "<% .Name %>"
   region              = "<% index .Params `region` %>"
-  # allowed_account_ids = ["<% index .Params `accountId` %>"]
+  allowed_account_ids = ["<% index .Params `accountId` %>"]
   # ECR configuration
   ecr_repositories = [ "gql-server" ]
 
