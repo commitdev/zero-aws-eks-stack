@@ -14,6 +14,9 @@ To init and apply the terraform configs, simply run the makefile and specify the
 make ENV=<environment>
 ```
 
+## Components
+[See Diagram](./docs/architecture-overview.svg)
+
 ## AWS Stack
 All the modules that are being applied can be found in [terraform/modules/environment/main.tf](terraform/modules/environment/main.tf)
 - [ ] VPC - [Virtual Private Cloud](https://aws.amazon.com/vpc/pricing/)
