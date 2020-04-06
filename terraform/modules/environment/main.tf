@@ -60,12 +60,19 @@ data "aws_iam_user" "ci_user" {
   user_name = "ci-user" # Should have been created in the bootstrap process
 }
 
+module "domain" {
+  source = "../../modules/domain"
+
+  domain_name = var.domain_name
+}
+
 module "s3_hosting" {
   source = "../../modules/s3_hosting"
 
-  buckets     = var.s3_hosting_buckets
-  cert_domain = var.s3_hosting_cert_domain
-  project     = var.project
+  buckets         = var.s3_hosting_buckets
+  certificate_arn = module.domain.certificate_arn
+  project         = var.project
+  route53_zone_id = module.domain.route53_zone_id
 }
 
 module "db" {
