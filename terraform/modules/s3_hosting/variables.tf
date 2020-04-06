@@ -7,7 +7,11 @@ variable "buckets" {
   type = set(string)
 }
 
-variable "cert_domain" {
-  description = "Domain of the ACM certificate to lookup for Cloudfront to use"
+variable "certificate_arn" {
+  description = "ARN of the certificate we created for the assets domain"
+}
+
+variable "route53_zone_id" {
+  description = "ID of the Route53 zone to create a record in"
   type = string
 }
