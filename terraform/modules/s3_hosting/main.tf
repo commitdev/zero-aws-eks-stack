@@ -1,5 +1,5 @@
 locals {
-  assets_access_identity = "${var.project}-client-assets"
+  assets_access_identity = "${var.project}-${var.environment}-client-assets"
 }
 
 resource "aws_s3_bucket" "client_assets" {
@@ -121,7 +121,7 @@ resource "aws_cloudfront_distribution" "client_assets_distribution" {
 
   # Use our cert
   viewer_certificate {
-      acm_certificate_arn      = var.certificate_arn
+      acm_certificate_arn      = var.certificate_arns[each.value]
       minimum_protocol_version = "TLSv1"
       ssl_support_method       = "sni-only"
     }

@@ -1,8 +1,15 @@
 
 # Create a route53 zone
-resource "aws_route53_zone" "public" {
+# resource "aws_route53_zone" "public" {
+#   name = var.domain_name
+# }
+
+# Reference an existing route53 zone
+data "aws_route53_zone" "public" {
   name = var.domain_name
 }
+
+
 
 # To use an ACM cert with CF it has to exist in us-east-1
 provider "aws" {
@@ -12,7 +19,7 @@ provider "aws" {
 
 # Create an ACM cert for this domain
 resource "aws_acm_certificate" "wildcard_cert" {
-  # provider    = aws.east1
+  provider    = aws.east1
 
   domain_name             = var.domain_name
   validation_method       = "DNS"
@@ -29,6 +36,6 @@ resource "aws_route53_record" "cert_validation" {
   records         = [aws_acm_certificate.wildcard_cert.domain_validation_options[0]["resource_record_value"]]
   type            = "CNAME"
   allow_overwrite = true
-  zone_id         = aws_route53_zone.public.zone_id
+  zone_id         = data.aws_route53_zone.public.zone_id
   ttl             = 300
 }
