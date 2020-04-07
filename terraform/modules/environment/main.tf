@@ -79,11 +79,12 @@ module "assets_domains" {
 module "s3_hosting" {
   source = "../../modules/s3_hosting"
 
-  buckets          = var.s3_hosting_buckets
-  project          = var.project
-  environment      = var.environment
-  certificate_arns = module.assets_domains.certificate_arns
-  route53_zone_id  = module.assets_domains.route53_zone_id
+  buckets                 = var.s3_hosting_buckets
+  project                 = var.project
+  environment             = var.environment
+  certificate_arns        = module.assets_domains.certificate_arns
+  route53_zone_id         = module.assets_domains.route53_zone_id
+  certificate_validations = module.assets_domains.certificate_validations
 }
 
 module "db" {

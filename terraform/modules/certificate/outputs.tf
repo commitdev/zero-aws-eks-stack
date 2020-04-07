@@ -7,3 +7,8 @@ output "certificate_arns" {
   description = "The ARNs of the created certificates, keyed by domain name"
   value       = zipmap(aws_acm_certificate.cert[*].domain_name, aws_acm_certificate.cert[*].arn)
 }
+
+output "certificate_validations" {
+  description = "The ids of the certificate validations. Provided as a dependency so dependents can wait until the cert is actually valid"
+  value       = aws_acm_certificate_validation.cert[*].id
+}
