@@ -6,6 +6,7 @@ The only things that will need to be set up before deploying for the first time 
 You'll also need a user created and the credentials available in your shell.
 
 [AWS Docs: Set up the AWS CLI](https://docs.aws.amazon.com/polly/latest/dg/setup-aws-cli.html)
+[AWS Docs: Register a domain with Route53](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html)
 
 ## Instructions
 To init and apply the terraform configs, simply run the makefile and specify the environment. The default environment is `staging`
