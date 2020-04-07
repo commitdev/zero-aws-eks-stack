@@ -1,5 +1,5 @@
 locals {
-  assets_access_identity = "${var.project}-client-assets"
+  assets_access_identity = "${var.project}-${var.environment}-client-assets"
 }
 
 resource "aws_s3_bucket" "client_assets" {
@@ -65,13 +65,6 @@ provider "aws" {
   alias  = "east1"
 }
 
-# Find an already created ACM cert for this domain
-data "aws_acm_certificate" "wildcard_cert" {
-  provider    = aws.east1
-  domain      = var.cert_domain
-  most_recent = "true"
-}
-
 # Create the cloudfront distribution
 resource "aws_cloudfront_distribution" "client_assets_distribution" {
   for_each = var.buckets
@@ -91,7 +84,7 @@ resource "aws_cloudfront_distribution" "client_assets_distribution" {
     response_code = 200
     error_caching_min_ttl = 0
     response_page_path = "/index.html"
-  }  
+  }
 
   enabled             = true
   is_ipv6_enabled     = true
@@ -128,24 +121,18 @@ resource "aws_cloudfront_distribution" "client_assets_distribution" {
 
   # Use our cert
   viewer_certificate {
-      acm_certificate_arn      = data.aws_acm_certificate.wildcard_cert.arn
+      acm_certificate_arn      = var.certificate_arns[each.value]
       minimum_protocol_version = "TLSv1"
       ssl_support_method       = "sni-only"
     }
 
 }
 
-# Find the route53 zone
-data "aws_route53_zone" "public" {
-  name         = "${var.cert_domain}."
-  private_zone = false
-}
-
 # Subdomain to point at CF
 resource "aws_route53_record" "client_assets" {
   for_each = var.buckets
 
-  zone_id = data.aws_route53_zone.public.zone_id
+  zone_id = var.route53_zone_id
   name    = each.value
   type    = "CNAME"
   ttl     = "120"
