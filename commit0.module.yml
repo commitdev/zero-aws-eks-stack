@@ -4,10 +4,10 @@ author: ''
 icon: ''
 thumbnail: ''
 
-prompts: 
+prompts:
   - field: region
     label: Select AWS Region
-    options: 
+    options:
       - "us-west-1"
       - "us-west-2"
       - "us-east-1"
@@ -17,12 +17,12 @@ prompts:
       - "eu-west-1"
       - "ap-east-1"
       - "ap-south-1"
-  - field: accountId  
+  - field: accountId
     label: AWS Account ID
-  - field: stagingHost  
-    label: Staging Host Name
-  - field: productionHost  
-    label: Production Host Name
+  - field: productionHost
+    label: Production Root Host Name (e.g. mydomain.com)
+  - field: stagingHost
+    label: Staging Root Host Name (e.g. mydomain-staging.com)
 
 template:
   strictMode: true

@@ -41,8 +41,8 @@ variable "s3_hosting_buckets" {
   type = set(string)
 }
 
-variable "s3_hosting_cert_domain" {
-  description = "Domain of the ACM certificate to lookup for Cloudfront to use"
+variable "domain_name" {
+  description = "Domain to create a R53 Zone and ACM Cert for"
   type = string
 }
 

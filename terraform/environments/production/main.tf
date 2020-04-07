@@ -32,9 +32,9 @@ module "production" {
 
   # Hosting configuration
   s3_hosting_buckets = [
-    "<% index .Params `productionHost` %>"
+    "assets.<% index .Params `productionHost` %>"
   ]
-  s3_hosting_cert_domain = "<% index .Params `productionHost` %>"
+  domain_name = "<% index .Params `productionHost` %>"
 
   # DB configuration
   db_instance_class = "db.t3.small"

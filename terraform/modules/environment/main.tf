@@ -60,12 +60,31 @@ data "aws_iam_user" "ci_user" {
   user_name = "ci-user" # Should have been created in the bootstrap process
 }
 
+module "wildcard_domain" {
+  source = "../../modules/certificate"
+
+  region        = var.region
+  zone_name     = var.domain_name
+  domain_names  = ["*.${var.domain_name}"]
+}
+
+module "assets_domains" {
+  source = "../../modules/certificate"
+
+  region        = "us-east-1" # For CF, the cert must be in us-east-1
+  zone_name     = var.domain_name
+  domain_names  = var.s3_hosting_buckets
+}
+
 module "s3_hosting" {
   source = "../../modules/s3_hosting"
 
-  buckets     = var.s3_hosting_buckets
-  cert_domain = var.s3_hosting_cert_domain
-  project     = var.project
+  buckets                 = var.s3_hosting_buckets
+  project                 = var.project
+  environment             = var.environment
+  certificate_arns        = module.assets_domains.certificate_arns
+  route53_zone_id         = module.assets_domains.route53_zone_id
+  certificate_validations = module.assets_domains.certificate_validations
 }
 
 module "db" {
