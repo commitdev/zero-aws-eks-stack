@@ -32,7 +32,7 @@ module "production" {
 
   # Hosting configuration
   s3_hosting_buckets = [
-    "<% index .Params `productionHost` %>"
+    "assets.<% index .Params `productionHost` %>"
   ]
   domain_name = "<% index .Params `productionHost` %>"
 

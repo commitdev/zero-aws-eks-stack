@@ -1,6 +1,6 @@
 output "route53_zone_id" {
-  description = "Identifier of the created Route53 Zone"
-  value       = aws_route53_zone.public.zone_id
+  description = "Identifier of the Route53 Zone"
+  value       = data.aws_route53_zone.public.zone_id
 }
 
 output "certificate_arn" {

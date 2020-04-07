@@ -32,7 +32,7 @@ module "staging" {
 
   # Hosting configuration
   s3_hosting_buckets = [
-    "<% index .Params `stagingHost` %>",
+    "assets.<% index .Params `stagingHost` %>",
   ]
   domain_name = "<% index .Params `stagingHost` %>"
 

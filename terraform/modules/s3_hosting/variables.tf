@@ -2,13 +2,18 @@ variable "project" {
   description = "The name of the project, mostly for tagging"
 }
 
+variable "environment" {
+  description = "The environment (dev/staging/prod)"
+}
+
 variable "buckets" {
   description = "S3 hosting buckets"
   type = set(string)
 }
 
-variable "certificate_arn" {
-  description = "ARN of the certificate we created for the assets domain"
+variable "certificate_arns" {
+  description = "ARN of the certificate we created for the assets domain, keyed by domain"
+  type = map
 }
 
 variable "route53_zone_id" {
