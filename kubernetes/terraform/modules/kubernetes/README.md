@@ -4,6 +4,18 @@
 
 This Terraform module contains configuration to provision kubernetes resources.
 
+## Core Components
+
+@TODO
+
+[External DNS](https://github.com/kubernetes-sigs/external-dns)
+
+Cloudwatch Agent/Fluentd
+
+Cert Manager
+
+...
+
 ## Organization
 
 ```

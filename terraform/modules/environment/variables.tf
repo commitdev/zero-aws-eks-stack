@@ -20,6 +20,10 @@ variable "ecr_repositories" {
   type        = list(string)
 }
 
+variable "eks_cluster_version" {
+  description = "EKS cluster version number to use. Incrementing this will start a cluster upgrade"
+}
+
 variable "eks_worker_instance_type" {
   description = "Instance type for the EKS workers"
 }

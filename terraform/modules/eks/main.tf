@@ -1,18 +1,35 @@
+# Set up the terraform provider
+data "aws_eks_cluster" "cluster" {
+  name = module.eks.cluster_id
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.cluster_id
+}
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+  load_config_file       = false
+  version                = "~> 1.11"
+}
+
 # Create KubernetesAdmin role for aws-iam-authenticator
 resource "aws_iam_role" "kubernetes_admin_role" {
-  name               = "<% .Name %>-kubernetes-admin"
+  name               = "<% .Name %>-kubernetes-admin-${var.environment}"
   assume_role_policy = var.assume_role_policy
   description        = "Kubernetes administrator role (for AWS IAM Authenticator)"
 }
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "6.0.2"
+  version = "10.0.0"
 
   cluster_name    = var.cluster_name
-  cluster_version = "1.14"
+  cluster_version = var.cluster_version
   subnets         = var.private_subnets
   vpc_id          = var.vpc_id
+  enable_irsa     = true
 
   worker_groups = [
     {
@@ -31,7 +48,7 @@ module "eks" {
 
   map_roles = [
     {
-      rolearn  = "arn:aws:iam::${var.iam_account_id}:role/<% .Name %>-kubernetes-admin"
+      rolearn  = "arn:aws:iam::${var.iam_account_id}:role/<% .Name %>-kubernetes-admin-${var.environment}"
       username = "<% .Name %>-kubernetes-admin"
       groups   = ["system:masters"]
     },
@@ -39,11 +56,10 @@ module "eks" {
   cluster_iam_role_name = "k8s-${var.cluster_name}-cluster"
   workers_role_name = "k8s-${var.cluster_name}-workers"
 
-  # TODO, determine if this should be true/false
-  manage_aws_auth = true
+  # Unfortunately fluentd doesn't yet support oidc auth so we need to grant it to the worker nodes
+  workers_additional_policies = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
 
   write_kubeconfig      = false
-  write_aws_auth_config = false
 
   tags = {
     environment = var.environment
