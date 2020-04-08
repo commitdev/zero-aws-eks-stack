@@ -50,55 +50,52 @@ module "eks" {
   worker_ami           = var.eks_worker_ami # EKS-Optimized AMI for your region: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
 }
 
+data "aws_iam_user" "ci_user" {
+  user_name = "ci-user" # Should have been created in the bootstrap process
+}
 
-# @TODO - UNCOMMENT
+module "wildcard_domain" {
+  source = "../../modules/certificate"
 
-# data "aws_iam_user" "ci_user" {
-#   user_name = "ci-user" # Should have been created in the bootstrap process
-# }
+  region        = var.region
+  zone_name     = var.domain_name
+  domain_names  = ["*.${var.domain_name}"]
+}
 
-# module "wildcard_domain" {
-#   source = "../../modules/certificate"
+module "assets_domains" {
+  source = "../../modules/certificate"
 
-#   region        = var.region
-#   zone_name     = var.domain_name
-#   domain_names  = ["*.${var.domain_name}"]
-# }
+  region        = "us-east-1" # For CF, the cert must be in us-east-1
+  zone_name     = var.domain_name
+  domain_names  = var.s3_hosting_buckets
+}
 
-# module "assets_domains" {
-#   source = "../../modules/certificate"
+module "s3_hosting" {
+  source = "../../modules/s3_hosting"
 
-#   region        = "us-east-1" # For CF, the cert must be in us-east-1
-#   zone_name     = var.domain_name
-#   domain_names  = var.s3_hosting_buckets
-# }
+  buckets                 = var.s3_hosting_buckets
+  project                 = var.project
+  environment             = var.environment
+  certificate_arns        = module.assets_domains.certificate_arns
+  route53_zone_id         = module.assets_domains.route53_zone_id
+  certificate_validations = module.assets_domains.certificate_validations
+}
 
-# module "s3_hosting" {
-#   source = "../../modules/s3_hosting"
+module "db" {
+  source = "../../modules/database"
 
-#   buckets                 = var.s3_hosting_buckets
-#   project                 = var.project
-#   environment             = var.environment
-#   certificate_arns        = module.assets_domains.certificate_arns
-#   route53_zone_id         = module.assets_domains.route53_zone_id
-#   certificate_validations = module.assets_domains.certificate_validations
-# }
+  project                   = var.project
+  environment               = var.environment
+  vpc_id                    = module.vpc.vpc_id
+  allowed_security_group_id = module.eks.worker_security_group_id
+  instance_class            = var.db_instance_class
+  storage_gb                = var.db_storage_gb
+}
 
-# module "db" {
-#   source = "../../modules/database"
+module "ecr" {
+  source = "../../modules/ecr"
 
-#   project                   = var.project
-#   environment               = var.environment
-#   vpc_id                    = module.vpc.vpc_id
-#   allowed_security_group_id = module.eks.worker_security_group_id
-#   instance_class            = var.db_instance_class
-#   storage_gb                = var.db_storage_gb
-# }
-
-# module "ecr" {
-#   source = "../../modules/ecr"
-
-#   environment       = var.environment
-#   ecr_repositories  = var.ecr_repositories
-#   ecr_principals    = [data.aws_iam_user.ci_user.arn]
-# }
+  environment       = var.environment
+  ecr_repositories  = var.ecr_repositories
+  ecr_principals    = [data.aws_iam_user.ci_user.arn]
+}
