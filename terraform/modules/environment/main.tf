@@ -16,6 +16,7 @@ module "vpc" {
 # Data sources for EKS IAM
 data "aws_caller_identity" "current" {}
 
+# Use this role to limit access to the k8s admin serviceaccount
 data "aws_iam_policy_document" "assumerole_root_policy" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -35,6 +36,8 @@ module "eks" {
   project              = var.project
   environment          = var.environment
   cluster_name         = local.kubernetes_cluster_name
+  cluster_version      = var.eks_cluster_version
+
   iam_account_id       = data.aws_caller_identity.current.account_id
 
   assume_role_policy   = data.aws_iam_policy_document.assumerole_root_policy.json
@@ -47,61 +50,55 @@ module "eks" {
   worker_ami           = var.eks_worker_ami # EKS-Optimized AMI for your region: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
 }
 
-module "kube2iam" {
-  source = "../../modules/kube2iam"
 
-  environment              = var.environment
-  eks_worker_iam_role_arn  = module.eks.worker_iam_role_arn
-  eks_worker_iam_role_name = module.eks.worker_iam_role_name
-  iam_account_id           = data.aws_caller_identity.current.account_id
-}
+# @TODO - UNCOMMENT
 
-data "aws_iam_user" "ci_user" {
-  user_name = "ci-user" # Should have been created in the bootstrap process
-}
+# data "aws_iam_user" "ci_user" {
+#   user_name = "ci-user" # Should have been created in the bootstrap process
+# }
 
-module "wildcard_domain" {
-  source = "../../modules/certificate"
+# module "wildcard_domain" {
+#   source = "../../modules/certificate"
 
-  region        = var.region
-  zone_name     = var.domain_name
-  domain_names  = ["*.${var.domain_name}"]
-}
+#   region        = var.region
+#   zone_name     = var.domain_name
+#   domain_names  = ["*.${var.domain_name}"]
+# }
 
-module "assets_domains" {
-  source = "../../modules/certificate"
+# module "assets_domains" {
+#   source = "../../modules/certificate"
 
-  region        = "us-east-1" # For CF, the cert must be in us-east-1
-  zone_name     = var.domain_name
-  domain_names  = var.s3_hosting_buckets
-}
+#   region        = "us-east-1" # For CF, the cert must be in us-east-1
+#   zone_name     = var.domain_name
+#   domain_names  = var.s3_hosting_buckets
+# }
 
-module "s3_hosting" {
-  source = "../../modules/s3_hosting"
+# module "s3_hosting" {
+#   source = "../../modules/s3_hosting"
 
-  buckets                 = var.s3_hosting_buckets
-  project                 = var.project
-  environment             = var.environment
-  certificate_arns        = module.assets_domains.certificate_arns
-  route53_zone_id         = module.assets_domains.route53_zone_id
-  certificate_validations = module.assets_domains.certificate_validations
-}
+#   buckets                 = var.s3_hosting_buckets
+#   project                 = var.project
+#   environment             = var.environment
+#   certificate_arns        = module.assets_domains.certificate_arns
+#   route53_zone_id         = module.assets_domains.route53_zone_id
+#   certificate_validations = module.assets_domains.certificate_validations
+# }
 
-module "db" {
-  source = "../../modules/database"
+# module "db" {
+#   source = "../../modules/database"
 
-  project                   = var.project
-  environment               = var.environment
-  vpc_id                    = module.vpc.vpc_id
-  allowed_security_group_id = module.eks.worker_security_group_id
-  instance_class            = var.db_instance_class
-  storage_gb                = var.db_storage_gb
-}
+#   project                   = var.project
+#   environment               = var.environment
+#   vpc_id                    = module.vpc.vpc_id
+#   allowed_security_group_id = module.eks.worker_security_group_id
+#   instance_class            = var.db_instance_class
+#   storage_gb                = var.db_storage_gb
+# }
 
-module "ecr" {
-  source = "../../modules/ecr"
+# module "ecr" {
+#   source = "../../modules/ecr"
 
-  environment       = var.environment
-  ecr_repositories  = var.ecr_repositories
-  ecr_principals    = [data.aws_iam_user.ci_user.arn]
-}
+#   environment       = var.environment
+#   ecr_repositories  = var.ecr_repositories
+#   ecr_principals    = [data.aws_iam_user.ci_user.arn]
+# }

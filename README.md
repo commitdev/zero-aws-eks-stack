@@ -38,7 +38,6 @@ EC2 instance sizing can be configured in [terraform/environments/staging/main.tf
 ## AWS Setting the Kubernetes context
 ```
 aws eks update-kubeconfig --name <cluster-name> --region us-west-2
-aws eks update-kubeconfig --name <cluster-name> --region us-west-2 --role-arn <role-arn>
 ```
 
 ## Workin with Kubernetes
