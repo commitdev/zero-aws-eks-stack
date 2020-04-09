@@ -7,7 +7,7 @@ module "iam_assumable_role_cloudwatch" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
   version                       = "~> v2.6.0"
   create_role                   = true
-  role_name                     = "test-k8s-${var.environment}-cloudwatch"
+  role_name                     = "<% .Name %>-k8s-${var.environment}-cloudwatch"
   provider_url                  = replace(data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer, "https://", "")
   role_policy_arns              = [data.aws_iam_policy.CloudWatchAgentServerPolicy.arn]
   oidc_fully_qualified_subjects = [ "system:serviceaccount:amazon-cloudwatch:cloudwatch-agent" ]
