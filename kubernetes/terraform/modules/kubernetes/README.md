@@ -21,7 +21,45 @@ Alongside external-dns, this allows you to make sure your new domains are always
 A unified logging layer, Fluentd handles capturing all log output from your cluster and routing it to various sources like Cloudwatch, Elasticsearch, etc.
 
 
-...
+## AWS IAM / Kubernetes RBAC integration
+
+Sometimes you may have an application running in your cluster that needs to access the AWS API (S3 is a common example.) In this case you want to be able to have fine-grained control over this, to allow an application only the very specific access it needs.
+
+Previously there were tools like `kube2iam` or `kiam` that would enable this functionality, but now there is a new official method that AWS introduced that they call [IRSA (IAM Roles for Service Accounts)](https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/)
+
+This uses their OIDC IAM support to be able to mount tokens into pods automatically that can then be used to auth with the AWS API using a specific role.
+
+The `cert_manager.tf` config has a good example of using this in practice. To allow a pod to have a specific level of access you need to:
+
+- Create a role that allows being assumed by a web identity:
+```
+module "iam_assumable_role_my_role_name" {
+  source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+  version                       = "~> v2.6.0"
+  create_role                   = true
+  role_name                     = "my-role-name"
+  provider_url                  = replace(data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer, "https://", "")
+  role_policy_arns              = [aws_iam_policy.external_dns.arn]
+  oidc_fully_qualified_subjects = ["system:serviceaccount:kube-system:my-service-account-name"]
+}
+```
+- Create a service account for your kubernetes service to use, with an annotation specifying which IAM role is associated:
+```
+resource "kubernetes_service_account" "my_service_account" {
+  metadata {
+    name        = "my-service-account-name"
+    namespace   = "kube-system"
+    annotations = {
+      "eks.amazonaws.com/role-arn" = module.iam_assumable_role.my_role_name.this_iam_role_arn
+    }
+  }
+}
+```
+- Use this service account in your deployment spec.
+
+Any pods that come up in that deployment will automatically have env vars injected called `AWS_ROLE_ARN` and `AWS_WEB_IDENTITY_TOKEN_FILE` that will let them use the AWS API.
+
+
 
 ## Organization
 

@@ -102,9 +102,6 @@ resource "kubernetes_deployment" "external_dns" {
         labels = {
           "app"    = "external-dns",
         }
-        annotations = {
-          "eks.amazonaws.com/role-arn" = module.iam_assumable_role_external_dns.this_iam_role_arn
-        }
       }
       spec {
         container {
