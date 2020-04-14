@@ -33,6 +33,7 @@ resource "helm_release" "cert_manager" {
   name       = "cert-manager"
   repository = data.helm_repository.jetstack.metadata[0].name
   chart      = "cert-manager"
+  version    = local.cert_manager_version
   namespace  = local.cert_manager_namespace
   set_string {
     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
