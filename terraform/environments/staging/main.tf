@@ -19,7 +19,7 @@ module "staging" {
   region              = "<% index .Params `region` %>"
   allowed_account_ids = ["<% index .Params `accountId` %>"]
   # ECR configuration
-  ecr_repositories = [ "gql-server" ]
+  ecr_repositories = [ "<% .Name %>-staging" ]
 
   # EKS configuration
   eks_cluster_version      = "1.15"
