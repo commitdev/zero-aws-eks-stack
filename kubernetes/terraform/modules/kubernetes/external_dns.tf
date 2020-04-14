@@ -1,28 +1,18 @@
-# Trust relationship
-data "aws_iam_policy_document" "external_dns_trust_relationship" {
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-    }
-  }
-
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "AWS"
-      identifiers = var.external_dns_assume_roles
-    }
-  }
+# Create a role using oidc to map service accounts
+module "iam_assumable_role" {
+  source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+  version                       = "~> v2.6.0"
+  create_role                   = true
+  role_name                     = "<% .Name %>-k8s-${var.environment}-external-dns"
+  provider_url                  = replace(data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer, "https://", "")
+  role_policy_arns              = [aws_iam_policy.external_dns.arn]
+  oidc_fully_qualified_subjects = ["system:serviceaccount:kube-system:external-dns"]
 }
 
-# external-dns role
-resource "aws_iam_role" "external_dns_role" {
-  name = "k8s-external-dns-role"
-  assume_role_policy = data.aws_iam_policy_document.external_dns_trust_relationship.json
+resource "aws_iam_policy" "external_dns" {
+  name_prefix = "external-dns"
+  description = "EKS external-dns policy for cluster ${var.cluster_name}"
+  policy      = data.aws_iam_policy_document.external_dns_policy_doc.json
 }
 
 data "aws_iam_policy_document" "external_dns_policy_doc" {
@@ -48,16 +38,13 @@ data "aws_iam_policy_document" "external_dns_policy_doc" {
   }
 }
 
-resource "aws_iam_role_policy" "external_dns_policy" {
-  name = "k8s-external-dns-policy"
-  role = aws_iam_role.external_dns_role.id
-  policy = data.aws_iam_policy_document.external_dns_policy_doc.json
-}
-
 resource "kubernetes_service_account" "external_dns" {
   metadata {
-    name      = "external-dns"
-    namespace = "kube-system"
+    name        = "external-dns"
+    namespace   = "kube-system"
+    annotations = {
+      "eks.amazonaws.com/role-arn" = module.iam_assumable_role.this_iam_role_arn
+    }
   }
 }
 
@@ -116,7 +103,7 @@ resource "kubernetes_deployment" "external_dns" {
           "app"    = "external-dns",
         }
         annotations = {
-          "iam.amazonaws.com/role" = "k8s-external-dns-role",
+          "eks.amazonaws.com/role-arn" = module.iam_assumable_role.this_iam_role_arn
         }
       }
       spec {
@@ -124,15 +111,19 @@ resource "kubernetes_deployment" "external_dns" {
           name  = "external-dns"
           image = "registry.opensource.zalan.do/teapot/external-dns:latest"
           args = [
-            "--source=service",
             "--source=ingress",
             "--domain-filter=${var.external_dns_zone}", # Give access only to the specified zone
             "--provider=aws",
             "--aws-zone-type=public",
             "--policy=upsert-only", # Prevent ExternalDNS from deleting any records
             "--registry=txt",
-            "--txt-owner-id=${var.external_dns_owner_id}", # ID of txt record to manage state
+            "--txt-owner-id=${var.cluster_name}", # ID of txt record to manage state
+            "--aws-batch-change-size=2", # Set the batch size to 2 so that a single record failure won't block other updates
           ]
+        }
+
+        security_context {
+          fs_group =  65534
         }
 
         service_account_name = "external-dns"

@@ -1,7 +1,10 @@
 resource "kubernetes_service_account" "cloudwatch_agent" {
   metadata {
-    name      = "cloudwatch-agent"
-    namespace = "amazon-cloudwatch"
+    name        = "cloudwatch-agent"
+    namespace   = "amazon-cloudwatch"
+    annotations = {
+      "eks.amazonaws.com/role-arn" = module.iam_assumable_role_cloudwatch.this_iam_role_arn
+    }
   }
   depends_on = [kubernetes_namespace.amazon_cloudwatch]
 }
@@ -93,7 +96,7 @@ resource "kubernetes_daemonset" "cloudwatch_agent" {
       metadata {
         labels = { name = "cloudwatch-agent" }
         annotations = {
-          "iam.amazonaws.com/role" = "k8s-${var.environment}-monitoring"
+          "eks.amazonaws.com/role-arn" = module.iam_assumable_role_cloudwatch.this_iam_role_arn
         }
       }
       spec {
@@ -209,6 +212,11 @@ resource "kubernetes_daemonset" "cloudwatch_agent" {
             mount_path = "/dev/disk"
           }
         }
+
+        security_context {
+          fs_group =  65534
+        }
+
         termination_grace_period_seconds = 60
         service_account_name             = "cloudwatch-agent"
         automount_service_account_token  = true

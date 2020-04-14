@@ -16,6 +16,7 @@ module "vpc" {
 # Data sources for EKS IAM
 data "aws_caller_identity" "current" {}
 
+# Use this role to limit access to the k8s admin serviceaccount
 data "aws_iam_policy_document" "assumerole_root_policy" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -35,6 +36,8 @@ module "eks" {
   project              = var.project
   environment          = var.environment
   cluster_name         = local.kubernetes_cluster_name
+  cluster_version      = var.eks_cluster_version
+
   iam_account_id       = data.aws_caller_identity.current.account_id
 
   assume_role_policy   = data.aws_iam_policy_document.assumerole_root_policy.json
@@ -45,15 +48,6 @@ module "eks" {
   worker_asg_min_size  = var.eks_worker_asg_min_size
   worker_asg_max_size  = var.eks_worker_asg_max_size
   worker_ami           = var.eks_worker_ami # EKS-Optimized AMI for your region: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
-}
-
-module "kube2iam" {
-  source = "../../modules/kube2iam"
-
-  environment              = var.environment
-  eks_worker_iam_role_arn  = module.eks.worker_iam_role_arn
-  eks_worker_iam_role_name = module.eks.worker_iam_role_name
-  iam_account_id           = data.aws_caller_identity.current.account_id
 }
 
 data "aws_iam_user" "ci_user" {
