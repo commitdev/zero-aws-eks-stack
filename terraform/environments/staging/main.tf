@@ -22,13 +22,14 @@ module "staging" {
   ecr_repositories = [ "gql-server" ]
 
   # EKS configuration
-  eks_worker_instance_type = "t2.small"
-  eks_worker_asg_min_size  = 2
-  eks_worker_asg_max_size  = 6
+  eks_cluster_version      = "1.15"
+  eks_worker_instance_type = "t3.medium"
+  eks_worker_asg_min_size  = 1
+  eks_worker_asg_max_size  = 3
 
   # EKS-Optimized AMI for your region: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
-  # https://us-east-1.console.aws.amazon.com/systems-manager/parameters/%252Faws%252Fservice%252Feks%252Foptimized-ami%252F1.14%252Famazon-linux-2%252Frecommended%252Fimage_id/description?region=us-east-1
-  eks_worker_ami = "ami-07be7092831897fd6"
+  # https://us-east-1.console.aws.amazon.com/systems-manager/parameters/%252Faws%252Fservice%252Feks%252Foptimized-ami%252F1.15%252Famazon-linux-2%252Frecommended%252Fimage_id/description?region=us-east-1
+  eks_worker_ami = "ami-0e710550577202c55"
 
   # Hosting configuration
   s3_hosting_buckets = [

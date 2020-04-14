@@ -10,8 +10,12 @@ variable "cluster_name" {
   description = "Name to be given to the EKS cluster"
 }
 
+variable "cluster_version" {
+  description = "EKS cluster version number to use. Incrementing this will start a cluster upgrade"
+}
+
 variable "assume_role_policy" {
-  description = "IAM policy document for AssumeRole"
+  description = "IAM policy document for AssumeRole. Controls access to the kubernetes admin serviceaccount"
 }
 
 variable "private_subnets" {

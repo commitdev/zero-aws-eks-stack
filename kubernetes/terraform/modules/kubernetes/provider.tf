@@ -1,4 +1,4 @@
-# https://github.com/terraform-providers/terraform-provider-kubernetes/issues/161#issuecomment-461190931
+data "aws_caller_identity" "current" {}
 
 data "aws_eks_cluster" "cluster" {
   name = var.cluster_name

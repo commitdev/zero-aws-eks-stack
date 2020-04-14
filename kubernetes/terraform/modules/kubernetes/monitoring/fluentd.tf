@@ -28,8 +28,11 @@ resource "kubernetes_config_map" "cluster_info" {
 
 resource "kubernetes_service_account" "fluentd" {
   metadata {
-    name      = "fluentd"
-    namespace = "amazon-cloudwatch"
+    name        = "fluentd"
+    namespace   = "amazon-cloudwatch"
+    annotations = {
+      "eks.amazonaws.com/role-arn" = module.iam_assumable_role_fluentd.this_iam_role_arn
+    }
   }
   depends_on = [kubernetes_namespace.amazon_cloudwatch]
 }
@@ -101,8 +104,7 @@ resource "kubernetes_daemonset" "fluentd_cloudwatch" {
           k8s-app = "fluentd-cloudwatch"
         }
         annotations = {
-          configHash               = "8915de4cf9c3551a8dc74c0137a3e83569d28c71044b0359c2578d2e0461825",
-          "iam.amazonaws.com/role" = "k8s-${var.environment}-monitoring"
+          "eks.amazonaws.com/role-arn" = module.iam_assumable_role_fluentd.this_iam_role_arn
         }
       }
       spec {
@@ -215,6 +217,11 @@ resource "kubernetes_daemonset" "fluentd_cloudwatch" {
             mount_path = "/var/log/dmesg"
           }
         }
+
+        security_context {
+          fs_group =  65534
+        }
+
         termination_grace_period_seconds = 30
         service_account_name             = "fluentd"
         automount_service_account_token  = true
