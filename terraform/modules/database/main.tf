@@ -35,12 +35,12 @@ data "aws_secretsmanager_secret_version" "rds_master_secret" {
 
 module "rds" {
   source  = "terraform-aws-modules/rds/aws"
-  version = "2.4.0"
+  version = "2.14.0"
 
   identifier = "${var.project}-${var.environment}"
 
   engine            = "postgres"
-  engine_version    = "11.5"
+  engine_version    = "11"
   instance_class    = var.instance_class
   allocated_storage = var.storage_gb
   storage_encrypted = true
@@ -71,8 +71,9 @@ module "rds" {
 
   # Enhanced monitoring
   performance_insights_enabled = true
+  create_monitoring_role = true
+  monitoring_role_name = "${var.project}-${var.environment}-rds-monitoring-role"
   monitoring_interval = "30"
-  monitoring_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/rds-monitoring-role"
 
   tags = {
     Name = "${var.project}-${var.environment}-rds-postgres"
