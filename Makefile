@@ -22,4 +22,22 @@ apply-k8s-utils:
 	terraform init; \
 	terraform apply
 
-.PHONY: apply apply-remote-state apply-secrets apply-env apply-k8s-utils
+teardown: teardown-k8s-utils teardown-env teardown-secrets teardown-remote-state
+
+teardown-remote-state: 
+	pushd terraform/bootstrap/remote-state; \
+	terraform destroy;
+
+teardown-secrets: 
+	pushd terraform/bootstrap/secrets; \
+	terraform destroy -auto-approve;
+
+teardown-env: 
+	pushd terraform/environments/$(ENV); \
+	terraform destroy -auto-approve;
+
+teardown-k8s-utils:
+	pushd kubernetes/terraform/environments/$(ENV); \
+	terraform destroy;
+
+.PHONY: apply apply-remote-state apply-secrets apply-env apply-k8s-utils teardown-k8s-utils teardown-env teardown-secrets teardown-remote-state
