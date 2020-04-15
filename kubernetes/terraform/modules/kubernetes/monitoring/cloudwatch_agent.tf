@@ -95,9 +95,6 @@ resource "kubernetes_daemonset" "cloudwatch_agent" {
     template {
       metadata {
         labels = { name = "cloudwatch-agent" }
-        annotations = {
-          "eks.amazonaws.com/role-arn" = module.iam_assumable_role_cloudwatch.this_iam_role_arn
-        }
       }
       spec {
         volume {

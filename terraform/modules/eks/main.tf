@@ -38,11 +38,24 @@ module "eks" {
       asg_desired_capacity  = var.worker_asg_min_size
       asg_max_size          = var.worker_asg_max_size
       ami_id                = var.worker_ami
-      tags = [{
-        key                 = "environment"
-        value               = var.environment
-        propagate_at_launch = true
-      }]
+      tags = [
+        {
+          key                 = "environment"
+          value               = var.environment
+          propagate_at_launch = true
+        },
+        {
+          key                 = "k8s.io/cluster-autoscaler/enabled"
+          propagate_at_launch = "false"
+          value               = "true"
+        },
+        {
+          key                 = "k8s.io/cluster-autoscaler/${var.cluster_name}"
+          propagate_at_launch = "false"
+          value               = "owned"
+        }
+      ]
+
     },
   ]
 
