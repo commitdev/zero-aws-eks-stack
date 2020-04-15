@@ -103,9 +103,6 @@ resource "kubernetes_daemonset" "fluentd_cloudwatch" {
         labels = {
           k8s-app = "fluentd-cloudwatch"
         }
-        annotations = {
-          "eks.amazonaws.com/role-arn" = module.iam_assumable_role_fluentd.this_iam_role_arn
-        }
       }
       spec {
         volume {

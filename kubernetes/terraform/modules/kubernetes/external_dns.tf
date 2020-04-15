@@ -1,5 +1,5 @@
 # Create a role using oidc to map service accounts
-module "iam_assumable_role" {
+module "iam_assumable_role_external_dns" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
   version                       = "~> v2.6.0"
   create_role                   = true
@@ -43,7 +43,7 @@ resource "kubernetes_service_account" "external_dns" {
     name        = "external-dns"
     namespace   = "kube-system"
     annotations = {
-      "eks.amazonaws.com/role-arn" = module.iam_assumable_role.this_iam_role_arn
+      "eks.amazonaws.com/role-arn" = module.iam_assumable_role_external_dns.this_iam_role_arn
     }
   }
 }
@@ -101,9 +101,6 @@ resource "kubernetes_deployment" "external_dns" {
       metadata {
         labels = {
           "app"    = "external-dns",
-        }
-        annotations = {
-          "eks.amazonaws.com/role-arn" = module.iam_assumable_role.this_iam_role_arn
         }
       }
       spec {
