@@ -21,7 +21,7 @@ template variables which need to be encoded into the terraform configuration.
 Once that is done you'll have a directory containing the contents of this
 repository minus the `.git` directory.
 
-### Edits Required
+### ⚠️ Edits Required
 
 This repository requires post-template configuration edits to the AMI depending
 on the region you chose. To find the appropriate AMI for your region you can use
