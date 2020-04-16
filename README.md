@@ -11,6 +11,7 @@ diagram](./docs/architecture-overview.svg).
  - A valid AWS account
  - [Set up the AWS CLI](https://docs.aws.amazon.com/polly/latest/dg/setup-aws-cli.html)
  - [A domain registered with Route53](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html)
+   - Note: if you want to use different domain per environment (staging/poduction), you need to have multiple hosted zones. The available zones in Route53 can be found by running this command. `aws route53 list-hosted-zones`
 
 ## Getting Started
 
