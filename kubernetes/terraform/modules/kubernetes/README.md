@@ -20,6 +20,13 @@ Alongside external-dns, this allows you to make sure your new domains are always
 [Cloudwatch Agent/Fluentd](https://github.com/fluent/fluentd)
 A unified logging layer, Fluentd handles capturing all log output from your cluster and routing it to various sources like Cloudwatch, Elasticsearch, etc.
 
+[Metrics Server](https://github.com/kubernetes-sigs/metrics-server)
+A collector of cluster-wide resource metrics.
+Used by things like HorizontalPodAutoscaler to determine the current usage of pods. Also allows the `kubectl top` command
+
+[Kubernetes Dashboard](https://github.com/kubernetes/dashboard)
+A web-based GUI for viewing and modifying resources in a Kubernetes cluster. Usage instructions below.
+
 
 ## AWS IAM / Kubernetes RBAC integration
 
@@ -69,3 +76,17 @@ Any pods that come up in that deployment will automatically have env vars inject
     ingress/ - Provision nginx-ingress-controller.
     monitoring/ - Provision cluster monitoring (cloudwatch agent and fluentd).
 ```
+
+
+## Dashboard
+
+Kubernetes dashboard will be installed and can be reached by running the following:
+(MacOS specific - requires `kubectl`, `jq`)
+
+```
+kubectl get secret -o json -n kubernetes-dashboard $(kubectl get secret -n kubernetes-dashboard | grep dashboard-user-token | awk '{print $1}') | jq -r .data.token | base64 -D | pbcopy && \
+open "http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/login" && kubectl proxy
+```
+
+This will get the token from k8s secrets, copy it to your clipboard, open a browser to the dashboard, and forward the appropriate port.
+
