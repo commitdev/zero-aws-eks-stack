@@ -71,7 +71,7 @@ module "rds" {
 
   # DB parameter and option group
   family = "postgres11"
-  major_engine_version = "11.5"
+  major_engine_version = "11"
 
   final_snapshot_identifier = "final-snapshot"
   deletion_protection = true
