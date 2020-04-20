@@ -213,7 +213,7 @@ resource "kubernetes_deployment" "kubernetes_dashboard" {
             initial_delay_seconds = 30
             timeout_seconds       = 30
           }
-          image_pull_policy = "Always"
+          image_pull_policy = "IfNotPresent"
           security_context {
             run_as_user               = 1001
             run_as_group              = 2001
