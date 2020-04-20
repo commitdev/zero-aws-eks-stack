@@ -1,8 +1,8 @@
 locals {
-  cert_manager_namespace  = "kube-system"
-  cert_manager_version    = "0.14.2"
+  cert_manager_namespace   = "kube-system"
+  cert_manager_version     = "0.14.2"
   cluster_issuer_name      = "clusterissuer-letsencrypt-${var.cert_manager_acme_environment}"
-  cert_manager_acme_server = var.cert_manager_acme_environment == "production" ? "https://acme-v02.api.letsencrypt.org/directory" : "https://acme-${var.cert_manager_acme_environment}-v02.api.letsencrypt.org/directory"
+  cert_manager_acme_server = var.cert_manager_use_production_acme_environment ? "https://acme-v02.api.letsencrypt.org/directory" : "https://acme-staging-v02.api.letsencrypt.org/directory"
 }
 
 # Reference an existing route53 zone
