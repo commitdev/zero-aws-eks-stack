@@ -223,7 +223,7 @@ resource "kubernetes_deployment" "nginx_ingress_controller" {
       spec {
         container {
           name  = "nginx-ingress-controller"
-          image = "quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.26.1"
+          image = "quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.30.0"
           args = [
             "/nginx-ingress-controller",
             "--configmap=$(POD_NAMESPACE)/nginx-configuration",
@@ -287,7 +287,7 @@ resource "kubernetes_deployment" "nginx_ingress_controller" {
             }
           }
           security_context {
-            run_as_user                = 33
+            run_as_user                = 101
             allow_privilege_escalation = true
             capabilities {
               add  = ["NET_BIND_SERVICE"]
