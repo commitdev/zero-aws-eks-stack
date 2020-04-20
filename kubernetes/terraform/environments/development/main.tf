@@ -20,4 +20,7 @@ module "kubernetes" {
 
   external_dns_zone = "<% index .Params `stagingHost` %>"
   external_dns_owner_id = "<% GenerateUUID %>" # randomly generated ID
+
+  # Registration email for LetsEncrypt
+  cert_manager_acme_registration_email = "devops@<% index .Params `stagingHost` %>"
 }

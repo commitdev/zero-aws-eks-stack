@@ -1,6 +1,8 @@
 locals {
   cert_manager_namespace  = "kube-system"
   cert_manager_version    = "0.14.2"
+  cluster_issuer_name      = "clusterissuer-letsencrypt-${var.cert_manager_acme_environment}"
+  cert_manager_acme_server = var.cert_manager_acme_environment == "production" ? "https://acme-v02.api.letsencrypt.org/directory" : "https://acme-${var.cert_manager_acme_environment}-v02.api.letsencrypt.org/directory"
 }
 
 # Reference an existing route53 zone
@@ -22,6 +24,32 @@ resource "null_resource" "cert_manager" {
   provisioner "local-exec" {
     command = "kubectl apply --validate=false -f ${path.module}/files/cert-manager.crds.yaml"
   }
+}
+
+
+# Cert-manager issuer manifest
+data "template_file" "cert_manager_issuer" {
+  template = "${file("${path.module}/files/cert_manager_issuer.yaml.tpl")}"
+  vars = {
+    name                    = local.cluster_issuer_name
+    environment             = var.environment
+    acme_registration_email = var.cert_manager_acme_registration_email
+    acme_server             = local.cert_manager_acme_server
+    region                  = var.region
+    hosted_zone_id          = data.aws_route53_zone.public.zone_id
+  }
+}
+
+# Manually kubectl apply the cert-manager issuer, as the kubernetes terraform provider
+# does not have support for custom resources.
+resource "null_resource" "cert_manager_issuer" {
+  triggers = {
+    manifest_sha1 = "${sha1("${data.template_file.cert_manager_issuer.rendered}")}"
+  }
+  provisioner "local-exec" {
+    command = "kubectl apply -f - <<EOF\n${data.template_file.cert_manager_issuer.rendered}\nEOF"
+  }
+  depends_on = [null_resource.cert_manager]
 }
 
 data "helm_repository" "jetstack" {
