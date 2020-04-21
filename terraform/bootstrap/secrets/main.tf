@@ -6,9 +6,13 @@ terraform {
   required_version = ">= 0.12"	
 }	
 
+locals {
+  project = "<% .Name %>"
+}
+
 # Create the CI User	
 resource "aws_iam_user" "ci_user" {	
-  name = "${var.project}-ci-user"	
+  name = "${local.project}-ci-user"	
 }	
 
 # Create a keypair to be used by CI systems	
