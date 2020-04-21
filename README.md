@@ -29,7 +29,7 @@ on the region you chose. To find the appropriate AMI for your region you can use
 the following snippet:
 
 ```shell
-$ REGION=us-east-2
+$ REGION=us-east-1
 $ aws ssm get-parameters \
   --names /aws/service/eks/optimized-ami/1.15/amazon-linux-2/recommended/image_id \
   --region $REGION \
