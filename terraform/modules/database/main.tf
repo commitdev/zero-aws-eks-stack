@@ -28,9 +28,16 @@ module "rds_security_group" {
 data "aws_caller_identity" "current" {
 }
 
-# This is created by bootstrap/secrets
+# creating RDS password in secret-manager
+module "db_password" {
+  source    = "../secret"
+  name_prefix      = "${var.project}-${var.environment}-rds-master-password"
+  type      = "random"
+}
+
+# RDS does not support secret-manager, have to provide the actual string
 data "aws_secretsmanager_secret_version" "rds_master_secret" {
-  secret_id = "${var.project}-${var.environment}-rds-master-password"
+  secret_id = module.db_password.secret_name
 }
 
 module "rds" {
@@ -64,7 +71,7 @@ module "rds" {
 
   # DB parameter and option group
   family = "postgres11"
-  major_engine_version = "11.5"
+  major_engine_version = "11"
 
   final_snapshot_identifier = "final-snapshot"
   deletion_protection = true
