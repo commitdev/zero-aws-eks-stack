@@ -51,7 +51,7 @@ module "eks" {
 }
 
 data "aws_iam_user" "ci_user" {
-  user_name = "ci-user" # Should have been created in the bootstrap process
+  user_name = "${var.project}-ci-user"  # Should have been created in the bootstrap process
 }
 
 module "wildcard_domain" {
@@ -97,5 +97,5 @@ module "ecr" {
 
   environment       = var.environment
   ecr_repositories  = var.ecr_repositories
-  ecr_principals    = [data.aws_iam_user.ci_user.arn]
+  ecr_principals    = [aws_iam_user.ci_user.arn]
 }

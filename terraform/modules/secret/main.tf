@@ -1,6 +1,6 @@
 # Add the keys to AWS secrets manager
 resource "aws_secretsmanager_secret" "secret" {
-  name = var.name
+  name_prefix = var.name_prefix
 }
 
 resource "aws_secretsmanager_secret_version" "string_secret" {

@@ -1,5 +1,6 @@
-variable "name" {
-  description = "The name of the secret in Secrets Manager"
+variable "name_prefix" {
+  default = "secret-key"
+  description = "The name prefix of the secret in Secrets Manager"
 }
 
 variable type {
