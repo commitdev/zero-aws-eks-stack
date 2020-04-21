@@ -97,5 +97,5 @@ module "ecr" {
 
   environment       = var.environment
   ecr_repositories  = var.ecr_repositories
-  ecr_principals    = [aws_iam_user.ci_user.arn]
+  ecr_principals    = [data.aws_iam_user.ci_user.arn]
 }
