@@ -11,7 +11,7 @@ resource "helm_release" "metrics_server" {
 
   set {
     name  = "args"
-    value = "--kubelet-preferred-address-types=InternalIP"
+    value = "{--kubelet-preferred-address-types=InternalIP}"
   }
   set {
     name  = "image.tag"
