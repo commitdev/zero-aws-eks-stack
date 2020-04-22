@@ -30,9 +30,10 @@ data "aws_caller_identity" "current" {
 
 # creating RDS password in secret-manager
 module "db_password" {
-  source    = "../secret"
-  name_prefix      = "${var.project}-${var.environment}-rds-master-password"
-  type      = "random"
+  source      = "../secret"
+  type        = "random"
+  ## note: secret name_prefix has a limitation of 32 characters 
+  name_prefix = "${var.project}-${var.environment}-rds"
 }
 
 # RDS does not support secret-manager, have to provide the actual string
