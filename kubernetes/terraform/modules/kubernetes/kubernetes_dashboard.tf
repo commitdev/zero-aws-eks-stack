@@ -3,6 +3,7 @@ resource "kubernetes_service_account" "kubernetes_dashboard_user" {
     name      = "dashboard-user"
     namespace = "kubernetes-dashboard"
   }
+  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_cluster_role_binding" "kubernetes_dashboard_user" {
@@ -33,6 +34,7 @@ resource "kubernetes_service_account" "kubernetes_dashboard" {
     namespace = "kubernetes-dashboard"
     labels    = { k8s-app = "kubernetes-dashboard" }
   }
+  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_service" "kubernetes_dashboard" {
