@@ -8,6 +8,7 @@ diagram](./docs/architecture-overview.svg).
 **Prerequisites**
  - Terraform installed
  - Kubectl installed
+ - Wget installed
  - A valid AWS account
  - [Set up the AWS CLI](https://docs.aws.amazon.com/polly/latest/dg/setup-aws-cli.html)
  - [A domain registered with Route53](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html)
