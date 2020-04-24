@@ -26,7 +26,7 @@ teardown: teardown-k8s-utils teardown-env teardown-secrets teardown-remote-state
 
 teardown-remote-state:
 	pushd terraform/bootstrap/remote-state; \
-	terraform destroy;
+	terraform destroy -auto-approve -var "environment=$(ENV)";
 
 teardown-secrets:
 	pushd terraform/bootstrap/secrets; \
