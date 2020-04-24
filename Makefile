@@ -2,17 +2,17 @@ ENV ?= staging
 
 apply: apply-remote-state apply-secrets apply-env apply-k8s-utils
 
-apply-remote-state: 
+apply-remote-state:
 	pushd terraform/bootstrap/remote-state; \
 	terraform init; \
-	terraform apply
+	terraform apply -var "environment=$(ENV)"
 
-apply-secrets: 
+apply-secrets:
 	pushd terraform/bootstrap/secrets; \
 	terraform init; \
 	terraform apply
 
-apply-env: 
+apply-env:
 	pushd terraform/environments/$(ENV); \
 	terraform init; \
 	terraform apply
@@ -24,15 +24,15 @@ apply-k8s-utils:
 
 teardown: teardown-k8s-utils teardown-env teardown-secrets teardown-remote-state
 
-teardown-remote-state: 
+teardown-remote-state:
 	pushd terraform/bootstrap/remote-state; \
 	terraform destroy;
 
-teardown-secrets: 
+teardown-secrets:
 	pushd terraform/bootstrap/secrets; \
 	terraform destroy -auto-approve;
 
-teardown-env: 
+teardown-env:
 	pushd terraform/environments/$(ENV); \
 	terraform destroy -auto-approve;
 
