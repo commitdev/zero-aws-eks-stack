@@ -233,6 +233,7 @@ resource "kubernetes_deployment" "kubernetes_dashboard" {
     }
     revision_history_limit = 10
   }
+  depends_on = [kubernetes_role_binding.kubernetes_dashboard]
 }
 
 resource "kubernetes_service" "dashboard_metrics_scraper" {

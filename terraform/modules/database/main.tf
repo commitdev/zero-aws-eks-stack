@@ -36,9 +36,16 @@ module "db_password" {
   name_prefix = "${var.project}-${var.environment}-rds"
 }
 
+# secret declared so secret version waits for rds-secret to be ready
+# or else we often see a AWSDEFAULT VERSION secret not found error
+data "aws_secretsmanager_secret" "rds_master_secret" {
+  name = module.db_password.secret_name
+}
+
 # RDS does not support secret-manager, have to provide the actual string
 data "aws_secretsmanager_secret_version" "rds_master_secret" {
-  secret_id = module.db_password.secret_name
+  secret_id = data.aws_secretsmanager_secret.rds_master_secret.name
+  depends_on = [data.aws_secretsmanager_secret.rds_master_secret]
 }
 
 module "rds" {
