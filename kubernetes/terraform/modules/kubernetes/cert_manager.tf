@@ -1,8 +1,14 @@
 locals {
-  cert_manager_namespace   = "kube-system"
+  cert_manager_namespace   = "cert-manager"
   cert_manager_version     = "0.14.2"
   cluster_issuer_name      = var.cert_manager_use_production_acme_environment ? "clusterissuer-letsencrypt-production" : "clusterissuer-letsencrypt-staging"
   cert_manager_acme_server = var.cert_manager_use_production_acme_environment ? "https://acme-v02.api.letsencrypt.org/directory" : "https://acme-staging-v02.api.letsencrypt.org/directory"
+}
+
+resource "kubernetes_namespace" "cert_manager" {
+  metadata {
+    name = "cert-manager"
+  }
 }
 
 # Reference an existing route53 zone
@@ -21,9 +27,11 @@ resource "null_resource" "cert_manager" {
   triggers = {
     manifest_sha1 = "${sha1("${data.local_file.cert_manager.content}")}"
   }
+  # local exec call requires kubeconfig to be updated
   provisioner "local-exec" {
     command = "kubectl apply --validate=false -f ${path.module}/files/cert-manager.crds.yaml"
   }
+  depends_on = [kubernetes_namespace.cert_manager]
 }
 
 
@@ -46,6 +54,7 @@ resource "null_resource" "cert_manager_issuer" {
   triggers = {
     manifest_sha1 = "${sha1("${data.template_file.cert_manager_issuer.rendered}")}"
   }
+  # local exec call requires kubeconfig to be updated
   provisioner "local-exec" {
     command = "kubectl apply -f - <<EOF\n${data.template_file.cert_manager_issuer.rendered}\nEOF"
   }
