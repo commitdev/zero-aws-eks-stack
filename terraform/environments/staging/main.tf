@@ -29,7 +29,7 @@ module "staging" {
 
   # EKS-Optimized AMI for your region: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
   # https://us-east-1.console.aws.amazon.com/systems-manager/parameters/%252Faws%252Fservice%252Feks%252Foptimized-ami%252F1.15%252Famazon-linux-2%252Frecommended%252Fimage_id/description?region=us-east-1
-  eks_worker_ami = "ami-0e710550577202c55"
+  eks_worker_ami = "<% index .Params `kubeWorkerAMI` %>"
 
   # Hosting configuration
   s3_hosting_buckets = [
