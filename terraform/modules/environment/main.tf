@@ -4,6 +4,10 @@ locals {
   kubernetes_cluster_name = "${var.project}-${var.environment}-${var.region}"
 }
 
+data "aws_iam_user" "ci_user" {
+  user_name = "${var.project}-ci-user"  # Should have been created in the bootstrap process
+}
+
 module "vpc" {
   source = "../../modules/vpc"
 
@@ -26,6 +30,21 @@ data "aws_iam_policy_document" "assumerole_root_policy" {
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
   }
+
+  # Allow the CI user to assume this role
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [data.aws_iam_user.ci_user.arn]
+    }
+  }
+}
+
+resource "aws_iam_user_policy_attachment" "circleci_ecr_access" {
+  user       = data.aws_iam_user.ci_user.user_name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
 }
 
 #
@@ -50,9 +69,6 @@ module "eks" {
   worker_ami           = var.eks_worker_ami # EKS-Optimized AMI for your region: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
 }
 
-data "aws_iam_user" "ci_user" {
-  user_name = "${var.project}-ci-user"  # Should have been created in the bootstrap process
-}
 
 module "wildcard_domain" {
   source = "../../modules/certificate"
