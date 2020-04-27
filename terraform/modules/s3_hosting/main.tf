@@ -126,6 +126,10 @@ resource "aws_cloudfront_distribution" "client_assets_distribution" {
       ssl_support_method       = "sni-only"
     }
 
+  # Reference the cert validations only so it becomes a dependency
+  tags = {
+    "certs-validated" = join(",", var.certificate_validations)
+  }
 }
 
 # Subdomain to point at CF

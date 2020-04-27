@@ -54,12 +54,40 @@ data "aws_iam_policy_document" "eks_list_and_describe" {
 }
 
 resource "aws_iam_policy" "eks_list_and_describe_policy" {
-  name   = "eks_list_and_describe"
+  name   = "${var.project}_eks_list_and_describe"
   policy = data.aws_iam_policy_document.eks_list_and_describe.json
 }
 
-resource "aws_iam_user_policy_attachment" "ci_user_list_and_describe_access" {
+resource "aws_iam_user_policy_attachment" "ci_user_list_and_describe_policy" {
   user       = data.aws_iam_user.ci_user.user_name
   policy_arn = aws_iam_policy.eks_list_and_describe_policy.arn
 }
 
+# Allow the CI user read/write access to the frontend assets bucket
+data "aws_iam_policy_document" "read_write_s3_policy" {
+  statement {
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = formatlist("arn:aws:s3:::%s", var.s3_hosting_buckets)
+  }
+
+  statement {
+    actions = [
+      "s3:*Object",
+    ]
+
+    resources = formatlist("arn:aws:s3:::%s/*", var.s3_hosting_buckets)
+  }
+}
+
+resource "aws_iam_policy" "read_write_s3_policy" {
+  name   = "${var.project}_ci_s3_policy"
+  policy = data.aws_iam_policy_document.read_write_s3_policy.json
+}
+
+resource "aws_iam_user_policy_attachment" "ci_s3_policy" {
+  user       = data.aws_iam_user.ci_user.user_name
+  policy_arn = aws_iam_policy.read_write_s3_policy.arn
+}
