@@ -1,7 +1,3 @@
-
-# Data sources for EKS IAM
-data "aws_caller_identity" "current" {}
-
 # @TODO - sort out creating only a single user but multiple roles per env
 
 # Create KubernetesAdmin role for aws-iam-authenticator
@@ -76,6 +72,7 @@ data "aws_iam_policy_document" "read_write_s3_policy" {
   statement {
     actions = [
       "s3:*Object",
+      "s3:GetBucketLocation",
     ]
 
     resources = formatlist("arn:aws:s3:::%s/*", var.s3_hosting_buckets)
