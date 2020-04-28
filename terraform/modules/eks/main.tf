@@ -14,38 +14,6 @@ provider "kubernetes" {
   version                = "~> 1.11"
 }
 
-# Create KubernetesAdmin role for aws-iam-authenticator
-resource "aws_iam_role" "kubernetes_admin_role" {
-  name               = "<% .Name %>-kubernetes-admin-${var.environment}"
-  assume_role_policy = var.assume_role_policy
-  description        = "Kubernetes administrator role (for AWS IAM Authenticator)"
-}
-
-# Allow kube admin to list and describe EKS clusters (through assumed role)
-data "aws_iam_policy_document" "eks_list_and_describe" {
-  statement {
-    actions = [
-      "eks:ListUpdates",
-      "eks:ListClusters",
-      "eks:DescribeUpdate",
-      "eks:DescribeCluster",
-    ]
-
-    resources = ["*"]
-  }
-}
-
-resource "aws_iam_policy" "eks_list_and_describe_policy" {
-  name   = "eks_list_and_describe"
-  policy = data.aws_iam_policy_document.eks_list_and_describe.json
-}
-
-resource "aws_iam_role_policy_attachment" "kube_admin_eks_access" {
-  role       = aws_iam_role.kubernetes_admin_role.id
-  policy_arn = aws_iam_policy.eks_list_and_describe_policy.arn
-}
-
-
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "10.0.0"
