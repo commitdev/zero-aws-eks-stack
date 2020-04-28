@@ -17,35 +17,8 @@ module "vpc" {
   kubernetes_cluster_name = local.kubernetes_cluster_name
 }
 
-# Data sources for EKS IAM
+# To get the current account id
 data "aws_caller_identity" "current" {}
-
-# Use this role to limit access to the k8s admin serviceaccount
-data "aws_iam_policy_document" "assumerole_root_policy" {
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-    }
-  }
-
-  # Allow the CI user to assume this role
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "AWS"
-      identifiers = [data.aws_iam_user.ci_user.arn]
-    }
-  }
-}
-
-resource "aws_iam_user_policy_attachment" "circleci_ecr_access" {
-  user       = data.aws_iam_user.ci_user.user_name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
-}
 
 #
 # Provision the EKS cluster
