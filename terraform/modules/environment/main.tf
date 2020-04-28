@@ -32,7 +32,6 @@ module "eks" {
 
   iam_account_id       = data.aws_caller_identity.current.account_id
 
-  assume_role_policy   = data.aws_iam_policy_document.assumerole_root_policy.json
   private_subnets      = module.vpc.private_subnets
   vpc_id               = module.vpc.vpc_id
 
