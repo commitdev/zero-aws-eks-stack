@@ -8,6 +8,10 @@ terraform {
   }
 }
 
+provider "aws" {
+  region  = "<% index .Params `region` %>"
+}
+
 # Provision kubernetes resources required to run services/applications
 module "kubernetes" {
   source = "../../modules/kubernetes"
