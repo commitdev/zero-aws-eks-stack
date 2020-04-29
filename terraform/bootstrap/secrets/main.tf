@@ -1,6 +1,6 @@
 provider "aws" {
   region  = "<% index .Params `region` %>"
-  allowed_account_ids = "<% index .Params `accountId` %>"
+  allowed_account_ids = [ "<% index .Params `accountId` %>" ]
 }
 
 
