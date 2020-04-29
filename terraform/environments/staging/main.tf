@@ -33,9 +33,9 @@ module "staging" {
 
   # Hosting configuration
   s3_hosting_buckets = [
-    "assets.<% index .Params `stagingHost` %>",
+    "<% index .Params `stagingFrontendHost` %>",
   ]
-  domain_name = "<% index .Params `stagingHost` %>"
+  domain_name = "<% index .Params `stagingHostRoot` %>"
 
   # DB configuration
   db_instance_class = "db.t3.small"

@@ -1,29 +1,3 @@
-name: basic-infrastructure
-description: ''
-author: ''
-icon: ''
-thumbnail: ''
-
-prompts:
-  - field: region
-    label: Select AWS Region
-    options:
-      - "us-west-1"
-      - "us-west-2"
-      - "us-east-1"
-      - "us-east-2"
-      - "ca-central-1"
-      - "eu-central-1"
-      - "eu-west-1"
-      - "ap-east-1"
-      - "ap-south-1"
-  - field: accountId
-    label: AWS Account ID
-  - field: productionHost
-    label: Production Root Host Name (e.g. mydomain.com)
-  - field: stagingHost
-    label: Staging Root Host Name (e.g. mydomain-staging.com)
-
 template:
   strictMode: true
   delimiters:

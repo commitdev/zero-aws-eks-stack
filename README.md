@@ -39,7 +39,7 @@ Then get the aws account id:
 aws sts get-caller-identity --query "Account"
 ```
 
-Then create a `config.yml` file and fill in the appropriate values:
+Then create a `zero.yml` file and fill in the appropriate values:
 
 ```yaml
 name: my-project
@@ -48,8 +48,13 @@ params:
   region: us-east-1
   accountId: <from above>
   kubeWorkerAMI: ami-<from above>
-  productionHost: domain.com
-  stagingHost: domain-staging.com
+  productionHostRoot: domain.com
+  productionFrontendHost: domain.com
+  productionBackendHost: api.domain.com
+  stagingHostRoot: domain-staging.com
+  stagingFrontendHost: domain-staging.com
+  stagingBackendHost: api.domain-staging.com
+
 ```
 
 And run `stack`:
