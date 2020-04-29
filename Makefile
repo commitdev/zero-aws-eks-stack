@@ -22,7 +22,8 @@ apply-k8s-utils: update-k8s-conf
 	terraform init; \
 	terraform apply
 
-update-k8s-conf: eks --region <% index .Params `region` %> update-kubeconfig --name <% .Name %>-$(ENV)-<% index .Params `region` %>
+update-k8s-conf: 
+	aws eks --region <% index .Params `region` %> update-kubeconfig --name <% .Name %>-$(ENV)-<% index .Params `region` %>
 
 teardown: teardown-k8s-utils teardown-env teardown-secrets teardown-remote-state
 
