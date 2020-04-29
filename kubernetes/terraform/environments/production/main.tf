@@ -18,9 +18,9 @@ module "kubernetes" {
   # Authenticate with the EKS cluster via the cluster id
   cluster_name = "<% .Name %>-production-<% index .Params `region` %>"
 
-  external_dns_zone = "<% index .Params `productionHost` %>"
+  external_dns_zone = "<% index .Params `productionHostRoot` %>"
   external_dns_owner_id = "<% GenerateUUID %>" # randomly generated ID
 
   # Registration email for LetsEncrypt
-  cert_manager_acme_registration_email = "devops@<% index .Params `productionHost` %>"
+  cert_manager_acme_registration_email = "devops@<% index .Params `productionHostRoot` %>"
 }
