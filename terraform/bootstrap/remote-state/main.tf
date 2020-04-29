@@ -1,5 +1,6 @@
 provider "aws" {
   region  = "<% index .Params `region` %>"
+  allowed_account_ids = "<% index .Params `accountId` %>"
 }
 
 resource "aws_s3_bucket" "terraform_remote_state" {
