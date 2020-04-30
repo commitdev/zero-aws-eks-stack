@@ -22,6 +22,10 @@ resource "aws_secretsmanager_secret_version" "random_secret" {
 }
 
 resource "random_password" "random" {
+  # this allows terraform state to have an identifier for generated passwords
+  keepers = {
+    aws_secret = var.name_prefix
+  }
   count             = var.type == "random" ? 1 : 0
   length            = var.random_length
   special           = true

@@ -45,7 +45,6 @@ data "aws_secretsmanager_secret" "rds_master_secret" {
 # RDS does not support secret-manager, have to provide the actual string
 data "aws_secretsmanager_secret_version" "rds_master_secret" {
   secret_id = data.aws_secretsmanager_secret.rds_master_secret.name
-  depends_on = [data.aws_secretsmanager_secret.rds_master_secret]
 }
 
 module "rds" {
