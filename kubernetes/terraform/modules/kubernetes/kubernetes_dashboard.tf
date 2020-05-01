@@ -20,6 +20,7 @@ resource "kubernetes_cluster_role_binding" "kubernetes_dashboard_user" {
     kind      = "ClusterRole"
     name      = "cluster-admin"
   }
+  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_namespace" "kubernetes_dashboard" {
@@ -50,6 +51,7 @@ resource "kubernetes_service" "kubernetes_dashboard" {
     }
     selector = { k8s-app = "kubernetes-dashboard" }
   }
+  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_secret" "kubernetes_dashboard_certs" {
@@ -59,6 +61,7 @@ resource "kubernetes_secret" "kubernetes_dashboard_certs" {
     labels    = { k8s-app = "kubernetes-dashboard" }
   }
   type = "Opaque"
+  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_secret" "kubernetes_dashboard_csrf" {
@@ -68,6 +71,7 @@ resource "kubernetes_secret" "kubernetes_dashboard_csrf" {
     labels    = { k8s-app = "kubernetes-dashboard" }
   }
   type = "Opaque"
+  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_secret" "kubernetes_dashboard_key_holder" {
@@ -77,6 +81,7 @@ resource "kubernetes_secret" "kubernetes_dashboard_key_holder" {
     labels    = { k8s-app = "kubernetes-dashboard" }
   }
   type = "Opaque"
+  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_config_map" "kubernetes_dashboard_settings" {
@@ -85,6 +90,7 @@ resource "kubernetes_config_map" "kubernetes_dashboard_settings" {
     namespace = "kubernetes-dashboard"
     labels    = { k8s-app = "kubernetes-dashboard" }
   }
+  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_role" "kubernetes_dashboard" {
@@ -117,6 +123,7 @@ resource "kubernetes_role" "kubernetes_dashboard" {
     resources      = ["services/proxy"]
     resource_names = ["heapster", "http:heapster:", "https:heapster:", "dashboard-metrics-scraper", "http:dashboard-metrics-scraper"]
   }
+  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_cluster_role" "kubernetes_dashboard" {
@@ -129,6 +136,7 @@ resource "kubernetes_cluster_role" "kubernetes_dashboard" {
     api_groups = ["metrics.k8s.io"]
     resources  = ["pods", "nodes"]
   }
+  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_role_binding" "kubernetes_dashboard" {
@@ -147,6 +155,7 @@ resource "kubernetes_role_binding" "kubernetes_dashboard" {
     kind      = "Role"
     name      = "kubernetes-dashboard"
   }
+  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_cluster_role_binding" "kubernetes_dashboard" {
@@ -163,6 +172,7 @@ resource "kubernetes_cluster_role_binding" "kubernetes_dashboard" {
     kind      = "ClusterRole"
     name      = "kubernetes-dashboard"
   }
+  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_deployment" "kubernetes_dashboard" {
@@ -249,6 +259,7 @@ resource "kubernetes_service" "dashboard_metrics_scraper" {
     }
     selector = { k8s-app = "dashboard-metrics-scraper" }
   }
+  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_deployment" "dashboard_metrics_scraper" {
@@ -308,5 +319,6 @@ resource "kubernetes_deployment" "dashboard_metrics_scraper" {
     }
     revision_history_limit = 10
   }
+  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
