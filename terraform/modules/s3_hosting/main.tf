@@ -132,13 +132,43 @@ resource "aws_cloudfront_distribution" "client_assets_distribution" {
   }
 }
 
-# Subdomain to point at CF
-resource "aws_route53_record" "client_assets" {
-  for_each = var.buckets
+locals {
+  # Find buckets that are the domain apex. These need to have A ALIAS records.
+  rootDomainBuckets = [
+    for bucket in var.buckets:
+      bucket if length(regexall("\\.", bucket)) == 1
+  ]
+
+  # Find buckets that are subdomains. These can have CNAME records.
+  subDomainBuckets = [
+    for bucket in var.buckets:
+      bucket if length(regexall("\\.", bucket)) > 1
+  ]
+
+}
+
+# Root domains to point at CF
+resource "aws_route53_record" "client_assets_root" {
+  count = length(local.rootDomainBuckets)
 
   zone_id = var.route53_zone_id
-  name    = each.value
+  name    = local.rootDomainBuckets[count.index]
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.client_assets_distribution[local.rootDomainBuckets[count.index]].domain_name
+    zone_id                = aws_cloudfront_distribution.client_assets_distribution[local.rootDomainBuckets[count.index]].hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+# Subdomains to point at CF
+resource "aws_route53_record" "client_assets_subdomain" {
+  count = length(local.subDomainBuckets)
+
+  zone_id = var.route53_zone_id
+  name    = local.subDomainBuckets[count.index]
   type    = "CNAME"
   ttl     = "120"
-  records = [aws_cloudfront_distribution.client_assets_distribution[each.value].domain_name]
+  records = [aws_cloudfront_distribution.client_assets_distribution[local.subDomainBuckets[count.index]].domain_name]
 }
