@@ -22,3 +22,9 @@ variable "random_length" {
   description = "The length of the generated string if type is random. Suitable for a db master password for example"
   default = 16
 }
+
+variable "tags" {
+  description = "Tags to include in the secret"
+  type = map
+  default = {}
+}
