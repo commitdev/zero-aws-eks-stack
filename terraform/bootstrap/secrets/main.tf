@@ -29,4 +29,5 @@ module "ci_user_keys" {
   name_prefix    = "ci-user-aws-keys"
   type    = "map"
   values  = map("access_key_id", aws_iam_access_key.ci_user.id, "secret_key", aws_iam_access_key.ci_user.secret)
+  tags = map("project", local.project)
 }
