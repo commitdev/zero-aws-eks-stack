@@ -18,8 +18,9 @@ module "production" {
   project             = "<% .Name %>"
   region              = "<% index .Params `region` %>"
   allowed_account_ids = ["<% index .Params `accountId` %>"]
+
   # ECR configuration
-  ecr_repositories = ["<% .Name %>-production"]
+  ecr_repositories = [] # Should be created by the staging environment
 
   # EKS configuration
   eks_cluster_version      = "1.15"
