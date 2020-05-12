@@ -59,8 +59,8 @@ resource "aws_iam_user_policy_attachment" "ci_user_list_and_describe_policy" {
   policy_arn = aws_iam_policy.eks_list_and_describe_policy.arn
 }
 
-# Allow the CI user read/write access to the frontend assets bucket
-data "aws_iam_policy_document" "read_write_s3_policy" {
+# Allow the CI user read/write access to the frontend assets bucket and CF invalidations
+data "aws_iam_policy_document" "deploy_assets_policy" {
   statement {
     actions = [
       "s3:ListBucket",
@@ -77,14 +77,29 @@ data "aws_iam_policy_document" "read_write_s3_policy" {
 
     resources = formatlist("arn:aws:s3:::%s/*", var.s3_hosting_buckets)
   }
+
+  statement {
+    actions = [
+      "cloudfront:ListDistributions",
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    actions = [
+      "cloudfront:CreateInvalidation",
+    ]
+    resources = formatlist("arn:aws:cloudfront::%s:distribution/%s", data.aws_caller_identity.current.account_id, module.s3_hosting.cloudfront_distribution_ids)
+  }
 }
 
-resource "aws_iam_policy" "read_write_s3_policy" {
-  name   = "${var.project}_ci_s3_policy"
-  policy = data.aws_iam_policy_document.read_write_s3_policy.json
+resource "aws_iam_policy" "deploy_assets_policy" {
+  name   = "${var.project}_ci_deploy_assets_policy"
+  policy = data.aws_iam_policy_document.deploy_assets_policy.json
 }
 
 resource "aws_iam_user_policy_attachment" "ci_s3_policy" {
   user       = data.aws_iam_user.ci_user.user_name
-  policy_arn = aws_iam_policy.read_write_s3_policy.arn
+  policy_arn = aws_iam_policy.deploy_assets_policy.arn
 }
