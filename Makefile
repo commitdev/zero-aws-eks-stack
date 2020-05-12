@@ -12,7 +12,7 @@ apply-remote-state:
 apply-secrets:
 	pushd terraform/bootstrap/secrets && \
 	terraform init && \
-	terraform apply &&
+	terraform apply && \
 	rm ./terraform.tfstate
 
 apply-env:
