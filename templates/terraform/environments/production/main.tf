@@ -34,7 +34,7 @@ module "production" {
 
   # Hosting configuration
   s3_hosting_buckets = [
-    "<% index .Params `productionFrontendHost` %>"
+    "<% index .Params `productionFrontendSubdomain` %><% index .Params `productionHostRoot` %>"
   ]
   domain_name = "<% index .Params `productionHostRoot` %>"
 
