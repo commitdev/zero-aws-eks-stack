@@ -24,16 +24,20 @@ parameters:
       - "us-east-2"
   - field: productionHostRoot
     label: Production Root Host Name (e.g. mydomain.com) - this must be the root of the chosen domain, not a subdomain.
-  - field: productionFrontendHost
-    label: Production Frontend Host Name (e.g. app.mydomain.com)
-  - field: productionBackendHost
-    label: Production Backend Host Name (e.g. api.mydomain.com)
+  - field: productionFrontendSubdomain
+    label: Production Frontend Host Name (e.g. app.)
+    default: app.
+  - field: productionBackendSubdomain
+    label: Production Backend Host Name (e.g. api.)
+    default: api.
   - field: stagingHostRoot
     label: Staging Root Host Name (e.g. mydomain-staging.com) - this must be the root of the chosen domain, not a subdomain.
-  - field: stagingFrontendHost
-    label: Staging Frontend Host Name (e.g. app.mydomain-staging.com)
-  - field: stagingBackendHost
-    label: Staging Backend Host Name (e.g. api.mydomain-staging.com)
+  - field: stagingFrontendSubdomain
+    label: Staging Frontend Host Name (e.g. app.)
+    default: app.
+  - field: stagingBackendSubdomain
+    label: Staging Backend Host Name (e.g. api.)
+    default: api.
   - field: accountId
     label: AWS Account ID
     execute: aws sts get-caller-identity --query "Account" | tr -d '"'
