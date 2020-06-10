@@ -33,7 +33,7 @@ module "staging" {
 
   # Hosting configuration
   s3_hosting_buckets = [
-    "<% index .Params `stagingFrontendHost` %>",
+    "<% index .Params `stagingFrontendSubdomain` %><% index .Params `stagingHostRoot` %>",
   ]
   domain_name = "<% index .Params `stagingHostRoot` %>"
 
