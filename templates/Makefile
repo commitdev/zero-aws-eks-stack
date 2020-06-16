@@ -1,4 +1,4 @@
-ENV ?= staging
+ENVIRONMENT ?= staging
 
 apply: apply-remote-state apply-secrets apply-env apply-k8s-utils
 
@@ -6,7 +6,7 @@ apply: apply-remote-state apply-secrets apply-env apply-k8s-utils
 apply-remote-state:
 	pushd terraform/bootstrap/remote-state && \
 	terraform init && \
-	terraform apply -var "environment=$(ENV)" && \
+	terraform apply -var "environment=$(ENVIRONMENT)" && \
 	rm ./terraform.tfstate
 
 apply-secrets:
@@ -16,12 +16,12 @@ apply-secrets:
 	rm ./terraform.tfstate
 
 apply-env:
-	pushd terraform/environments/$(ENV); \
+	pushd terraform/environments/$(ENVIRONMENT); \
 	terraform init && \
 	terraform apply
 
 apply-k8s-utils: update-k8s-conf
-	pushd kubernetes/terraform/environments/$(ENV) && \
+	pushd kubernetes/terraform/environments/$(ENVIRONMENT) && \
 	terraform init && \
 	terraform apply
 
@@ -32,8 +32,8 @@ teardown: teardown-k8s-utils teardown-env teardown-secrets teardown-remote-state
 
 teardown-remote-state:
 	export AWS_PAGER='' && \
-	aws s3 rb s3://<% .Name %>-$(ENV)-terraform-state --force && \
-	aws dynamodb delete-table --table-name <% .Name %>-$(ENV)-terraform-state-locks
+	aws s3 rb s3://<% .Name %>-$(ENVIRONMENT)-terraform-state --force && \
+	aws dynamodb delete-table --table-name <% .Name %>-$(ENVIRONMENT)-terraform-state-locks
 
 teardown-secrets:
 	export AWS_PAGER='' && \
@@ -42,11 +42,11 @@ teardown-secrets:
 	aws iam delete-user --user-name <% .Name %>-ci-user
 
 teardown-env:
-	pushd terraform/environments/$(ENV) && \
+	pushd terraform/environments/$(ENVIRONMENT) && \
 	terraform destroy
 
 teardown-k8s-utils:
-	pushd kubernetes/terraform/environments/$(ENV) && \
+	pushd kubernetes/terraform/environments/$(ENVIRONMENT) && \
 	terraform destroy
 
 .PHONY: apply apply-remote-state apply-secrets apply-env apply-k8s-utils teardown-k8s-utils teardown-env teardown-secrets teardown-remote-state
