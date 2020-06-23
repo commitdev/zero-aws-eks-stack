@@ -1,6 +1,7 @@
 # Add the keys to AWS secrets manager
 resource "aws_secretsmanager_secret" "secret" {
   name_prefix = var.name_prefix
+  name = var.name
   tags = var.tags
 }
 

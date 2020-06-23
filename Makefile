@@ -1,3 +1,4 @@
 
 run:
-	@echo Done
+	cd $(PROJECT_DIR) && AUTO_APPROVE="-auto-approve" make
+
