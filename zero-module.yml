@@ -46,5 +46,5 @@ parameters:
     execute: aws ssm get-parameters --names /aws/service/eks/optimized-ami/1.16/amazon-linux-2/recommended/image_id --region $region --query "Parameters[0].Value" | tr -d '"'
   - field: randomSeed
     label: Random seed that will be shared between projects to come up with deterministic resource names
-    execute: uuidgen
+    execute: uuidgen | head -c 8
 
