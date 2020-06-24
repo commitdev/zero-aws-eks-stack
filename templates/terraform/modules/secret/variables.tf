@@ -1,6 +1,10 @@
+variable "name" {
+  default = ""
+  description = "The name of the secret in Secrets Manager (only one of name or name_prefix can be specified)"
+}
 variable "name_prefix" {
-  default = "secret-key"
-  description = "The name prefix of the secret in Secrets Manager"
+  default = ""
+  description = "The name prefix of the secret in Secrets Manager - a random suffix will be appended (only one of name or name_prefix can be specified)"
 }
 
 variable type {

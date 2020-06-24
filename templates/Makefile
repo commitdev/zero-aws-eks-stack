@@ -2,28 +2,29 @@ ENVIRONMENT ?= staging
 
 apply: apply-remote-state apply-secrets apply-env apply-k8s-utils
 
-## remove state file only if exit code 0 from terraform apply
 apply-remote-state:
+	aws s3 ls <% .Name %>-$(ENVIRONMENT)-terraform-state || (\
 	pushd terraform/bootstrap/remote-state && \
 	terraform init && \
-	terraform apply -var "environment=$(ENVIRONMENT)" && \
-	rm ./terraform.tfstate
+	terraform apply -var "environment=$(ENVIRONMENT)" $(AUTO_APPROVE) && \
+	rm ./terraform.tfstate)
 
 apply-secrets:
+	aws iam list-access-keys --user-name <% .Name %>-ci-user > /dev/null || (\
 	pushd terraform/bootstrap/secrets && \
 	terraform init && \
-	terraform apply && \
-	rm ./terraform.tfstate
+	terraform apply $(AUTO_APPROVE) && \
+	rm ./terraform.tfstate)
 
 apply-env:
 	pushd terraform/environments/$(ENVIRONMENT); \
 	terraform init && \
-	terraform apply
+	terraform apply $(AUTO_APPROVE)
 
 apply-k8s-utils: update-k8s-conf
 	pushd kubernetes/terraform/environments/$(ENVIRONMENT) && \
 	terraform init && \
-	terraform apply
+	terraform apply $(AUTO_APPROVE)
 
 update-k8s-conf:
 	aws eks --region <% index .Params `region` %> update-kubeconfig --name <% .Name %>-$(ENVIRONMENT)-<% index .Params `region` %>

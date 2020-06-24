@@ -26,7 +26,7 @@ resource "aws_iam_access_key" "ci_user" {
 module "ci_user_keys" {
   source  = "../../modules/secret"
 
-  name_prefix    = "ci-user-aws-keys"
+  name    = "ci-user-aws-keys<% index .Params `randomSeed` %>"
   type    = "map"
   values  = map("access_key_id", aws_iam_access_key.ci_user.id, "secret_key", aws_iam_access_key.ci_user.secret)
   tags = map("project", local.project)
