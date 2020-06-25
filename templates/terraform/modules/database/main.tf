@@ -32,8 +32,7 @@ data "aws_caller_identity" "current" {
 module "db_password" {
   source      = "../secret"
   type        = "random"
-  ## note: secret name_prefix has a limitation of 32 characters 
-  name_prefix = "${var.project}-${var.environment}-rds"
+  name = "${var.project}-${var.environment}-rds-<% index .Params `randomSeed` %>"
 }
 
 # secret declared so secret version waits for rds-secret to be ready
