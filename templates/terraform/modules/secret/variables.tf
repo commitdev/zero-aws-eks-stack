@@ -2,10 +2,6 @@ variable "name" {
   default = ""
   description = "The name of the secret in Secrets Manager (only one of name or name_prefix can be specified)"
 }
-variable "name_prefix" {
-  default = ""
-  description = "The name prefix of the secret in Secrets Manager - a random suffix will be appended (only one of name or name_prefix can be specified)"
-}
 
 variable type {
   description = "The type of data to hold in this secret (map, string, random)"
