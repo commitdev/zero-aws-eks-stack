@@ -32,12 +32,13 @@ update-k8s-conf:
 teardown: teardown-k8s-utils teardown-env teardown-secrets teardown-remote-state
 
 teardown-remote-state:
-	export AWS_PAGER='' && \
+	export AWS_PAGER='' && export AWS_DEFAULT_REGION=<% index .Params `region` %> && \
+	aws s3 rm s3://<% .Name %>-$(ENVIRONMENT)-terraform-state --recursive && \
 	aws s3 rb s3://<% .Name %>-$(ENVIRONMENT)-terraform-state --force && \
 	aws dynamodb delete-table --table-name <% .Name %>-$(ENVIRONMENT)-terraform-state-locks
 
 teardown-secrets:
-	export AWS_PAGER='' && \
+	export AWS_PAGER='' && export AWS_DEFAULT_REGION=<% index .Params `region` %> && \
 	aws secretsmanager list-secrets --query "SecretList[?Tags[?Key=='project' && Value=='<% .Name %>']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --secret-id && \
 	aws iam delete-access-key --user-name <% .Name %>-ci-user --access-key-id $(shell aws iam list-access-keys --user-name <% .Name %>-ci-user --query "AccessKeyMetadata[0].AccessKeyId" | sed 's/"//g') && \
 	aws iam delete-user --user-name <% .Name %>-ci-user

@@ -5,7 +5,7 @@ locals {
 
 resource "helm_release" "metrics_server" {
   name       = "metrics-server"
-  repository = data.helm_repository.stable.metadata[0].name
+  repository = "https://kubernetes-charts.storage.googleapis.com"
   chart      = "metrics-server"
   namespace  = local.metrics_server_namespace
 
