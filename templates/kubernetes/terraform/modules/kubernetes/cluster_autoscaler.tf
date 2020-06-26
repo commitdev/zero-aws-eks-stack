@@ -5,7 +5,7 @@ locals {
 
 resource "helm_release" "cluster_autoscaler" {
   name       = "cluster-autoscaler"
-  repository = data.helm_repository.stable.metadata[0].name
+  repository = "https://kubernetes-charts.storage.googleapis.com"
   chart      = "cluster-autoscaler"
   namespace  = local.cluster_autoscaler_namespace
 
@@ -17,7 +17,8 @@ resource "helm_release" "cluster_autoscaler" {
     name  = "rbac.create"
     value = true
   }
-  set_string {
+  set {
+    type  = "string"
     name  = "rbac.serviceAccountAnnotations.eks\\.amazonaws\\.com/role-arn"
     value =  module.iam_assumable_role_cluster_autoscaler.this_iam_role_arn
   }
