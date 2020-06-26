@@ -1,4 +1,4 @@
-name: aws-eks-stack
+name: zero-aws-eks-stack
 description: 'zero module for a basic AWS kubernetes stack on EKS'
 author: 'Commit'
 
