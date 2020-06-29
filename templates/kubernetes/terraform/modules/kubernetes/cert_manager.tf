@@ -61,22 +61,19 @@ resource "null_resource" "cert_manager_issuer" {
   depends_on = [null_resource.cert_manager]
 }
 
-data "helm_repository" "jetstack" {
-  name = "jetstack"
-  url  = "https://charts.jetstack.io"
-}
-
 resource "helm_release" "cert_manager" {
   name       = "cert-manager"
-  repository = data.helm_repository.jetstack.metadata[0].name
+  repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
   version    = local.cert_manager_version
   namespace  = local.cert_manager_namespace
-  set_string {
+  set {
+    type  = "string"
     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
     value =  module.iam_assumable_role_cert_manager.this_iam_role_arn
   }
-  set_string {
+  set {
+    type  = "string"
     name  = "podAnnotations.eks\\.amazonaws\\.com/role-arn"
     value =  module.iam_assumable_role_cert_manager.this_iam_role_arn
   }
