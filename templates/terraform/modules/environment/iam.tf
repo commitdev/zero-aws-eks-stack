@@ -50,7 +50,8 @@ data "aws_iam_policy_document" "eks_list_and_describe" {
 }
 
 resource "aws_iam_policy" "eks_list_and_describe_policy" {
-  name   = "${var.project}_eks_list_and_describe"
+  name_prefix   = "eks-list-and-describe"
+  description = "Policy to allow listing and describing EKS clusters for ${var.project} ${var.environment}"
   policy = data.aws_iam_policy_document.eks_list_and_describe.json
 }
 
@@ -95,7 +96,8 @@ data "aws_iam_policy_document" "deploy_assets_policy" {
 }
 
 resource "aws_iam_policy" "deploy_assets_policy" {
-  name   = "${var.project}_ci_deploy_assets_policy"
+  name_prefix   = "ci-deploy-assets"
+  description = "Policy to allow a CI user to deploy assets for ${var.project} ${var.environment}"
   policy = data.aws_iam_policy_document.deploy_assets_policy.json
 }
 
