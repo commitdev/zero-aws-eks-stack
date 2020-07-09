@@ -57,3 +57,9 @@ variable "db_instance_class" {
 variable "db_storage_gb" {
   description = "The amount of storage to allocate for the db, in GB"
 }
+
+variable "vpc_use_single_nat_gateway" {
+  description = "Use single nat-gateway instead of nat-gateway per subnet"
+  type        = bool
+  default     = true
+}

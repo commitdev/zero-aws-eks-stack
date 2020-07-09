@@ -37,6 +37,8 @@ module "staging" {
   ]
   domain_name = "<% index .Params `stagingHostRoot` %>"
 
+  vpc_use_single_nat_gateway = true
+
   # DB configuration
   db_instance_class = "db.t3.small"
   db_storage_gb = 20

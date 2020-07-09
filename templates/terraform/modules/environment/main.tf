@@ -15,6 +15,7 @@ module "vpc" {
   environment             = var.environment
   region                  = var.region
   kubernetes_cluster_name = local.kubernetes_cluster_name
+  single_nat_gateway = var.vpc_use_single_nat_gateway
 }
 
 # To get the current account id
