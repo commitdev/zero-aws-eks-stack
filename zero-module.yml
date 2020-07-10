@@ -18,7 +18,6 @@ parameters:
   - field: region
     label: Select AWS Region
     options:
-      - "us-west-1"
       - "us-west-2"
       - "us-east-1"
       - "us-east-2"
