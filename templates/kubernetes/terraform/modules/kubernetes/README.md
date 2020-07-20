@@ -1,9 +1,5 @@
 # kubernetes tf module
 
-## Introduction
-
-This Terraform module contains configuration to provision kubernetes resources.
-
 ## Core Components
 
 [Nginx Ingress Controller](https://github.com/kubernetes/ingress-nginx/)

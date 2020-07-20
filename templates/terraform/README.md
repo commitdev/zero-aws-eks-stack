@@ -27,7 +27,7 @@
 
 - All environments should contain the following:
 
-    `main.tf`: Toplevel terraform configuration file that instantiates the `environment` module.
+    `main.tf`: Top level terraform configuration file that instantiates the `environment` module.
 
 - Configuration should be pushed "top->down" from the `environment` module to it's submodules.
 
@@ -40,7 +40,7 @@
     `main.tf`: Module entrypoint where instantiation of resources happens.
     `backend.tf`: Terraform remote state configuration.
     `provider.tf`: Provider configuration.
-    `variables.tf`: Environment-specific variables are desclared here.
+    `variables.tf`: Environment-specific variables are declared here.
     `versions.tf`: Terraform version information.
     `files/`: (DEPRECATED)
 
@@ -78,9 +78,9 @@
 
 - When to use the Terraform Kuberenetes Provider and when to use manifests?
 
-    - Use the Terraform Kubernetes Provider (`provider "kubernetes"`) whenever you are provisioning a resource that could be considered relatively static (think Ingress, RoleBinding, CluterRoleBinding, etc).
+    - Use the Terraform Kubernetes Provider (`provider "kubernetes"`) whenever you are provisioning a resource that could be considered relatively static (think Ingress, RoleBinding, ClusterRoleBinding, etc).
 
-    - Use conventional Kubernetes manifests / `kubectl` when provisioning resouirces that could be considered dynamic (think Deployments).
+    - Use conventional Kubernetes manifests / `kubectl` when provisioning resources that could be considered dynamic (think Deployments).
 
 ## Application
 
