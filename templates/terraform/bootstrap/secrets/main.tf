@@ -31,3 +31,19 @@ module "ci_user_keys" {
   values  = map("access_key_id", aws_iam_access_key.ci_user.id, "secret_key", aws_iam_access_key.ci_user.secret)
   tags = map("project", local.project)
 }
+
+module "rds_master_secret_staging" {
+  source  = "../../modules/secret"
+  name = "${local.project}-staging-rds-<% index .Params `randomSeed` %>"
+  type          = "random"	
+  random_length = 32
+  tags = map("rds", "${local.project}-staging")
+}
+
+module "rds_master_secret_production" {
+  source  = "../../modules/secret"
+  name = "${local.project}-production-rds-<% index .Params `randomSeed` %>"
+  type          = "random"	
+  random_length = 32
+  tags = map("rds", "${local.project}-production")
+}

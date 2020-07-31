@@ -28,17 +28,10 @@ module "rds_security_group" {
 data "aws_caller_identity" "current" {
 }
 
-# creating RDS password in secret-manager
-module "db_password" {
-  source      = "../secret"
-  type        = "random"
-  name = "${var.project}-${var.environment}-rds-<% index .Params `randomSeed` %>"
-}
-
 # secret declared so secret version waits for rds-secret to be ready
 # or else we often see a AWSDEFAULT VERSION secret not found error
 data "aws_secretsmanager_secret" "rds_master_secret" {
-  name = module.db_password.secret_name
+  name = "${var.project}-${var.environment}-rds-<% index .Params `randomSeed` %>"
 }
 
 # RDS does not support secret-manager, have to provide the actual string
