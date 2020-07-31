@@ -74,10 +74,42 @@ Commonly used links in AWS console
 |IAM        |https://console.aws.amazon.com/iam/home#/users|
 |ECR        |https://console.aws.amazon.com/ecr/repositories|
 |RDS        |https://console.aws.amazon.com/rds|
+
+### Teardown 
+Tearing down the infrastructure requires multiple steps, as some of the resources have protection mechanism so they're not accidentally deleted 
+
+_Note: the following steps are not reversible, tearing down the cluster results in lost data/resources._
+
+```
+export ENVIRONMENT=staging/production
+```
+1. Navigate to your infrastructure repository (where this readme/makefile provided is located), we will remove the resources in a Last in First out order.
+```
+make teardown-k8s-utils
+```
+
+2. Disable the RDS delete protection of the database https://console.aws.amazon.com/rds. Goal is to delete the entire database, so make sure you **backup your database before going so**.
+
+3. Empty the s3 bucket for your frontend assets, http://s3.console.aws.amazon.com/s3/home
+
+4. teardown the EKS cluster and VPC with the following command:
+```
+make teardown-env
+```
+5. teardown the secrets created for CI and RDS with the following command:
+```
+make teardown-secrets
+```
+6. Empty the s3 bucket for your terraform backend, http://s3.console.aws.amazon.com/s3/home
+7. teardown the dynamodb and terraform backend with the following command:
+```
+make teardown-remote-state
+```
+
 ### Suggested readings
 - [Terraform workflow][tf-workflow]
 - [Why do I want code as infrastructure][why-infra-as-code]
-- 
+
 
 
 <!-- Links -->
