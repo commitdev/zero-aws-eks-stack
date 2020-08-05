@@ -1,10 +1,10 @@
 terraform {
   backend "s3" {
-    bucket         = "<% .Name %>-staging-terraform-state"
-    key            = "infrastructure/terraform/environments/staging/kubernetes"
+    bucket         = "<% .Name %>-prod-terraform-state"
+    key            = "infrastructure/terraform/environments/production/kubernetes"
     encrypt        = true
     region         = "<% index .Params `region` %>"
-    dynamodb_table = "<% .Name %>-staging-terraform-state-locks"
+    dynamodb_table = "<% .Name %>-prod-terraform-state-locks"
   }
 }
 
@@ -16,15 +16,15 @@ provider "aws" {
 module "kubernetes" {
   source = "../../modules/kubernetes"
 
-  environment = "stage"
+  environment = "prod"
   region      = "<% index .Params `region` %>"
 
   # Authenticate with the EKS cluster via the cluster id
-  cluster_name = "<% .Name %>-stage-<% index .Params `region` %>"
+  cluster_name = "<% .Name %>-prod-<% index .Params `region` %>"
 
-  external_dns_zone = "<% index .Params `stagingHostRoot` %>"
+  external_dns_zone = "<% index .Params `productionHostRoot` %>"
   external_dns_owner_id = "<% GenerateUUID %>" # randomly generated ID
 
   # Registration email for LetsEncrypt
-  cert_manager_acme_registration_email = "devops@<% index .Params `stagingHostRoot` %>"
+  cert_manager_acme_registration_email = "devops@<% index .Params `productionHostRoot` %>"
 }
