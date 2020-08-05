@@ -12,7 +12,7 @@ terraform {
 # Instantiate the staging environment
 module "staging" {
   source      = "../../modules/environment"
-  environment = "staging"
+  environment = "stage"
 
   # Project configuration
   project             = "<% .Name %>"

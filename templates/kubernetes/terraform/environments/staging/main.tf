@@ -16,11 +16,11 @@ provider "aws" {
 module "kubernetes" {
   source = "../../modules/kubernetes"
 
-  environment = "staging"
+  environment = "stage"
   region      = "<% index .Params `region` %>"
 
   # Authenticate with the EKS cluster via the cluster id
-  cluster_name = "<% .Name %>-staging-<% index .Params `region` %>"
+  cluster_name = "<% .Name %>-stage-<% index .Params `region` %>"
 
   external_dns_zone = "<% index .Params `stagingHostRoot` %>"
   external_dns_owner_id = "<% GenerateUUID %>" # randomly generated ID

@@ -12,7 +12,7 @@ terraform {
 # Instantiate the production environment
 module "production" {
   source      = "../../modules/environment"
-  environment = "production"
+  environment = "prod"
 
   # Project configuration
   project             = "<% .Name %>"
