@@ -16,13 +16,13 @@ The root folder is used for declaring parameters required by the templates, and 
 |   |-- terraform/
 |   |   |-- bootstrap/              #initial setup
 |   |   |-- environments/           #infrastructure setup
-|   |   |   |-- production/
-|   |   |   |-- staging/
+|   |   |   |-- prod/
+|   |   |   |-- stage/
 |   |-- kubernetes
 |   |   |-- terraform
 |   |   |   |-- environments        #k8s-ultities
-|   |   |   |   |-- production/
-|   |   |   |   |-- staging/
+|   |   |   |   |-- prod/
+|   |   |   |   |-- stage/
 ```
 
 ## AWS EKS Stack
@@ -60,7 +60,7 @@ infrastructure:
  - RDS (db.t3.small): $0.034 USD / hr
  - EC2 (t2.small): $0.023 USD / hr
 
-EC2 instance sizing can be configured in [terraform/environments/staging/main.tf](terraform/environments/staging/main.tf)
+EC2 instance sizing can be configured in [terraform/environments/stage/main.tf](terraform/environments/stage/main.tf)
 
 ## Other links
 Project board: [zenhub][zenhub-board]
