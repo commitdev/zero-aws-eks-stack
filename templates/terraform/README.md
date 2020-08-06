@@ -49,9 +49,9 @@
 ```
     README.md
     environments/
-        production/
+        prod/
             main.tf
-        staging/
+        stage/
             main.tf
         development/
             main.tf

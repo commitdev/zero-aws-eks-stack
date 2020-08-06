@@ -1,18 +1,18 @@
 terraform {
   required_version = ">= 0.12"
   backend "s3" {
-    bucket         = "<% .Name %>-staging-terraform-state"
+    bucket         = "<% .Name %>-stage-terraform-state"
     key            = "infrastructure/terraform/environments/staging/main"
     encrypt        = true
     region         = "<% index .Params `region` %>"
-    dynamodb_table = "<% .Name %>-staging-terraform-state-locks"
+    dynamodb_table = "<% .Name %>-stage-terraform-state-locks"
   }
 }
 
 # Instantiate the staging environment
-module "staging" {
+module "stage" {
   source      = "../../modules/environment"
-  environment = "staging"
+  environment = "stage"
 
   # Project configuration
   project             = "<% .Name %>"

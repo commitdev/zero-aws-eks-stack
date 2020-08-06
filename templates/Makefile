@@ -1,4 +1,4 @@
-ENVIRONMENT ?= staging
+ENVIRONMENT ?= stage
 
 apply: apply-remote-state apply-secrets apply-env apply-k8s-utils
 

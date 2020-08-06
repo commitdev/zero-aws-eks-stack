@@ -1,22 +1,26 @@
 terraform {
   backend "s3" {
-    bucket         = "<% .Name %>-development-terraform-state"
-    key            = "infrastructure/terraform/environments/development/kubernetes"
+    bucket         = "<% .Name %>-stage-terraform-state"
+    key            = "infrastructure/terraform/environments/staging/kubernetes"
     encrypt        = true
     region         = "<% index .Params `region` %>"
-    dynamodb_table = "<% .Name %>-development-terraform-state-locks"
+    dynamodb_table = "<% .Name %>-stage-terraform-state-locks"
   }
+}
+
+provider "aws" {
+  region  = "<% index .Params `region` %>"
 }
 
 # Provision kubernetes resources required to run services/applications
 module "kubernetes" {
   source = "../../modules/kubernetes"
 
-  environment = "development"
+  environment = "stage"
   region      = "<% index .Params `region` %>"
 
   # Authenticate with the EKS cluster via the cluster id
-  cluster_name = "<% .Name %>-dev-<% index .Params `region` %>"
+  cluster_name = "<% .Name %>-stage-<% index .Params `region` %>"
 
   external_dns_zone = "<% index .Params `stagingHostRoot` %>"
   external_dns_owner_id = "<% GenerateUUID %>" # randomly generated ID

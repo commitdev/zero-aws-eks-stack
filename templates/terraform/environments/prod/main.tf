@@ -1,18 +1,18 @@
 terraform {
   required_version = ">= 0.12"
   backend "s3" {
-    bucket         = "<% .Name %>-production-terraform-state"
+    bucket         = "<% .Name %>-prod-terraform-state"
     key            = "infrastructure/terraform/environments/production/main"
     encrypt        = true
     region         = "<% index .Params `region` %>"
-    dynamodb_table = "<% .Name %>-production-terraform-state-locks"
+    dynamodb_table = "<% .Name %>-prod-terraform-state-locks"
   }
 }
 
 # Instantiate the production environment
-module "production" {
+module "prod" {
   source      = "../../modules/environment"
-  environment = "production"
+  environment = "prod"
 
   # Project configuration
   project             = "<% .Name %>"
