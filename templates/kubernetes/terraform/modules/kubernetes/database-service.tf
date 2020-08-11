@@ -9,9 +9,12 @@ resource "kubernetes_namespace" "app_namespace" {
 }
 
 resource "kubernetes_service" "app_db" {
+  ## this should match the deployable backend's name/namespace
+  ## it uses this service to connect and create application user
+  ## https://github.com/commitdev/zero-deployable-backend/blob/b2cee21982b1e6a0ac9996e2a1bf214e5bf10ab5/db-ops/create-db-user.sh#L6
   metadata {  
     namespace = kubernetes_namespace.app_namespace.metadata[0].name
-    name = "<% .Name %>"
+    name = "database"
   }
   spec {
     type = "ExternalName"
