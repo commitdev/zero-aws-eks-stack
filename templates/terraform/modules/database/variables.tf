@@ -21,3 +21,7 @@ variable "instance_class" {
 variable "storage_gb" {
   description = "The amount of storage to allocate for the db, in GB"
 }
+
+variable "database_engine" {
+  description = "Which database engine to use, currently supports `postgres` or `mysql`"
+}

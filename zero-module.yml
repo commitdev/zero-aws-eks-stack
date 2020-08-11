@@ -61,6 +61,11 @@ parameters:
       type: regex
       value: '^([a-z0-9]+(-[a-z0-9]+)*\.)$'
       errorMessage: Invalid subdomain (cannot contain special chars & must end with a '.')
+  - field: database
+    label: Database engine to use (postgres)
+    options:
+      - "postgres"
+      - "mysql"
   - field: accountId
     label: AWS Account ID
     execute: aws sts get-caller-identity --query "Account" | tr -d '"'

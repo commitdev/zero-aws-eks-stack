@@ -40,6 +40,7 @@ module "stage" {
   vpc_use_single_nat_gateway = true
 
   # DB configuration
+  database = "<% index .Params `database` %>"
   db_instance_class = "db.t3.small"
   db_storage_gb = 20
 }

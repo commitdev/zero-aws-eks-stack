@@ -39,6 +39,7 @@ module "prod" {
   domain_name = "<% index .Params `productionHostRoot` %>"
 
   # DB configuration
+  database = "<% index .Params `database` %>"
   db_instance_class = "db.t3.small"
   db_storage_gb = 100
 
