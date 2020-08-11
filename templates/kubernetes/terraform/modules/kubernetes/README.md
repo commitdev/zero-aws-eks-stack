@@ -38,7 +38,7 @@ The `cert_manager.tf` config has a good example of using this in practice. To al
 ```
 module "iam_assumable_role_my_role_name" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version                       = "~> v2.6.0"
+  version                       = "~> v2.14.0"
   create_role                   = true
   role_name                     = "my-role-name"
   provider_url                  = replace(data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer, "https://", "")

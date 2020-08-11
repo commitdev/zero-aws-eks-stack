@@ -41,7 +41,7 @@ data "aws_secretsmanager_secret_version" "rds_master_secret" {
 
 module "rds" {
   source  = "terraform-aws-modules/rds/aws"
-  version = "2.14.0"
+  version = "2.17.0"
 
   identifier = "${var.project}-${var.environment}"
 

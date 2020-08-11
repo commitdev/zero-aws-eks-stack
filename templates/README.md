@@ -1,5 +1,3 @@
-
-
 # Overview
 Your infrastructure should be up and running, your terraform repository is the source of truth for your infrastructure, here is [a list of components and resources][zero-resource-list] that comes with the EKS-stack
 

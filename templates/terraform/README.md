@@ -1,12 +1,12 @@
 ## Guidelines & Style Convention Summary
 
 - All Terraform configuration should be formatted with `terraform fmt` before being accepted into this repository.
-- This repository is Terraform version >= 0.12, as such, leverage features from this release whenever possible.
+- This repository is Terraform version >= 0.13, as such, leverage features from this release whenever possible.
     See https://www.terraform.io/upgrade-guides/0-12.html for more information.
 - Leverage community-maintained Terraform modules whenever possible.
 - Attempt to minimize duplication whenever possible, but only within reason -- sometimes duplication is an acceptable solution.
 - Follow style conventions described in `docs/guide.pdf` whenever possible.
-- Whenever possible, inject resources down versus referencing resources across modules. This has been made easier with new features in v0.12.
+- Whenever possible, inject resources down versus referencing resources across modules. This has been made easier with new features in v0.13.
 - Whenever possible, define the types of variables.
 
 ### Module Conventions
