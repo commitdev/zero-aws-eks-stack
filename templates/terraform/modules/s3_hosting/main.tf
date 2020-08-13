@@ -128,8 +128,7 @@ resource "aws_cloudfront_distribution" "client_assets_distribution" {
 
   # Reference the cert validations only so it becomes a dependency
   tags = {
-    # join with realy used char - easier delimiter to indentify;
-    "certs-validated" = join("@", var.certificate_validations)
+    "certs-validated" = join("-", var.certificate_validations)
   }
 }
 
