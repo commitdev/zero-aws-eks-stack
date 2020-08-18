@@ -79,6 +79,7 @@ module "db" {
   allowed_security_group_id = module.eks.worker_security_group_id
   instance_class            = var.db_instance_class
   storage_gb                = var.db_storage_gb
+  database_engine             = var.database
 }
 
 module "ecr" {

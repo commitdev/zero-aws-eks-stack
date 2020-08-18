@@ -63,3 +63,8 @@ variable "vpc_use_single_nat_gateway" {
   type        = bool
   default     = true
 }
+
+variable "database" {
+  default = "postgres"
+  description = "Which database engine to use, currently supports postgres or mysql"
+}
