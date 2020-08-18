@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.12"
+  required_version = ">= 0.13"
   backend "s3" {
     bucket         = "<% .Name %>-stage-terraform-state"
     key            = "infrastructure/terraform/environments/staging/main"
@@ -41,6 +41,7 @@ module "stage" {
   vpc_use_single_nat_gateway = true
 
   # DB configuration
+  database = "<% index .Params `database` %>"
   db_instance_class = "db.t3.small"
   db_storage_gb = 20
 }

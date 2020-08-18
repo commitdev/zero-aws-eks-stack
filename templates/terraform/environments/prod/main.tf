@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.12"
+  required_version = ">= 0.13"
   backend "s3" {
     bucket         = "<% .Name %>-prod-terraform-state"
     key            = "infrastructure/terraform/environments/production/main"
@@ -40,6 +40,7 @@ module "prod" {
   domain_name = "<% index .Params `productionHostRoot` %>"
 
   # DB configuration
+  database = "<% index .Params `database` %>"
   db_instance_class = "db.t3.small"
   db_storage_gb = 100
 
