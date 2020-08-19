@@ -9,7 +9,7 @@ module "rds_security_group" {
 
   number_of_computed_ingress_with_source_security_group_id = 1
   computed_ingress_with_source_security_group_id = [
-    var.database == "postgres" ? {
+    var.database_engine == "postgres" ? {
       from_port   = 5432
       to_port     = 5432
       protocol    = "tcp"
