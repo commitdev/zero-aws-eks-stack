@@ -68,3 +68,46 @@ variable "database" {
   default = "postgres"
   description = "Which database engine to use, currently supports postgres or mysql"
 }
+
+
+variable "logging_type" {
+  description = "Which application logging mechanism to use (cloudwatch, kibana)"
+  type        = string
+  default     = "cloudwatch"
+
+  validation {
+    condition     = (
+      var.logging_type == "cloudwatch" || var.logging_type == "kibana"
+    )
+    error_message = "Invalid value. Valid values are cloudwatch or kibana."
+  }
+}
+
+variable "logging_es_version" {
+  description = "The version of elasticsearch to use"
+}
+
+variable "logging_az_count" {
+  description = "The number of availability zones to use for the cluster. More is more higly available but requires more instances, which increases cost"
+  type        = number
+}
+
+variable "logging_es_instance_type" {
+  description = "Instance type for nodes"
+}
+
+variable "logging_es_instance_count" {
+  description = "Number of nodes in the cluster. Must be a multiple of the number of"
+  type        = number
+}
+
+variable "logging_volume_size_in_gb" {
+  description = "Size of EBS volume (in GB) to attach to *each* of the nodes in the cluster. The maximum size is limited by the size of the instance"
+  type        = number
+}
+
+variable "enable_cluster_logging" {
+  description = "If enabled, sends the logs from the elasticsearch cluster to Cloudwatch"
+  type        = bool
+  default     = false
+}

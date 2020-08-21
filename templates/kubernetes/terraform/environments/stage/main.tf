@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket         = "<% .Name %>-stage-terraform-state"
-    key            = "infrastructure/terraform/environments/staging/kubernetes"
+    key            = "infrastructure/terraform/environments/stage/kubernetes"
     encrypt        = true
     region         = "<% index .Params `region` %>"
     dynamodb_table = "<% .Name %>-stage-terraform-state-locks"

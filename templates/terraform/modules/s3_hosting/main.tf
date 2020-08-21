@@ -59,12 +59,6 @@ resource "aws_s3_bucket_policy" "client_assets" {
   policy = data.aws_iam_policy_document.assets_origin[each.value].json
 }
 
-# To use an ACM cert with CF it has to exist in us-east-1
-provider "aws" {
-  region = "us-east-1"
-  alias  = "east1"
-}
-
 # Create the cloudfront distribution
 resource "aws_cloudfront_distribution" "client_assets_distribution" {
   for_each = var.buckets
@@ -125,11 +119,6 @@ resource "aws_cloudfront_distribution" "client_assets_distribution" {
       minimum_protocol_version = "TLSv1"
       ssl_support_method       = "sni-only"
     }
-
-  # Reference the cert validations only so it becomes a dependency
-  tags = {
-    "certs-validated" = join("-", var.certificate_validations)
-  }
 }
 
 locals {
