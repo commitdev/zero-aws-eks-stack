@@ -1,0 +1,38 @@
+name: Zero Module CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Validate root Makefile
+      run: |
+        #!/bin/bash
+
+        function check_make_target {
+          output=$(make -n "$1" 2>&1 | head -1)
+          [[ "$output" != *"No rule to make target"* ]]
+        }
+
+
+        declare -a required_make_rules=(run summary)
+
+        for i in "${required_make_rules[@]}"; do
+          if check_make_target "$i"; then
+            # echo "required make target: ${i} is available"
+            continue
+          else 
+            echo "ERR: required make target:${i} is not a rule in the Makefile"
+            exit 1
+          fi
+        done
+
+        echo "required make rules exist"
