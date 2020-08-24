@@ -60,14 +60,15 @@ module "assets_domains" {
 }
 
 module "s3_hosting" {
-  source = "../../modules/s3_hosting"
+  source     = "../../modules/s3_hosting"
+  # We need to wait for certificate validation to complete before using the certs
+  depends_on = [module.assets_domains.certificate_validations]
 
   buckets                 = var.s3_hosting_buckets
   project                 = var.project
   environment             = var.environment
   certificate_arns        = module.assets_domains.certificate_arns
   route53_zone_id         = module.assets_domains.route53_zone_id
-  certificate_validations = module.assets_domains.certificate_validations
 }
 
 module "db" {
@@ -79,7 +80,7 @@ module "db" {
   allowed_security_group_id = module.eks.worker_security_group_id
   instance_class            = var.db_instance_class
   storage_gb                = var.db_storage_gb
-  database_engine             = var.database
+  database_engine           = var.database
 }
 
 module "ecr" {
@@ -88,4 +89,20 @@ module "ecr" {
   environment       = var.environment
   ecr_repositories  = var.ecr_repositories
   ecr_principals    = [data.aws_iam_user.ci_user.arn]
+}
+
+module "logging" {
+  source = "../../modules/logging"
+  count  = var.logging_type == "kibana" ? 1 : 0
+
+  project               = var.project
+  environment           = var.environment
+  vpc_id                = module.vpc.vpc_id
+  elasticsearch_version = var.logging_es_version
+  security_groups       = [module.eks.worker_security_group_id] # TODO : Add vpn SG when available
+  subnet_ids            = slice(module.vpc.private_subnets.*, 1, (1+var.logging_az_count)) # We will use 2 subnets
+  instance_type         = var.logging_es_instance_type
+  instance_count        = var.logging_es_instance_count
+  ebs_volume_size_in_gb = var.logging_volume_size_in_gb
+
 }

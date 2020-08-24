@@ -66,6 +66,11 @@ parameters:
     options:
       - "postgres"
       - "mysql"
+  - field: loggingType
+    label: Application logging to configure. Cloudwatch is cheaper with a more limited feature set. Elasticsearch + Kibana will set up more infrastructure but enable a much richer logging search and visualization experience.
+    options:
+      - "cloudwatch"
+      - "kibana"
   - field: accountId
     label: AWS Account ID
     execute: aws sts get-caller-identity --query "Account" | tr -d '"'
