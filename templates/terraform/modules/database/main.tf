@@ -133,12 +133,12 @@ module "rds_mysql" {
   deletion_protection = true
 
   # Enhanced monitoring
-  # Seems like mysql doesnt have performance insight on this instance size 
+  # Seems like mysql doesnt have performance insight on this instance size
   # Amazon RDS for MySQL
   # 8.0.17 and higher 8.0 versions, version 5.7.22 and higher 5.7 versions,
-  # and version 5.6.41 and higher 5.6 versions. Not supported for version 5.5. 
-  # Not supported on the following DB instance classes: 
-  # db.t2.micro, db.t2.small, db.t3.micro, db.t3.small, 
+  # and version 5.6.41 and higher 5.6 versions. Not supported for version 5.5.
+  # Not supported on the following DB instance classes:
+  # db.t2.micro, db.t2.small, db.t3.micro, db.t3.small,
   # all db.m6g instance classes, and all db.r6g instance classes.
   performance_insights_enabled = false
   create_monitoring_role = true

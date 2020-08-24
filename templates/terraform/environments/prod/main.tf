@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 0.13"
   backend "s3" {
     bucket         = "<% .Name %>-prod-terraform-state"
-    key            = "infrastructure/terraform/environments/production/main"
+    key            = "infrastructure/terraform/environments/prod/main"
     encrypt        = true
     region         = "<% index .Params `region` %>"
     dynamodb_table = "<% .Name %>-prod-terraform-state-locks"
@@ -44,4 +44,12 @@ module "prod" {
   db_instance_class = "db.t3.small"
   db_storage_gb = 100
 
+  # Logging configuration
+  logging_type = "<% index .Params `loggingType` %>"
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_version = "7.7"
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_az_count = "2"
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_instance_type = "t2.medium.elasticsearch"
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_instance_count = "2" # Must be a mulitple of the az count
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_volume_size_in_gb = "50" # Maximum value is limited by the instance type
+  # See https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-limits.html
 }

@@ -16,10 +16,6 @@ variable "certificate_arns" {
   type = map
 }
 
-variable "certificate_validations" {
-  description = "Certificate validations, provided as a dependency so we can wait on the certs to be valid"
-}
-
 variable "route53_zone_id" {
   description = "ID of the Route53 zone to create a record in"
   type = string
