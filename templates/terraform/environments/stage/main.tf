@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 0.13"
   backend "s3" {
     bucket         = "<% .Name %>-stage-terraform-state"
-    key            = "infrastructure/terraform/environments/staging/main"
+    key            = "infrastructure/terraform/environments/stage/main"
     encrypt        = true
     region         = "<% index .Params `region` %>"
     dynamodb_table = "<% .Name %>-stage-terraform-state-locks"
@@ -38,10 +38,21 @@ module "stage" {
   ]
   domain_name = "<% index .Params `stagingHostRoot` %>"
 
+  # This will save some money as there a cost associated to each NAT gateway, but if the AZ with the gateway
+  # goes down, nothing in the private subnets will be able to reach the internet. Not recommended for production.
   vpc_use_single_nat_gateway = true
 
   # DB configuration
   database = "<% index .Params `database` %>"
   db_instance_class = "db.t3.small"
   db_storage_gb = 20
+
+  # Logging configuration
+  logging_type = "<% index .Params `loggingType` %>"
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_version = "7.7"
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_az_count = "1"
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_instance_type = "t2.small.elasticsearch"
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_instance_count = "1" # Must be a mulitple of the az count
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_volume_size_in_gb = "10" # Maximum value is limited by the instance type
+  # See https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-limits.html
 }
