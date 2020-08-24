@@ -35,7 +35,7 @@ module "ci_user_keys" {
 module "rds_master_secret_stage" {
   source  = "../../modules/secret"
   name = "${local.project}-stage-rds-<% index .Params `randomSeed` %>"
-  type          = "random"	
+  type          = "random"
   random_length = 32
   tags = map("rds", "${local.project}-stage")
 }
@@ -43,7 +43,7 @@ module "rds_master_secret_stage" {
 module "rds_master_secret_prod" {
   source  = "../../modules/secret"
   name = "${local.project}-prod-rds-<% index .Params `randomSeed` %>"
-  type          = "random"	
+  type          = "random"
   random_length = 32
   tags = map("rds", "${local.project}-prod")
 }

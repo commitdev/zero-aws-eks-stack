@@ -34,5 +34,5 @@ resource "aws_dynamodb_table" "terraform_state_locks" {
 }
 
 variable "environment" {
-  description = "The environment (staging/production)"
+  description = "The environment (stage/prod)"
 }
