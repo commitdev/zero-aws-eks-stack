@@ -16,6 +16,8 @@ provider "aws" {
 module "kubernetes" {
   source = "../../modules/kubernetes"
 
+  project = "<% .Name %>"
+
   environment = "prod"
   region      = "<% index .Params `region` %>"
 
@@ -27,4 +29,7 @@ module "kubernetes" {
 
   # Registration email for LetsEncrypt
   cert_manager_acme_registration_email = "devops@<% index .Params `productionHostRoot` %>"
+
+  # Logging configuration
+  logging_type = "<% index .Params `loggingType` %>"
 }
