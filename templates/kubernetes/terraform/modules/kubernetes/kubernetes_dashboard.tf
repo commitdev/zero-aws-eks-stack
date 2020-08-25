@@ -1,9 +1,8 @@
 resource "kubernetes_service_account" "kubernetes_dashboard_user" {
   metadata {
     name      = "dashboard-user"
-    namespace = "kubernetes-dashboard"
+    namespace = kubernetes_namespace.kubernetes_dashboard.metadata[0].name
   }
-  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_cluster_role_binding" "kubernetes_dashboard_user" {
@@ -13,14 +12,13 @@ resource "kubernetes_cluster_role_binding" "kubernetes_dashboard_user" {
   subject {
     kind      = "ServiceAccount"
     name      = "dashboard-user"
-    namespace = "kubernetes-dashboard"
+    namespace = kubernetes_namespace.kubernetes_dashboard.metadata[0].name
   }
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
     name      = "cluster-admin"
   }
-  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_namespace" "kubernetes_dashboard" {
@@ -32,16 +30,15 @@ resource "kubernetes_namespace" "kubernetes_dashboard" {
 resource "kubernetes_service_account" "kubernetes_dashboard" {
   metadata {
     name      = "kubernetes-dashboard"
-    namespace = "kubernetes-dashboard"
+    namespace = kubernetes_namespace.kubernetes_dashboard.metadata[0].name
     labels    = { k8s-app = "kubernetes-dashboard" }
   }
-  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_service" "kubernetes_dashboard" {
   metadata {
     name      = "kubernetes-dashboard"
-    namespace = "kubernetes-dashboard"
+    namespace = kubernetes_namespace.kubernetes_dashboard.metadata[0].name
     labels    = { k8s-app = "kubernetes-dashboard" }
   }
   spec {
@@ -51,52 +48,47 @@ resource "kubernetes_service" "kubernetes_dashboard" {
     }
     selector = { k8s-app = "kubernetes-dashboard" }
   }
-  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_secret" "kubernetes_dashboard_certs" {
   metadata {
     name      = "kubernetes-dashboard-certs"
-    namespace = "kubernetes-dashboard"
+    namespace = kubernetes_namespace.kubernetes_dashboard.metadata[0].name
     labels    = { k8s-app = "kubernetes-dashboard" }
   }
   type = "Opaque"
-  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_secret" "kubernetes_dashboard_csrf" {
   metadata {
     name      = "kubernetes-dashboard-csrf"
-    namespace = "kubernetes-dashboard"
+    namespace = kubernetes_namespace.kubernetes_dashboard.metadata[0].name
     labels    = { k8s-app = "kubernetes-dashboard" }
   }
   type = "Opaque"
-  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_secret" "kubernetes_dashboard_key_holder" {
   metadata {
     name      = "kubernetes-dashboard-key-holder"
-    namespace = "kubernetes-dashboard"
+    namespace = kubernetes_namespace.kubernetes_dashboard.metadata[0].name
     labels    = { k8s-app = "kubernetes-dashboard" }
   }
   type = "Opaque"
-  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_config_map" "kubernetes_dashboard_settings" {
   metadata {
     name      = "kubernetes-dashboard-settings"
-    namespace = "kubernetes-dashboard"
+    namespace = kubernetes_namespace.kubernetes_dashboard.metadata[0].name
     labels    = { k8s-app = "kubernetes-dashboard" }
   }
-  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_role" "kubernetes_dashboard" {
   metadata {
     name      = "kubernetes-dashboard"
-    namespace = "kubernetes-dashboard"
+    namespace = kubernetes_namespace.kubernetes_dashboard.metadata[0].name
     labels    = { k8s-app = "kubernetes-dashboard" }
   }
   rule {
@@ -123,7 +115,6 @@ resource "kubernetes_role" "kubernetes_dashboard" {
     resources      = ["services/proxy"]
     resource_names = ["heapster", "http:heapster:", "https:heapster:", "dashboard-metrics-scraper", "http:dashboard-metrics-scraper"]
   }
-  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_cluster_role" "kubernetes_dashboard" {
@@ -136,26 +127,24 @@ resource "kubernetes_cluster_role" "kubernetes_dashboard" {
     api_groups = ["metrics.k8s.io"]
     resources  = ["pods", "nodes"]
   }
-  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_role_binding" "kubernetes_dashboard" {
   metadata {
     name      = "kubernetes-dashboard"
-    namespace = "kubernetes-dashboard"
+    namespace = kubernetes_namespace.kubernetes_dashboard.metadata[0].name
     labels    = { k8s-app = "kubernetes-dashboard" }
   }
   subject {
     kind      = "ServiceAccount"
     name      = "kubernetes-dashboard"
-    namespace = "kubernetes-dashboard"
+    namespace = kubernetes_namespace.kubernetes_dashboard.metadata[0].name
   }
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "Role"
     name      = "kubernetes-dashboard"
   }
-  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_cluster_role_binding" "kubernetes_dashboard" {
@@ -165,20 +154,19 @@ resource "kubernetes_cluster_role_binding" "kubernetes_dashboard" {
   subject {
     kind      = "ServiceAccount"
     name      = "kubernetes-dashboard"
-    namespace = "kubernetes-dashboard"
+    namespace = kubernetes_namespace.kubernetes_dashboard.metadata[0].name
   }
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
     name      = "kubernetes-dashboard"
   }
-  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_deployment" "kubernetes_dashboard" {
   metadata {
     name      = "kubernetes-dashboard"
-    namespace = "kubernetes-dashboard"
+    namespace = kubernetes_namespace.kubernetes_dashboard.metadata[0].name
     labels    = { k8s-app = "kubernetes-dashboard" }
   }
   spec {
@@ -199,6 +187,7 @@ resource "kubernetes_deployment" "kubernetes_dashboard" {
         }
         volume {
           name = "tmp-volume"
+          empty_dir {}
         }
         container {
           name  = "kubernetes-dashboard"
@@ -243,13 +232,12 @@ resource "kubernetes_deployment" "kubernetes_dashboard" {
     }
     revision_history_limit = 10
   }
-  depends_on = [kubernetes_role_binding.kubernetes_dashboard]
 }
 
 resource "kubernetes_service" "dashboard_metrics_scraper" {
   metadata {
     name      = "dashboard-metrics-scraper"
-    namespace = "kubernetes-dashboard"
+    namespace = kubernetes_namespace.kubernetes_dashboard.metadata[0].name
     labels    = { k8s-app = "dashboard-metrics-scraper" }
   }
   spec {
@@ -259,13 +247,12 @@ resource "kubernetes_service" "dashboard_metrics_scraper" {
     }
     selector = { k8s-app = "dashboard-metrics-scraper" }
   }
-  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 
 resource "kubernetes_deployment" "dashboard_metrics_scraper" {
   metadata {
     name      = "dashboard-metrics-scraper"
-    namespace = "kubernetes-dashboard"
+    namespace = kubernetes_namespace.kubernetes_dashboard.metadata[0].name
     labels    = { k8s-app = "dashboard-metrics-scraper" }
   }
   spec {
@@ -281,6 +268,7 @@ resource "kubernetes_deployment" "dashboard_metrics_scraper" {
       spec {
         volume {
           name = "tmp-volume"
+          empty_dir {}
         }
         container {
           name  = "dashboard-metrics-scraper"
@@ -319,6 +307,5 @@ resource "kubernetes_deployment" "dashboard_metrics_scraper" {
     }
     revision_history_limit = 10
   }
-  depends_on = [kubernetes_namespace.kubernetes_dashboard]
 }
 

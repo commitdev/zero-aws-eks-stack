@@ -89,7 +89,7 @@ module "iam_assumable_role_cert_manager" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
   version                       = "~> v2.14.0"
   create_role                   = true
-  role_name                     = "<% .Name %>-k8s-${var.environment}-cert-manager"
+  role_name                     = "${var.project}-k8s-${var.environment}-cert-manager"
   provider_url                  = replace(data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer, "https://", "")
   role_policy_arns              = [aws_iam_policy.cert_manager.arn]
   oidc_fully_qualified_subjects = ["system:serviceaccount:${local.cert_manager_namespace}:cert-manager"]

@@ -12,6 +12,8 @@ terraform {
 module "kubernetes" {
   source = "../../modules/kubernetes"
 
+  project = "<% .Name %>"
+
   environment = "dev"
   region      = "<% index .Params `region` %>"
 
@@ -23,4 +25,7 @@ module "kubernetes" {
 
   # Registration email for LetsEncrypt
   cert_manager_acme_registration_email = "devops@<% index .Params `stagingHostRoot` %>"
+
+  # Logging configuration
+  logging_type = "<% index .Params `loggingType` %>"
 }

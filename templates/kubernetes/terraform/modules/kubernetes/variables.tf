@@ -2,6 +2,10 @@ variable "region" {
   description = "AWS Region"
 }
 
+variable "project" {
+  description = "The name of the project"
+}
+
 variable "environment" {
   description = "Environment"
 }
@@ -26,4 +30,17 @@ variable "cert_manager_use_production_acme_environment" {
 
 variable "cert_manager_acme_registration_email" {
   description = "Email to associate with ACME account when registering with LetsEncrypt"
+}
+
+variable "logging_type" {
+  description = "Which application logging mechanism to use (cloudwatch, kibana)"
+  type        = string
+  default     = "cloudwatch"
+
+  validation {
+    condition     = (
+      var.logging_type == "cloudwatch" || var.logging_type == "kibana"
+    )
+    error_message = "Invalid value. Valid values are cloudwatch or kibana."
+  }
 }
