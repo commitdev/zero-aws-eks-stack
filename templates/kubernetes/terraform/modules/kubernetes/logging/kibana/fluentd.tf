@@ -115,11 +115,11 @@ resource "kubernetes_daemonset" "fluentd" {
           }
           env {
             name  = "FLUENT_ELASTICSEARCH_PORT"
-            value = "80"
+            value = "443"
           }
           env {
             name  = "FLUENT_ELASTICSEARCH_SCHEME"
-            value = "http"
+            value = "https"
           }
           env {
             name  = "FLUENT_UID"
