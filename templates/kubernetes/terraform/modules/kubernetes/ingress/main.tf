@@ -1,3 +1,29 @@
+locals {
+  log_format = <<EOF
+{
+ "time_local": "$time_local",
+ "timestamp": "$time_iso8601",
+ "remote_addr": "$remote_addr",
+ "remote_user": "$remote_user",
+ "request": "$request",
+ "status": "$status",
+ "request_id": "$req_id",
+ "bytes_sent": "$bytes_sent",
+ "request_method": "$request_method",
+ "request_length": "$request_length",
+ "request_time": "$request_time",
+ "http_referrer": "$http_referer",
+ "http_user_agent": "$http_user_agent",
+ "host": "$host",
+ "request_proto": "$server_protocol",
+ "path": "$uri",
+ "request_query": "$args",
+ "http_x_forwarded_for": "$proxy_add_x_forwarded_for"
+}
+EOF
+
+}
+
 resource "kubernetes_namespace" "ingress_nginx" {
   metadata {
     name = "ingress-nginx"
@@ -11,66 +37,52 @@ resource "kubernetes_namespace" "ingress_nginx" {
 resource "kubernetes_config_map" "nginx_configuration" {
   metadata {
     name      = "nginx-configuration"
-    namespace = "ingress-nginx"
+    namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
     labels = {
       "app.kubernetes.io/name"    = "ingress-nginx",
       "app.kubernetes.io/part-of" = "ingress-nginx"
     }
   }
   data = {
-    proxy-real-ip-cidr    = "0.0.0.0/0",
-    use-forwarded-headers = "true",
-    use-proxy-protocol    = "false"
+    proxy-real-ip-cidr     = "0.0.0.0/0",
+    use-forwarded-headers  = "true",
+    use-proxy-protocol     = "false"
+    log-format-escape-json = "true"
+    log-format-upstream    = replace(local.log_format, "\n", "")
   }
-  depends_on = [kubernetes_namespace.ingress_nginx]
 }
-
-# resource "kubernetes_config_map" "nginx_configuration" {
-#   metadata {
-#     name      = "nginx-configuration"
-#     namespace = "ingress-nginx"
-#     labels = {
-#       "app.kubernetes.io/name"    = "ingress-nginx",
-#       "app.kubernetes.io/part-of" = "ingress-nginx"
-#     }
-#   }
-#  depends_on = [kubernetes_namespace.ingress_nginx]
-# }
 
 resource "kubernetes_config_map" "tcp_services" {
   metadata {
     name      = "tcp-services"
-    namespace = "ingress-nginx"
+    namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
     labels = {
       "app.kubernetes.io/name"    = "ingress-nginx",
       "app.kubernetes.io/part-of" = "ingress-nginx"
     }
   }
-  depends_on = [kubernetes_namespace.ingress_nginx]
 }
 
 resource "kubernetes_config_map" "udp_services" {
   metadata {
     name      = "udp-services"
-    namespace = "ingress-nginx"
+    namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
     labels = {
       "app.kubernetes.io/name"    = "ingress-nginx",
       "app.kubernetes.io/part-of" = "ingress-nginx"
     }
   }
-  depends_on = [kubernetes_namespace.ingress_nginx]
 }
 
 resource "kubernetes_service_account" "nginx_ingress_serviceaccount" {
   metadata {
     name      = "nginx-ingress-serviceaccount"
-    namespace = "ingress-nginx"
+    namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
     labels = {
       "app.kubernetes.io/name"    = "ingress-nginx",
       "app.kubernetes.io/part-of" = "ingress-nginx"
     }
   }
-  depends_on = [kubernetes_namespace.ingress_nginx]
 }
 
 resource "kubernetes_cluster_role" "nginx_ingress_clusterrole" {
@@ -116,7 +128,7 @@ resource "kubernetes_cluster_role" "nginx_ingress_clusterrole" {
 resource "kubernetes_role" "nginx_ingress_role" {
   metadata {
     name      = "nginx-ingress-role"
-    namespace = "ingress-nginx"
+    namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
     labels = {
       "app.kubernetes.io/name"    = "ingress-nginx",
       "app.kubernetes.io/part-of" = "ingress-nginx"
@@ -143,13 +155,12 @@ resource "kubernetes_role" "nginx_ingress_role" {
     api_groups = [""]
     resources  = ["endpoints"]
   }
-  depends_on = [kubernetes_namespace.ingress_nginx]
 }
 
 resource "kubernetes_role_binding" "nginx_ingress_role_nisa_binding" {
   metadata {
     name      = "nginx-ingress-role-nisa-binding"
-    namespace = "ingress-nginx"
+    namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
     labels = {
       "app.kubernetes.io/name"    = "ingress-nginx",
       "app.kubernetes.io/part-of" = "ingress-nginx"
@@ -158,14 +169,13 @@ resource "kubernetes_role_binding" "nginx_ingress_role_nisa_binding" {
   subject {
     kind      = "ServiceAccount"
     name      = "nginx-ingress-serviceaccount"
-    namespace = "ingress-nginx"
+    namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
   }
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "Role"
     name      = "nginx-ingress-role"
   }
-  depends_on = [kubernetes_namespace.ingress_nginx]
 }
 
 resource "kubernetes_cluster_role_binding" "nginx_ingress_clusterrole_nisa_binding" {
@@ -179,7 +189,7 @@ resource "kubernetes_cluster_role_binding" "nginx_ingress_clusterrole_nisa_bindi
   subject {
     kind      = "ServiceAccount"
     name      = "nginx-ingress-serviceaccount"
-    namespace = "ingress-nginx"
+    namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
   }
   role_ref {
     api_group = "rbac.authorization.k8s.io"
@@ -195,7 +205,7 @@ resource "kubernetes_deployment" "nginx_ingress_controller" {
   ]
   metadata {
     name      = "nginx-ingress-controller"
-    namespace = "ingress-nginx"
+    namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
     labels = {
       "app.kubernetes.io/name"    = "ingress-nginx",
       "app.kubernetes.io/part-of" = "ingress-nginx"
@@ -307,7 +317,7 @@ resource "kubernetes_deployment" "nginx_ingress_controller" {
 resource "kubernetes_service" "ingress_nginx" {
   metadata {
     name      = "ingress-nginx"
-    namespace = "ingress-nginx"
+    namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
     labels = {
       "app.kubernetes.io/name"    = "ingress-nginx",
       "app.kubernetes.io/part-of" = "ingress-nginx"
@@ -331,41 +341,4 @@ resource "kubernetes_service" "ingress_nginx" {
     type                    = "LoadBalancer"
     external_traffic_policy = "Local"
   }
-  depends_on = [kubernetes_namespace.ingress_nginx]
 }
-
-# HTTPS Load balancer
-# resource "kubernetes_service" "ingress_nginx" {
-#   metadata {
-#     name      = "ingress-nginx"
-#     namespace = "ingress-nginx"
-#     labels = {
-#       "app.kubernetes.io/name"    = "ingress-nginx",
-#       "app.kubernetes.io/part-of" = "ingress-nginx"
-#     }
-#     annotations = {
-#       "service.beta.kubernetes.io/aws-load-balancer-backend-protocol"        = "http",
-#       "service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout" = "60",
-#       "service.beta.kubernetes.io/aws-load-balancer-ssl-cert"                = var.load_balancer_ssl_cert_arn,
-#       "service.beta.kubernetes.io/aws-load-balancer-ssl-ports"               = "https"
-#     }
-#   }
-#   spec {
-#     port {
-#       name        = "http"
-#       port        = 80
-#       target_port = "http"
-#     }
-#     port {
-#       name        = "https"
-#       port        = 443
-#       target_port = "http"
-#     }
-#     selector = {
-#       "app.kubernetes.io/name"    = "ingress-nginx",
-#       "app.kubernetes.io/part-of" = "ingress-nginx"
-#     }
-#     type = "LoadBalancer"
-#   }
-#  depends_on = [kubernetes_namespace.ingress_nginx]
-# }

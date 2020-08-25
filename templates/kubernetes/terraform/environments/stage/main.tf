@@ -16,6 +16,8 @@ provider "aws" {
 module "kubernetes" {
   source = "../../modules/kubernetes"
 
+  project = "<% .Name %>"
+
   environment = "stage"
   region      = "<% index .Params `region` %>"
 
