@@ -9,7 +9,7 @@ module "elasticsearch" {
   security_groups         = var.security_groups
   vpc_id                  = var.vpc_id
   subnet_ids              = var.subnet_ids
-  zone_awareness_enabled  = (count(var.subnet_ids) > 1)
+  zone_awareness_enabled  = (length(var.subnet_ids) > 1)
   availability_zone_count = length(var.subnet_ids)
   elasticsearch_version   = var.elasticsearch_version
   instance_type           = var.instance_type
