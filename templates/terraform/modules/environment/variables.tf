@@ -83,27 +83,33 @@ variable "logging_type" {
   }
 }
 
+# The following have default values specified in case logging_type is not set to "kibana", in which case they are not necessary.
 variable "logging_es_version" {
   description = "The version of elasticsearch to use"
+  default     = "7.7"
 }
 
 variable "logging_az_count" {
   description = "The number of availability zones to use for the cluster. More is more higly available but requires more instances, which increases cost"
   type        = number
+  default     = 1
 }
 
 variable "logging_es_instance_type" {
   description = "Instance type for nodes"
+  default     = "m3.medium.elasticsearch"
 }
 
 variable "logging_es_instance_count" {
-  description = "Number of nodes in the cluster. Must be a multiple of the number of"
+  description = "Number of nodes in the cluster. Must be a multiple of the number of availability zones"
   type        = number
+  default     = 1
 }
 
 variable "logging_volume_size_in_gb" {
   description = "Size of EBS volume (in GB) to attach to *each* of the nodes in the cluster. The maximum size is limited by the size of the instance"
   type        = number
+  default     = 10
 }
 
 variable "enable_cluster_logging" {
