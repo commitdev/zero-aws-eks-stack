@@ -8,11 +8,11 @@ module "logging_cloudwatch" {
 }
 
 module "logging_kibana" {
-  count              = var.logging_type == "kibana" ? 1 : 0
-  source             = "./logging/kibana"
-  environment        = var.environment
-  region             = var.region
-  cluster_name       = "${var.project}-${var.environment}-logging"
+  count                = var.logging_type == "kibana" ? 1 : 0
+  source               = "./logging/kibana"
+  environment          = var.environment
+  region               = var.region
+  elasticsearch_domain = "${var.project}-${var.environment}-logging"
 }
 
 module "ingress" {
