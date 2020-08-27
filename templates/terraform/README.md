@@ -139,7 +139,7 @@ After creating the AWS Elasticsearch cluster to hold log data it’s a good idea
 
 Typically you will want different policies on Staging and Production, as staging will probably have less restrictions about availability and speed, and more retained data increases cost.
 
-You can view these in Kibana's Index Management UI by clicking on the "IM" tab, but some default indices and lifecycles are automatically created. You can see the policies that were created in [scripts/files/](scripts/files/)
+You can view these in Kibana's Index Management UI by clicking on the "IM" tab, but some default indices and lifecycles are automatically created. You can see the policies that were created in [scripts/files/](../scripts/files/)
 If you want to change these policies you can update the json files as necessary and then run `sh scripts/elasticsearch-logging.sh`
 
 ### Maintenance
