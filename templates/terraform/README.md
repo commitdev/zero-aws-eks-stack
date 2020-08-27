@@ -131,3 +131,39 @@ The process should be:
 - Do the drain/delete process with one node at a time. Wait for a new node to be available before running the process on a second one. This will prevent any traffic from being lost.
 
 Done!
+
+<% if eq (index .Params `loggingType`) "kibana" %>
+## Kibana and Elasticsearch index Management
+
+After creating the AWS Elasticsearch cluster to hold log data it’s a good idea to create index policies to control how data ages over time.
+
+Typically you will want different policies on Staging and Production, as staging will probably have less restrictions about availability and speed, and more retained data increases cost.
+
+You can view these in Kibana's Index Management UI by clicking on the "IM" tab, but some default indices and lifecycles are automatically created. You can see the policies that were created in [scripts/files/](scripts/files/)
+If you want to change these policies you can update the json files as necessary and then run `sh scripts/elasticsearch-logging.sh`
+
+### Maintenance
+
+Over the long term, policies like this should prevent indices from growing too big for the system to be able to store, but if the policies or amount of data per day change over time it may be necessary to investigate the state of the system to tweak some of these values.
+
+The most likely limitations to hit will be size on disk and number of shards.
+
+**Number of shards** will most likely stay at a stable amount, regardless of log volume, unless the policies are changed, as the policies control the number of indices that will be maintained, and each index has a set number of shards.
+
+To see the current number of shards you can execute the stats query through the Kibana dev UI:
+
+```
+GET /_stats
+result:
+{ "_shards" : { "total" : 471, "successful" : 240, "failed" : 0 }, ...
+}
+```
+
+The number of shards can’t exceed 1000 per node. If it reaches that limit, new indices can’t be created and log ingestion will stop until previous indices have been deleted.
+
+**Size on disk** may fluctuate more than the number of shards because it is affected by the log volume. Old indices will be removed which will clear space every day, but it’s possible that the log volume will increase faster than the rate old logs are deleted, in which case the disk may fill up.
+
+The best place to view this is the AWS console for Elasticsearch.
+
+If the free space gets too low, the EBS volume can be resized by changing the value in Terraform, and it will be resized with no downtime.
+<% end %>

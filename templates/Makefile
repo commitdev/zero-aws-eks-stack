@@ -1,6 +1,6 @@
 ENVIRONMENT ?= stage
 
-apply: apply-remote-state apply-secrets apply-env apply-k8s-utils
+apply: apply-remote-state apply-secrets apply-env apply-k8s-utils post-apply-setup
 
 apply-remote-state:
 	aws s3 ls <% .Name %>-$(ENVIRONMENT)-terraform-state || (\
@@ -28,6 +28,9 @@ apply-k8s-utils: update-k8s-conf
 
 update-k8s-conf:
 	aws eks --region <% index .Params `region` %> update-kubeconfig --name <% .Name %>-$(ENVIRONMENT)-<% index .Params `region` %>
+
+post-apply-setup:
+	pushd scripts && sh post-apply.sh
 
 teardown: teardown-k8s-utils teardown-env teardown-secrets teardown-remote-state
 
