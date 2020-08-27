@@ -30,7 +30,7 @@ update-k8s-conf:
 	aws eks --region <% index .Params `region` %> update-kubeconfig --name <% .Name %>-$(ENVIRONMENT)-<% index .Params `region` %>
 
 post-apply-setup:
-	pushd scripts && sh post-apply.sh
+	cd scripts && sh post-apply.sh
 
 teardown: teardown-k8s-utils teardown-env teardown-secrets teardown-remote-state
 
