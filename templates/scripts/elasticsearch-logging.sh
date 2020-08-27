@@ -2,7 +2,7 @@
 # This file wil run locally. It will run a run a job inside the kubernetes cluster that will set up indices and a lifecycle policy in Elasticsearch
 
 DOCKER_IMAGE_TAG=commitdev/zero-k8s-utilities:0.0.2
-ES_ENDPOINT=$(aws es describe-elasticsearch-domain --domain-name bill-aug21-stage-logging --query "DomainStatus.Endpoints.vpc" | jq -r '.')
+ES_ENDPOINT=$(aws es describe-elasticsearch-domain --domain-name $PROJECT-$ENVIRONMENT-logging --query "DomainStatus.Endpoints.vpc" | jq -r '.')
 
 kubectl create namespace zero-setup 2>/dev/null || echo "Namespace exists"
 kubectl create configmap setup-script -n zero-setup --from-file=files/elasticsearch-setup.sh 2>/dev/null || echo "Setup script exists"
