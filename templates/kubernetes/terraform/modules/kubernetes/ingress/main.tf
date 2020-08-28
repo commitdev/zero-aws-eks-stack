@@ -1,7 +1,6 @@
 locals {
   log_format = <<EOF
 {
- "time_local": "$time_local",
  "timestamp": "$time_iso8601",
  "remote_addr": "$remote_addr",
  "remote_user": "$remote_user",

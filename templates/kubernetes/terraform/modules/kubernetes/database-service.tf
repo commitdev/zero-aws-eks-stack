@@ -4,7 +4,7 @@ data "aws_db_instance" "database" {
 
 resource "kubernetes_namespace" "app_namespace" {
   metadata {
-    name = "${var.project}"
+    name = var.project
   }
 }
 
