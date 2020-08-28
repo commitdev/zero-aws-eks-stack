@@ -5,25 +5,25 @@ apply: apply-remote-state apply-secrets apply-env apply-k8s-utils post-apply-set
 
 apply-remote-state:
 	aws s3 ls $(PROJECT)-$(ENVIRONMENT)-terraform-state || (\
-	pushd terraform/bootstrap/remote-state && \
+	cd terraform/bootstrap/remote-state && \
 	terraform init && \
 	terraform apply -var "environment=$(ENVIRONMENT)" $(AUTO_APPROVE) && \
 	rm ./terraform.tfstate)
 
 apply-secrets:
 	aws iam list-access-keys --user-name $(PROJECT)-ci-user > /dev/null || (\
-	pushd terraform/bootstrap/secrets && \
+	cd terraform/bootstrap/secrets && \
 	terraform init && \
 	terraform apply $(AUTO_APPROVE) && \
 	rm ./terraform.tfstate)
 
 apply-env:
-	pushd terraform/environments/$(ENVIRONMENT); \
+	cd terraform/environments/$(ENVIRONMENT); \
 	terraform init && \
 	terraform apply $(AUTO_APPROVE)
 
 apply-k8s-utils: update-k8s-conf
-	pushd kubernetes/terraform/environments/$(ENVIRONMENT) && \
+	cd kubernetes/terraform/environments/$(ENVIRONMENT) && \
 	terraform init && \
 	terraform apply $(AUTO_APPROVE)
 
@@ -51,11 +51,11 @@ teardown-secrets:
 	aws iam delete-user --user-name $(PROJECT)-ci-user
 
 teardown-env:
-	pushd terraform/environments/$(ENVIRONMENT) && \
+	cd terraform/environments/$(ENVIRONMENT) && \
 	terraform destroy
 
 teardown-k8s-utils:
-	pushd kubernetes/terraform/environments/$(ENVIRONMENT) && \
+	cd kubernetes/terraform/environments/$(ENVIRONMENT) && \
 	terraform destroy
 
 .PHONY: apply apply-remote-state apply-secrets apply-env apply-k8s-utils teardown-k8s-utils teardown-env teardown-secrets teardown-remote-state
