@@ -1,0 +1,72 @@
+{
+    "policy": {
+      "description": "Keep 2 days of hot data, 4 weeks of warm data, 4 more weeks of cold data, then delete",
+      "default_state": "hot",
+      "states": [
+        {
+          "name": "hot",
+          "actions": [
+            {
+              "replica_count": {
+                "number_of_replicas": 2
+              }
+            }
+          ],
+          "transitions": [
+            {
+              "state_name": "warm",
+              "conditions": {
+                "min_index_age": "2d"
+              }
+            }
+          ]
+        },
+        {
+          "name": "warm",
+          "actions": [
+            {
+              "replica_count": {
+                "number_of_replicas": 2
+              },
+              "read_only": {}
+            }
+          ],
+          "transitions": [
+            {
+              "state_name": "cold",
+              "conditions": {
+                "min_index_age": "30d"
+              }
+            }
+          ]
+        },
+        {
+          "name": "cold",
+          "actions": [
+            {
+              "replica_count": {
+                "number_of_replicas": 1
+              }
+            }
+          ],
+          "transitions": [
+            {
+              "state_name": "delete",
+              "conditions": {
+                "min_index_age": "58d"
+              }
+            }
+          ]
+        },
+        {
+          "name": "delete",
+          "actions": [
+            {
+              "delete": {}
+            }
+          ],
+          "transitions": []
+        }
+      ]
+    }
+  }

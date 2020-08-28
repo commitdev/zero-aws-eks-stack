@@ -1,0 +1,54 @@
+{
+    "policy": {
+      "description": "Keep 1 day of hot data, 1 month of cold data, then delete",
+      "default_state": "hot",
+      "states": [
+        {
+          "name": "hot",
+          "actions": [
+            {
+              "replica_count": {
+                "number_of_replicas": 1
+              }
+            }
+          ],
+          "transitions": [
+            {
+              "state_name": "cold",
+              "conditions": {
+                "min_index_age": "1d"
+              }
+            }
+          ]
+        },
+        {
+          "name": "cold",
+          "actions": [
+            {
+              "replica_count": {
+                "number_of_replicas": 1
+              },
+              "read_only": {}
+            }
+          ],
+          "transitions": [
+            {
+              "state_name": "delete",
+              "conditions": {
+                "min_index_age": "30d"
+              }
+            }
+          ]
+        },
+        {
+          "name": "delete",
+          "actions": [
+            {
+              "delete": {}
+            }
+          ],
+          "transitions": []
+        }
+      ]
+    }
+  }

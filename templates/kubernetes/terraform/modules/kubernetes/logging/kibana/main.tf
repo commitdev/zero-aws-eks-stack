@@ -48,19 +48,6 @@ resource "kubernetes_namespace" "logging" {
 #   depends_on = [kubernetes_namespace.logging]
 # }
 
-# # ExternalName service allowing us to refer to elasticsearch
-# resource "kubernetes_service" "kibana_service" {
-#   metadata {
-#     name      = "elasticsearch"
-#     namespace = "logging"
-#   }
-#   spec {
-#     type          = "ExternalName"
-#     external_name = "es-eks.${var.internal_domain}"
-#   }
-#   depends_on = [kubernetes_namespace.logging]
-# }
-
 
 # # Create prometheus exporter to gather metrics about the elasticsearch cluster
 # resource "helm_release" "elasticsearch_prometheus_exporter" {

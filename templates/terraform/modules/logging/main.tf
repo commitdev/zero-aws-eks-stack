@@ -19,6 +19,8 @@ module "elasticsearch" {
   iam_actions             = ["es:*"]
   iam_role_arns           = ["*"]
 
+  create_iam_service_linked_role = var.create_service_role
+
   log_publishing_application_enabled = var.enable_cluster_logging
   log_publishing_index_enabled       = var.enable_cluster_logging
   log_publishing_search_enabled      = var.enable_cluster_logging
