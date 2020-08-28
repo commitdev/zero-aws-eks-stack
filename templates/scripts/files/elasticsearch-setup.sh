@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 # This file will be pushed into a configmap and executed inside a container in the kubernetes cluster.
 # This will allow it to access Elasticsearch
 

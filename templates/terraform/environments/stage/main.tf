@@ -51,7 +51,7 @@ module "stage" {
   logging_type = "<% index .Params `loggingType` %>"
   <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_version = "7.7"
   <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_az_count = "1"
-  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_instance_type = "t2.small.elasticsearch"
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_instance_type = "t2.medium.elasticsearch"
   <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_instance_count = "1" # Must be a mulitple of the az count
   <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_volume_size_in_gb = "10" # Maximum value is limited by the instance type
   # See https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-limits.html
