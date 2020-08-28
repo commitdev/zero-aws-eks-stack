@@ -33,6 +33,11 @@ variable "instance_type" {
   }
 }
 
+variable "create_service_role" {
+  description = "Set this to false if you already have an existing Elasticsearch cluster in this AWS account"
+  type        = bool
+}
+
 variable "instance_count" {
   description = "Number of nodes in the cluster. Must be a multiple of the number of"
   type        = number

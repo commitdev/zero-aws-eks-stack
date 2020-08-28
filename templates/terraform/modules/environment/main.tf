@@ -104,5 +104,5 @@ module "logging" {
   instance_type         = var.logging_es_instance_type
   instance_count        = var.logging_es_instance_count
   ebs_volume_size_in_gb = var.logging_volume_size_in_gb
-
+  create_service_role   = var.logging_create_service_role
 }

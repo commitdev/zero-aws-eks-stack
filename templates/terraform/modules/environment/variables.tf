@@ -89,6 +89,12 @@ variable "logging_es_version" {
   default     = "7.7"
 }
 
+variable "logging_create_service_role" {
+  description = "Set this to false if you already have an existing Elasticsearch cluster in this AWS account"
+  type        = bool
+  default     = true
+}
+
 variable "logging_az_count" {
   description = "The number of availability zones to use for the cluster. More is more higly available but requires more instances, which increases cost"
   type        = number
