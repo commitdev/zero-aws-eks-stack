@@ -1,9 +1,9 @@
-# IRSA support: allow application specific policy via service-account and role
+# IRSA support: allow backend service to have a specific policy via service-account and role
 
 # application_policy_list is passed from main.tf as below:
   # application_policy_list = [
   #   {
-  #     service_account = "app1"
+  #     service_account = "backend-service"
   #     namespace       = "my-app"
   #     policy          = data.aws_iam_policy_document.resource_access_app1
   #   }

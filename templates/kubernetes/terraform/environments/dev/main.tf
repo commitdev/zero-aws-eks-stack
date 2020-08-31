@@ -32,14 +32,9 @@ module "kubernetes" {
   # Application policy list
   application_policy_list = [
     {
-      service_account = "app1"
+      service_account = "backend-service"
       namespace       = "<% .Name %>"
-      policy          = data.aws_iam_policy_document.resource_access_app1
-    },
-    {
-      service_account = "app2"
-      namespace       = "<% .Name %>"
-      policy          = data.aws_iam_policy_document.resource_access_app2
+      policy          = data.aws_iam_policy_document.resource_access_backendservice
     }
     # could be more policies defined here (if have)
   ]
