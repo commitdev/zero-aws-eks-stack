@@ -44,3 +44,9 @@ variable "logging_type" {
     error_message = "Invalid value. Valid values are cloudwatch or kibana."
   }
 }
+
+variable "application_policy_list" {
+  description = "Application policies"
+  type        = list
+  default     = []
+}

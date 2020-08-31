@@ -32,4 +32,13 @@ module "kubernetes" {
 
   # Logging configuration
   logging_type = "<% index .Params `loggingType` %>"
-}
+
+  # Application policy list
+  application_policy_list = [
+    {
+      service_account = "backend-service"
+      namespace       = "<% .Name %>"
+      policy          = data.aws_iam_policy_document.resource_access_backendservice
+    }
+    # could be more policies defined here (if have)
+  ]
