@@ -28,4 +28,19 @@ module "kubernetes" {
 
   # Logging configuration
   logging_type = "<% index .Params `loggingType` %>"
+
+  # Application policy list
+  application_policy_list = [
+    {
+      application     = "app1"
+      namespace       = "<% .Name %>"
+      policy          = data.aws_iam_policy_document.resource_access_app1
+    },
+    {
+      application     = "app2"
+      namespace       = "<% .Name %>"
+      policy          = data.aws_iam_policy_document.resource_access_app2
+    }
+    # could be more policies defined here (if have)
+  ]
 }
