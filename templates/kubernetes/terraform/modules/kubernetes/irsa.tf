@@ -4,13 +4,8 @@
   # application_policy_list = [
   #   {
   #     service_account = "app1"
-  #     namespace       = "piggycloud-me"
+  #     namespace       = "my-app"
   #     policy          = data.aws_iam_policy_document.resource_access_app1
-  #   },
-  #   {
-  #     service_account = "app2"
-  #     namespace       = "piggycloud-me"
-  #     policy          = data.aws_iam_policy_document.resource_access_app2
   #   }
   #   # could be more here
   # ]
@@ -30,8 +25,8 @@ module "iam_assumable_role_irsa" {
 # Create policies
 resource "aws_iam_policy" "irsa" {
   count       = length(var.application_policy_list)
-  name_prefix = var.project
-  description = "${var.project} policy for service account ${var.application_policy_list[count.index].service_account}"
+  name_prefix = "${var.project}-k8s-${var.environment}"
+  description = "policy for service account ${var.application_policy_list[count.index].namespace}:${var.application_policy_list[count.index].service_account}"
   policy      = var.application_policy_list[count.index].policy.json
 }
 
