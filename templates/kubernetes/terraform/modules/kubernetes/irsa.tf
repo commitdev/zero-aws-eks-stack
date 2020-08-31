@@ -23,7 +23,7 @@ module "iam_assumable_role_irsa" {
   create_role                   = true
   role_name                     = "${var.project}-k8s-${var.environment}-${var.application_policy_list[count.index].application}"
   provider_url                  = replace(data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer, "https://", "")
-  role_policy_arns              = [aws_iam_policy.piggycloud_me[count.index].arn]
+  role_policy_arns              = [aws_iam_policy.irsa[count.index].arn]
   oidc_fully_qualified_subjects = ["system:serviceaccount:${var.application_policy_list[count.index].namespace}:${var.application_policy_list[count.index].application}"]
 }
 
@@ -35,14 +35,14 @@ resource "aws_iam_policy" "irsa" {
   policy      = var.application_policy_list[count.index].policy.json
 }
 
-# Create kubernetes applications
-resource "kubernetes_application" "irsa" {
+# Create kubernetes service account
+resource "kubernetes_service_account" "irsa" {
   count         = length(var.application_policy_list)
   metadata {
     name        = var.application_policy_list[count.index].application
     namespace   = var.application_policy_list[count.index].namespace
     annotations = {
-      "eks.amazonaws.com/role-arn" = module.iam_assumable_role_piggycloud_me[count.index].this_iam_role_arn
+      "eks.amazonaws.com/role-arn" = module.iam_assumable_role_irsa[count.index].this_iam_role_arn
     }
   }
 }
