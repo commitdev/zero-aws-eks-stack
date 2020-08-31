@@ -24,16 +24,33 @@ Used by things like HorizontalPodAutoscaler to determine the current usage of po
 A web-based GUI for viewing and modifying resources in a Kubernetes cluster. Usage instructions below.
 
 
-## IRSA Support for POD level of access
+## AWS IAM / Kubernetes RBAC integration
+
+Sometimes you may have an application running in the Kubernetes cluster that needs to access the AWS API (S3 is a common example.) In this case you want to be able to have fine-grained control over this, to allow an application only the very specific access it needs.
+
+There is an official method for EKS called [IRSA (IAM Roles for Service Accounts)](https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/). This uses AWS IAM OIDC support to be able to mount tokens into pods automatically that can then be used to auth with the AWS API using a specific role. Any pods that come up in that deployment will automatically have env vars injected called `AWS_ROLE_ARN` and `AWS_WEB_IDENTITY_TOKEN_FILE` that will let them use the AWS API.
+
+*Note that you may need to use a minimum specific version of the AWS API to take advantage of this automatically. You can see a list of the version numbers in the link above.*
+
+The `irsa` module makes it easy to grant a pod to have a specific level of access. You need to:
+
+- Create a policy in `environments/<env>/application_iam_policy.tf`, there should already be examples there. These will be the AWS policies that grant a specific level of access to AWS resources.
+- Add your policy, namespace and service account name to `application_policy_list` in `environments/<env>/application_iam_policy.tf`. This is a mapping of a policy to a specific application that will run in the cluster.
 
 ```
-An official method [IRSA (IAM Roles for Service Accounts)](https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/) is introduced. This uses their OIDC IAM support to be able to mount tokens into pods automatically that can then be used to auth with the AWS API using a specific role. Any pods that come up in that deployment will automatically have env vars injected called `AWS_ROLE_ARN` and `AWS_WEB_IDENTITY_TOKEN_FILE` that will let them use the AWS API.
-
-Module `irsa` is created to allow a pod to have a specific level of access. You need to:
-
-- Modify policy-application under environments/<env>/application_iam_policy.tf and corresponding main.tf with variables passing to module irsa
-- Use created service account in your deployment spec
+{
+   service_account = "backendservice" # The name of your app. Unique per namespace
+   namespace       = "my-app"         # The namespace your app is in
+   policy          = data.aws_iam_policy_document.resource_access_backendservice
+ },
 ```
+
+- This will create a Kubernetes "service account" in your cluster. You would refrence this in your application deployment manifest inside the pod template:
+```
+  spec:
+    serviceAccountName: backendservice
+```
+
 
 
 ## Organization
