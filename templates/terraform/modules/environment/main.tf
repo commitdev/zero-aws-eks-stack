@@ -8,8 +8,10 @@ data "aws_iam_user" "ci_user" {
   user_name = "${var.project}-ci-user"  # Should have been created in the bootstrap process
 }
 
+
 module "vpc" {
-  source = "../../modules/vpc"
+  source = "commitdev/zero/aws//modules/vpc"
+  version = "0.0.1"
 
   project                 = var.project
   environment             = var.environment
@@ -24,7 +26,8 @@ data "aws_caller_identity" "current" {}
 #
 # Provision the EKS cluster
 module "eks" {
-  source = "../../modules/eks"
+  source = "commitdev/zero/aws//modules/eks"
+  version = "0.0.1"
 
   project              = var.project
   environment          = var.environment
@@ -44,7 +47,8 @@ module "eks" {
 
 
 module "wildcard_domain" {
-  source = "../../modules/certificate"
+  source = "commitdev/zero/aws//modules/certificate"
+  version = "0.0.1"
 
   region        = var.region
   zone_name     = var.domain_name
@@ -52,7 +56,8 @@ module "wildcard_domain" {
 }
 
 module "assets_domains" {
-  source = "../../modules/certificate"
+  source = "commitdev/zero/aws//modules/certificate"
+  version = "0.0.1"
 
   region        = "us-east-1" # For CF, the cert must be in us-east-1
   zone_name     = var.domain_name
@@ -60,7 +65,9 @@ module "assets_domains" {
 }
 
 module "s3_hosting" {
-  source     = "../../modules/s3_hosting"
+  source = "commitdev/zero/aws//modules/s3_hosting"
+  version = "0.0.1"
+
   # We need to wait for certificate validation to complete before using the certs
   depends_on = [module.assets_domains.certificate_validations]
 
@@ -72,11 +79,13 @@ module "s3_hosting" {
 }
 
 module "db" {
-  source = "../../modules/database"
+  source = "commitdev/zero/aws//modules/database"
+  version = "0.0.1"
 
   project                   = var.project
   environment               = var.environment
   vpc_id                    = module.vpc.vpc_id
+  password_secret_suffix    = var.random_seed
   allowed_security_group_id = module.eks.worker_security_group_id
   instance_class            = var.db_instance_class
   storage_gb                = var.db_storage_gb
@@ -84,7 +93,8 @@ module "db" {
 }
 
 module "ecr" {
-  source = "../../modules/ecr"
+  source = "commitdev/zero/aws//modules/ecr"
+  version = "0.0.1"
 
   environment       = var.environment
   ecr_repositories  = var.ecr_repositories
@@ -92,7 +102,9 @@ module "ecr" {
 }
 
 module "logging" {
-  source = "../../modules/logging"
+  source = "commitdev/zero/aws//modules/logging"
+  version = "0.0.1"
+
   count  = var.logging_type == "kibana" ? 1 : 0
 
   project               = var.project
