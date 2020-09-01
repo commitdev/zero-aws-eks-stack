@@ -15,6 +15,10 @@ variable "allowed_account_ids" {
   type        = list(string)
 }
 
+variable "random_seed" {
+  description = "A randomly generated string to prevent collisions of resource names - should be unique within an AWS account"
+}
+
 variable "ecr_repositories" {
   description = "List of ECR repository names to create"
   type        = list(string)
