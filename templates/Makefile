@@ -1,7 +1,7 @@
 ENVIRONMENT ?= stage
 PROJECT = <% .Name %>
 
-apply: apply-remote-state apply-secrets apply-env apply-k8s-utils post-apply-setup
+apply: apply-remote-state apply-secrets pre-env-setup apply-env apply-k8s-utils post-apply-setup
 
 apply-remote-state:
 	aws s3 ls $(PROJECT)-$(ENVIRONMENT)-terraform-state || (\
@@ -30,6 +30,9 @@ apply-k8s-utils: update-k8s-conf
 update-k8s-conf:
 	aws eks --region <% index .Params `region` %> update-kubeconfig --name $(PROJECT)-$(ENVIRONMENT)-<% index .Params `region` %>
 
+pre-env-setup:
+	cd scripts && ENVIRONMENT=$(ENVIRONMENT) PROJECT=$(PROJECT) sh pre-env.sh
+
 post-apply-setup:
 	cd scripts && ENVIRONMENT=$(ENVIRONMENT) PROJECT=$(PROJECT) sh post-apply.sh
 
@@ -47,6 +50,7 @@ teardown-secrets:
 	export AWS_PAGER='' && export AWS_DEFAULT_REGION=<% index .Params `region` %> && \
 	aws secretsmanager list-secrets --region <% index .Params `region` %> --query "SecretList[?Tags[?Key=='project' && Value=='$(PROJECT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region <% index .Params `region` %> --secret-id && \
 	aws secretsmanager list-secrets --region <% index .Params `region` %> --query "SecretList[?Tags[?Key=='rds' && Value=='$(PROJECT)-$(ENVIRONMENT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region <% index .Params `region` %> --secret-id && \
+	aws secretsmanager list-secrets --region <% index .Params `region` %> --query "SecretList[?Tags[?Key=='sendgrid' && Value=='$(PROJECT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region <% index .Params `region` %> --secret-id && \
 	aws iam delete-access-key --user-name $(PROJECT)-ci-user --access-key-id $(shell aws iam list-access-keys --user-name $(PROJECT)-ci-user --query "AccessKeyMetadata[0].AccessKeyId" | sed 's/"//g') && \
 	aws iam delete-user --user-name $(PROJECT)-ci-user
 

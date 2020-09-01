@@ -127,3 +127,18 @@ variable "enable_cluster_logging" {
   type        = bool
   default     = false
 }
+
+variable "sendgrid_enabled" {
+  description = "If enabled, creates route53 entries for domain authentication"
+  type  = bool
+}
+
+variable "sendgrid_cnames" {
+  description = "If enabled, creates route53 entries for domain authentication"
+  type  = list(tuple([string, string]))
+}
+
+variable "sendgrid_domain_id" {
+  description = "domain_id from sendgrid api"
+  type  = string
+}
