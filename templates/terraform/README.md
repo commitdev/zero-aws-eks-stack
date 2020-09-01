@@ -2,34 +2,23 @@
 
 - All Terraform configuration should be formatted with `terraform fmt` before being accepted into this repository.
 - This repository is Terraform version >= 0.13, as such, leverage features from this release whenever possible.
-    See https://www.terraform.io/upgrade-guides/0-12.html for more information.
+    See https://www.terraform.io/upgrade-guides/0-13.html for more information.
 - Leverage community-maintained Terraform modules whenever possible.
 - Attempt to minimize duplication whenever possible, but only within reason -- sometimes duplication is an acceptable solution.
-- Follow style conventions described in `docs/guide.pdf` whenever possible.
-- Whenever possible, inject resources down versus referencing resources across modules. This has been made easier with new features in v0.13.
 - Whenever possible, define the types of variables.
 
-### Module Conventions
-
-- All modules should contain the following:
-
-    `README.md`: A description of the module.
-    `main.tf`: Module entrypoint where instantiation of resources happens.
-    `variables.tf`: Module variables.
-    `outputs.tf`: Output values (optional).
-    `files/`: Any / all files required by the module.
-
-- All module variables must have a description.
-- Again, leverage community-maintained Terraform modules whenever possible.
-- Avoid writing a module that is simply a wrapper of a Terraform resource unless absolutely necessary.
 
 ### Environment Conventions
 
+- `terraform/environments/` contains the configuration for specific environments (staging, production, etc.)
 - All environments should contain the following:
 
-    `main.tf`: Top level terraform configuration file that instantiates the `environment` module.
+    `main.tf`: Top level terraform configuration file that instantiates the `environment` module and provides configuration values.
 
 - Configuration should be pushed "top->down" from the `environment` module to it's submodules.
+- If there is some feature that is specific to a single environment it could be put into another `.tf` file in the `environments/<env>` directory, but as much as possible, try to work with reusable modules instead.
+- Many modules are provided from the Zero terraform registry. These specify a version number. To take advantage of a new fix or feature in one of these modules, just change the version number and run `terraform init` to pull in the new code.
+
 
 ### The Environment Module
 
@@ -38,11 +27,25 @@
 - The `environment` module contains the following:
 
     `main.tf`: Module entrypoint where instantiation of resources happens.
-    `backend.tf`: Terraform remote state configuration.
     `provider.tf`: Provider configuration.
     `variables.tf`: Environment-specific variables are declared here.
     `versions.tf`: Terraform version information.
-    `files/`: (DEPRECATED)
+
+
+### Module Conventions
+
+- Modules should be used to provide functionality that will be used in multiple environments. The `environment` module is the place where all shared modules are used.
+- All modules should contain the following:
+
+    `README.md`: A description of the module.
+    `main.tf`: Module entrypoint where instantiation of resources happens.
+    `variables.tf`: Module variables.
+    `outputs.tf`: Output values.
+    `files/`: Any non-Terraform files required by the module.
+
+- All module variables must have a description.
+- Again, leverage community-maintained Terraform modules whenever possible.
+- Avoid writing a module that is simply a wrapper of a Terraform resource unless absolutely necessary.
 
 ## Directory Structure
 
@@ -53,10 +56,6 @@
             main.tf
         stage/
             main.tf
-        development/
-            main.tf
-    docs/
-        guide.pdf
     modules/
         environment/
             ...
@@ -90,15 +89,18 @@
  2. Run the following from the appropriate environment directory under `environments/`:
 
  ```
- environment/development$ terraform init
- environment/development$ terraform plan
+ environment/stage$ terraform init
+ environment/stage$ terraform plan
  ```
 
 ## To use kubectl with the created EKS cluster:
 
  Exchange your aws credentials for kubernetes credentials.
  This will add a new context to your kubeconfig.
- `aws eks update-kubeconfig --name <cluster name> --region <aws region>`
+ In the root of the project, run:
+ ```
+ make update-k8s-conf
+ ```
 
 
 
