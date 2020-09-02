@@ -18,7 +18,7 @@ module "prod" {
   project             = "<% .Name %>"
   region              = "<% index .Params `region` %>"
   allowed_account_ids = ["<% index .Params `accountId` %>"]
-  random_seed         = "<% index .Params `.randomSeed` %>"
+  random_seed         = "<% index .Params `randomSeed` %>"
 
   # ECR configuration
   ecr_repositories = [] # Should be created by the staging environment
