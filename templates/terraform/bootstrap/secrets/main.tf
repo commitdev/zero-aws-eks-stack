@@ -47,3 +47,11 @@ module "rds_master_secret_prod" {
   random_length = 32
   tags = map("rds", "${local.project}-prod")
 }
+
+module "sendgrid_api_key" {
+  source  = "../../modules/secret"
+  name = "${local.project}-sendgrid-<% index .Params `randomSeed` %>"
+  type  = "string"
+  value = "<% index .Params `sendgridApiKey` %>"
+  tags = map("sendgrid", local.project)
+}

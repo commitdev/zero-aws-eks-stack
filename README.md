@@ -42,6 +42,9 @@ which describes the environment mapped in this [architecture diagram][arch-diagr
  - [A domain registered with Route53][aws-route53]
    - Note: if you want to use different domain per environment (staging/production), you need to have multiple hosted zones. The available zones in Route53 can be found by running this command. `aws route53 list-hosted-zones`
 
+_Optional Prerequisites_
+- [Sendgrid account][sendgrid] with developer [API key][sendgrid-apikey]: this will enable transactional email sending with simple API calls.
+
 ## Getting Started
 
 This is meant to be used with the `zero` tool and not directly. See
@@ -73,3 +76,5 @@ Project board: [zenhub][zenhub-board]
 [aws-cli]: https://docs.aws.amazon.com/polly/latest/dg/setup-aws-cli.html
 [aws-route53]: https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html
 [zenhub-board]: https://app.zenhub.com/workspaces/commit-zero-5da8decc7046a60001c6db44/board?filterLogic=any&repos=203630543,247773730,257676371,258369081
+[sendgrid]: https://signup.sendgrid.com
+[sendgrid-apikey]: https://app.sendgrid.com/settings/api_keys
