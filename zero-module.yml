@@ -72,7 +72,7 @@ parameters:
       - "cloudwatch"
       - "kibana"
   - field: sendgridApiKey
-    label: API key to setup email integration
+    label: "API key to setup email integration (optional: leave blank to opt-out of Sendgrid setup)"
     info: Signup at https://signup.sendgrid.com or create an API key from https://app.sendgrid.com/settings/api_keys. Sendgrid is an email delivery service enabling transactional email sending and more.
   - field: accountId
     label: AWS Account ID
