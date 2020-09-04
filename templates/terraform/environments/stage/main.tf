@@ -59,10 +59,6 @@ module "stage" {
   <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_volume_size_in_gb = "10" # Maximum value is limited by the instance type
   # See https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-limits.html
 
-  # Sendgird CNAME and domain authentication setup
-  # If SendgridApiKey was provided these should be available in `./sendgrid.auto.tfvars.json`
-  # otherwise will fallback to default
-  sendgrid_enabled = var.sendgrid_enabled
-  sendgrid_cnames = var.sendgrid_cnames
-  sendgrid_domain_id = var.sendgrid_domain_id
+  sendgrid_enabled = <%if eq (index .Params `sendgridApiKey`) "" %>false<% else %>true<% end %>
+  sendgrid_api_key_secret_name = "<% .Name %>-sendgrid-<% index .Params `randomSeed` %>"
 }

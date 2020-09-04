@@ -1,7 +1,7 @@
 ENVIRONMENT ?= stage
 PROJECT = <% .Name %>
 
-apply: apply-remote-state apply-secrets pre-env-setup apply-env apply-k8s-utils post-apply-setup
+apply: apply-remote-state apply-secrets apply-env apply-k8s-utils post-apply-setup
 
 apply-remote-state:
 	aws s3 ls $(PROJECT)-$(ENVIRONMENT)-terraform-state || (\
@@ -29,9 +29,6 @@ apply-k8s-utils: update-k8s-conf
 
 update-k8s-conf:
 	aws eks --region <% index .Params `region` %> update-kubeconfig --name $(PROJECT)-$(ENVIRONMENT)-<% index .Params `region` %>
-
-pre-env-setup:
-	cd scripts && ENVIRONMENT=$(ENVIRONMENT) PROJECT=$(PROJECT) sh pre-env.sh
 
 post-apply-setup:
 	cd scripts && ENVIRONMENT=$(ENVIRONMENT) PROJECT=$(PROJECT) sh post-apply.sh

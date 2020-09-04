@@ -125,7 +125,5 @@ module "sendgrid" {
   count  = var.sendgrid_enabled ? 1 : 0
 
   zone_name = var.domain_name
-  sendgrid_api_key_secret_name = "${var.project}-sendgrid-${var.random_seed}"
-  cnames = var.sendgrid_cnames
-  domain_id = var.sendgrid_domain_id
+  sendgrid_api_key_secret_name = var.sendgrid_api_key_secret_name
 }

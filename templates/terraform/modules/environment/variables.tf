@@ -133,12 +133,7 @@ variable "sendgrid_enabled" {
   type  = bool
 }
 
-variable "sendgrid_cnames" {
-  description = "If enabled, creates route53 entries for domain authentication"
-  type  = list(tuple([string, string]))
-}
-
-variable "sendgrid_domain_id" {
-  description = "domain_id from sendgrid api"
+variable "sendgrid_api_key_secret_name" {
+  description = "AWS secret manager's secret name storing the sendgrid api key"
   type  = string
 }
