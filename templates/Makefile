@@ -28,7 +28,7 @@ apply-k8s-utils: update-k8s-conf
 	terraform apply $(AUTO_APPROVE)
 
 update-k8s-conf:
-	aws eks --region <% index .Params `region` %> update-kubeconfig --name $(PROJECT)-$(ENVIRONMENT)-<% index .Params `region` %>
+	aws eks --region <% index .Params `region` %> update-kubeconfig --role "arn:aws:iam::<% index .Params `accountId` %>:role/$(PROJECT)-kubernetes-admin-$(ENVIRONMENT)" --name $(PROJECT)-$(ENVIRONMENT)-<% index .Params `region` %>
 
 post-apply-setup:
 	cd scripts && ENVIRONMENT=$(ENVIRONMENT) PROJECT=$(PROJECT) sh post-apply.sh
