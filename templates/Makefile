@@ -47,6 +47,7 @@ teardown-secrets:
 	export AWS_PAGER='' && export AWS_DEFAULT_REGION=<% index .Params `region` %> && \
 	aws secretsmanager list-secrets --region <% index .Params `region` %> --query "SecretList[?Tags[?Key=='project' && Value=='$(PROJECT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region <% index .Params `region` %> --secret-id && \
 	aws secretsmanager list-secrets --region <% index .Params `region` %> --query "SecretList[?Tags[?Key=='rds' && Value=='$(PROJECT)-$(ENVIRONMENT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region <% index .Params `region` %> --secret-id && \
+	aws secretsmanager list-secrets --region <% index .Params `region` %> --query "SecretList[?Tags[?Key=='sendgrid' && Value=='$(PROJECT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region <% index .Params `region` %> --secret-id && \
 	aws iam delete-access-key --user-name $(PROJECT)-ci-user --access-key-id $(shell aws iam list-access-keys --user-name $(PROJECT)-ci-user --query "AccessKeyMetadata[0].AccessKeyId" | sed 's/"//g') && \
 	aws iam delete-user --user-name $(PROJECT)-ci-user
 

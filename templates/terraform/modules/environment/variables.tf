@@ -127,3 +127,13 @@ variable "enable_cluster_logging" {
   type        = bool
   default     = false
 }
+
+variable "sendgrid_enabled" {
+  description = "If enabled, creates route53 entries for domain authentication"
+  type  = bool
+}
+
+variable "sendgrid_api_key_secret_name" {
+  description = "AWS secret manager's secret name storing the sendgrid api key"
+  type  = string
+}
