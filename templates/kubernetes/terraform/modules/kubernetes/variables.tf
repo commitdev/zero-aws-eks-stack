@@ -10,6 +10,10 @@ variable "environment" {
   description = "Environment"
 }
 
+variable "random_seed" {
+  description = "A randomly generated string to prevent collisions of resource names - should be unique within an AWS account"
+}
+
 variable "cluster_name" {
   description = "Kubernetes cluster name"
 }
