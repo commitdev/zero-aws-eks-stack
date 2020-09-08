@@ -9,12 +9,6 @@ data "aws_eks_cluster_auth" "cluster_auth" {
 }
 
 provider "kubernetes" {
-  host                   = data.aws_eks_cluster.cluster.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
-  token                  = data.aws_eks_cluster_auth.cluster_auth.token
-  load_config_file       = false
-}
-provider "kubernetes" {
   ## This is a workaround because aws-eks-cluster-auth will default to us-east-1
   ## leading to an invalid token to access the cluster
   exec {
@@ -28,6 +22,6 @@ provider "kubernetes" {
       "--cluster-name",
       var.cluster_name,
       "--role",
-      "arn:aws:iam::${data.aws_caller_identity.account_id}:role/${var.project}-kubernetes-admin-${var.environment}"]
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.project}-kubernetes-admin-${var.environment}"]
   }
 }
