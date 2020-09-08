@@ -1,7 +1,7 @@
 ENVIRONMENT ?= stage
 PROJECT = <% .Name %>
 
-apply: apply-remote-state apply-secrets apply-env apply-k8s-utils post-apply-setup
+apply: apply-remote-state apply-secrets apply-env pre-k8s apply-k8s-utils post-apply-setup
 
 apply-remote-state:
 	aws s3 ls $(PROJECT)-$(ENVIRONMENT)-terraform-state || (\
@@ -21,6 +21,11 @@ apply-env:
 	cd terraform/environments/$(ENVIRONMENT); \
 	terraform init && \
 	terraform apply $(AUTO_APPROVE)
+
+pre-k8s:
+        @echo "Creating VPN private key..."
+        aws secretsmanager create-secret --name $(PROJECT)-$(ENVIRONMENT)-vpn-wg-privatekey-<% index .Params `randomSeed` %> --description "Create VPN private key from infrasture pre-k8s of makefile" --secret-string '{"key":"$(shell kubectl run -i --tty zero-k8s-utilities --image=commitdev/zero-k8s-utilities:0.0.3 --restart=Never -- wg genkey)"}' && kubectl delete pod/zero-k8s-utilities
+        @echo "Done VPN private key creation"
 
 apply-k8s-utils: update-k8s-conf
 	cd kubernetes/terraform/environments/$(ENVIRONMENT) && \

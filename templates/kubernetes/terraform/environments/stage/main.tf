@@ -20,6 +20,7 @@ module "kubernetes" {
 
   environment = "stage"
   region      = "<% index .Params `region` %>"
+  random_seed = "<% index .Params `randomSeed` %>"
 
   # Authenticate with the EKS cluster via the cluster id
   cluster_name = "<% .Name %>-stage-<% index .Params `region` %>"
@@ -41,5 +42,11 @@ module "kubernetes" {
       policy          = data.aws_iam_policy_document.resource_access_backendservice
     }
     # could be more policies defined here (if have)
+  ]
+
+  # VPN configuration
+  vpn_client_publickeys = [
+    { "10.10.10.101/32" = "ODxGk1+WNAby/5fbzygvrEOrzjqJGumT9o2k6wP5Q2I=" }, # client IP1
+    { "10.10.11.101/32" = "ODxGk1+WNAby/5fbzygvrEOrzjqJGumT9o2k6wP5Q2I=" }, # client IP2
   ]
 }

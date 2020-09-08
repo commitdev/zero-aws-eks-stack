@@ -50,3 +50,13 @@ variable "application_policy_list" {
   type        = list
   default     = []
 }
+
+variable "vpn_server_address" {
+  description = "VPN server address"
+  type        = string
+}
+
+variable "vpn_client_publickeys" {
+  type        = list
+  description = "VPN List of maps of client IPs and public keys"
+}
