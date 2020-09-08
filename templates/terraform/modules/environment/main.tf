@@ -118,3 +118,12 @@ module "logging" {
   ebs_volume_size_in_gb = var.logging_volume_size_in_gb
   create_service_role   = var.logging_create_service_role
 }
+
+module "sendgrid" {
+  source = "commitdev/zero/aws//modules/sendgrid"
+  version = "0.0.2"
+  count  = var.sendgrid_enabled ? 1 : 0
+
+  zone_name = var.domain_name
+  sendgrid_api_key_secret_name = var.sendgrid_api_key_secret_name
+}
