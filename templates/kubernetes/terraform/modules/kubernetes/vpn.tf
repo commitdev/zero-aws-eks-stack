@@ -27,7 +27,7 @@ data "aws_subnet" "my_db_subnet" {
 
 ## get client public keys
 data "template_file" "vpn_client_data_json" {
-  template = file("${path.module}/templates/wireguard-peer.tpl")
+  template = file("${path.module}/files/wireguard-peer.tpl")
   count    = length(var.vpn_client_publickeys)
 
   vars = {
