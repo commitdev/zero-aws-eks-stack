@@ -24,7 +24,9 @@ resource "aws_iam_access_key" "ci_user" {
 
 # Add the keys to AWS secrets manager
 module "ci_user_keys" {
-  source  = "../../modules/secret"
+  source = "commitdev/zero/aws//modules/secret"
+  version = "0.0.2"
+
 
   name    = "ci-user-aws-keys<% index .Params `randomSeed` %>"
   type    = "map"
@@ -33,7 +35,9 @@ module "ci_user_keys" {
 }
 
 module "rds_master_secret_stage" {
-  source  = "../../modules/secret"
+  source = "commitdev/zero/aws//modules/secret"
+  version = "0.0.2"
+
   name = "${local.project}-stage-rds-<% index .Params `randomSeed` %>"
   type          = "random"
   random_length = 32
@@ -41,7 +45,9 @@ module "rds_master_secret_stage" {
 }
 
 module "rds_master_secret_prod" {
-  source  = "../../modules/secret"
+  source = "commitdev/zero/aws//modules/secret"
+  version = "0.0.2"
+
   name = "${local.project}-prod-rds-<% index .Params `randomSeed` %>"
   type          = "random"
   random_length = 32
@@ -49,7 +55,9 @@ module "rds_master_secret_prod" {
 }
 
 module "sendgrid_api_key" {
-  source  = "../../modules/secret"
+  source = "commitdev/zero/aws//modules/secret"
+  version = "0.0.2"
+
   name = "${local.project}-sendgrid-<% index .Params `randomSeed` %>"
   type  = "string"
   value = "<% index .Params `sendgridApiKey` %>"
