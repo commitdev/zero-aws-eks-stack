@@ -42,7 +42,7 @@ variable "logging_type" {
   default     = "cloudwatch"
 
   validation {
-    condition     = (
+    condition = (
       var.logging_type == "cloudwatch" || var.logging_type == "kibana"
     )
     error_message = "Invalid value. Valid values are cloudwatch or kibana."

@@ -2,11 +2,11 @@
 
 # generate VPN configuration
 locals {
-  namespace  = "vpn"
+  namespace = "vpn"
 
   db_identifier          = "${var.project}-${var.environment}"
   destination_subnets    = join(",", [for s in data.aws_subnet.my_db_subnet : s.cidr_block])
-  server_address	 = var.vpn_server_address
+  server_address         = var.vpn_server_address
   server_privatekey_name = "${var.project}-${var.environment}-vpn-wg-privatekey-${var.random_seed}"
   client_publickeys      = var.vpn_client_publickeys
 }
@@ -63,7 +63,7 @@ resource "kubernetes_namespace" "vpn_namespace" {
 
 resource "kubernetes_secret" "vpn_private_key" {
   metadata {
-    name = "wg-secret"
+    name      = "wg-secret"
     namespace = local.namespace
   }
 
@@ -76,7 +76,7 @@ resource "kubernetes_secret" "vpn_private_key" {
 
 resource "kubernetes_config_map" "vpn_configmap" {
   metadata {
-    name = "wg-configmap"
+    name      = "wg-configmap"
     namespace = local.namespace
   }
 
@@ -87,7 +87,7 @@ resource "kubernetes_config_map" "vpn_configmap" {
 
 resource "kubernetes_service" "wireguard" {
   metadata {
-    name = "wireguard"
+    name      = "wireguard"
     namespace = local.namespace
 
     labels = {
@@ -111,14 +111,14 @@ resource "kubernetes_service" "wireguard" {
       app = "wireguard"
     }
 
-    type = "LoadBalancer"
+    type                    = "LoadBalancer"
     external_traffic_policy = "Local"
   }
 }
 
 resource "kubernetes_deployment" "wireguard" {
   metadata {
-    name = "wireguard"
+    name      = "wireguard"
     namespace = local.namespace
   }
 

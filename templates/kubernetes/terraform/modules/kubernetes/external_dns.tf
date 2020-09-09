@@ -40,8 +40,8 @@ data "aws_iam_policy_document" "external_dns_policy_doc" {
 
 resource "kubernetes_service_account" "external_dns" {
   metadata {
-    name        = "external-dns"
-    namespace   = "kube-system"
+    name      = "external-dns"
+    namespace = "kube-system"
     annotations = {
       "eks.amazonaws.com/role-arn" = module.iam_assumable_role_external_dns.this_iam_role_arn
     }
@@ -62,7 +62,7 @@ resource "kubernetes_cluster_role" "external_dns" {
     api_groups = ["extensions"]
     resources  = ["ingresses"]
   }
-rule {
+  rule {
     verbs      = ["list"]
     api_groups = [""]
     resources  = ["nodes"]
@@ -94,13 +94,13 @@ resource "kubernetes_deployment" "external_dns" {
     replicas = 1
     selector {
       match_labels = {
-        "app"    = "external-dns",
+        "app" = "external-dns",
       }
     }
     template {
       metadata {
         labels = {
-          "app"    = "external-dns",
+          "app" = "external-dns",
         }
       }
       spec {
@@ -115,16 +115,16 @@ resource "kubernetes_deployment" "external_dns" {
             "--policy=upsert-only", # Prevent ExternalDNS from deleting any records
             "--registry=txt",
             "--txt-owner-id=${var.cluster_name}", # ID of txt record to manage state
-            "--aws-batch-change-size=2", # Set the batch size to 2 so that a single record failure won't block other updates
+            "--aws-batch-change-size=2",          # Set the batch size to 2 so that a single record failure won't block other updates
           ]
         }
 
         security_context {
-          fs_group =  65534
+          fs_group = 65534
         }
 
-        service_account_name = "external-dns"
-        automount_service_account_token  = true
+        service_account_name            = "external-dns"
+        automount_service_account_token = true
       }
     }
   }

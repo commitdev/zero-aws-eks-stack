@@ -9,7 +9,7 @@ terraform {
 }
 
 provider "aws" {
-  region  = "<% index .Params `region` %>"
+  region = "<% index .Params `region` %>"
 }
 
 # Provision kubernetes resources required to run services/applications
@@ -24,7 +24,7 @@ module "kubernetes" {
   # Authenticate with the EKS cluster via the cluster id
   cluster_name = "<% .Name %>-prod-<% index .Params `region` %>"
 
-  external_dns_zone = "<% index .Params `productionHostRoot` %>"
+  external_dns_zone     = "<% index .Params `productionHostRoot` %>"
   external_dns_owner_id = "<% GenerateUUID %>" # randomly generated ID
 
   # Registration email for LetsEncrypt
