@@ -27,7 +27,7 @@ data "aws_caller_identity" "current" {}
 # Provision the EKS cluster
 module "eks" {
   source = "commitdev/zero/aws//modules/eks"
-  version = "0.0.1"
+  version = "0.0.2"
 
   project              = var.project
   environment          = var.environment
