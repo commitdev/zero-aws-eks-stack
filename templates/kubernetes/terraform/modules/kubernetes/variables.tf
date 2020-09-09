@@ -61,6 +61,6 @@ variable "vpn_server_address" {
 }
 
 variable "vpn_client_publickeys" {
-  type        = list
-  description = "VPN List of maps of client IPs and public keys"
+  type        = list(tuple([string, string, string]))
+  description = "VPN List of client name, IP and public key"
 }
