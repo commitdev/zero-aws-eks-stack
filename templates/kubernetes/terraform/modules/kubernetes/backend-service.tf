@@ -5,7 +5,7 @@ data "aws_secretsmanager_secret_version" "cf_keypair" {
 
 resource "kubernetes_secret" "cf_keypair" {
   metadata {
-    name = "cf_keypair"
+    name = "cf-keypair"
   }
 
   data = {
