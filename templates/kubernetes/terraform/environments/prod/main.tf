@@ -44,9 +44,9 @@ module "kubernetes" {
   ]
 
   # Wireguard configuration
-  vpn_server_address = "10.10.199.0/24"
+  vpn_server_address = "10.10.99.0/24"
   vpn_client_publickeys = [
-    { "10.10.199.201/32" = "/B3Q/Hlf+ILInjpehTLk9DZGgybdGdbm0SsG87OnWV0=" }, # client IP1
-    { "10.10.199.202/32" = "h2jMuaXNIlx7Z0a3owWFjPsAA8B+ZpQH3FbZK393+08=" }, # client IP2
+    ["Max C", "10.10.99.201/32", "/B3Q/Hlf+ILInjpehTLk9DZGgybdGdbm0SsG87OnWV0="],
+    ["Carter L", "10.10.99.202/32", "h2jMuaXNIlx7Z0a3owWFjPsAA8B+ZpQH3FbZK393+08="],
   ]
 }

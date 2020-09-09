@@ -10,15 +10,4 @@ data "aws_iam_policy_document" "resource_access_backendservice" {
     resources = ["arn:aws:ec2:::stage-*"]
   }
   # can be more statements here
-
-  statement {
-    effect = "Allow"
-    actions = [
-      "secretsmanager:GetResourcePolicy",
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:DescribeSecret",
-      "secretsmanager:ListSecretVersionIds"
-    ]
-    resources = ["arn:aws:secretsmanager:us-west-2:864003660840:secret:vpn-stage*"]
-  }
 }

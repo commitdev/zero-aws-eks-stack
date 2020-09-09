@@ -8,7 +8,7 @@ locals {
   destination_subnets    = join(",", [for s in data.aws_subnet.my_db_subnet : s.cidr_block])
   server_address	 = var.vpn_server_address
   server_privatekey_name = "${var.project}-${var.environment}-vpn-wg-privatekey-${var.random_seed}"
-  client_peers           = join("\n", data.template_file.vpn_client_data_json.*.rendered)
+  client_publickeys      = var.vpn_client_publickeys
 }
 
 ## get destination database subnets
@@ -25,18 +25,29 @@ data "aws_subnet" "my_db_subnet" {
 
 ## TBD: get other destination subnets
 
-## get client public keys
-data "template_file" "vpn_client_data_json" {
-  template = file("${path.module}/files/wireguard-peer.tpl")
-  count    = length(var.vpn_client_publickeys)
+## get server config
+data "template_file" "vpn_server_conf" {
+  template = file("${path.module}/files/wireguard-wg0-conf.tpl")
 
   vars = {
-    client_pub_key       = element(values(var.vpn_client_publickeys[count.index]), 0)
-    client_ip            = element(keys(var.vpn_client_publickeys[count.index]), 0)
-    persistent_keepalive = 25
+    tpl_server_address      = local.server_address
+    tpl_destination_subnets = local.destination_subnets
+    tpl_client_peers        = join("\n", data.template_file.vpn_client_peers_section.*.rendered)
   }
 }
 
+data "template_file" "vpn_client_peers_section" {
+  template = file("${path.module}/files/wireguard-peer.tpl")
+  count    = length(local.client_publickeys)
+
+  vars = {
+    tpl_client_name    = local.client_publickeys[count.index][0]
+    tpl_client_ip      = local.client_publickeys[count.index][1]
+    tpl_client_pub_key = local.client_publickeys[count.index][2]
+  }
+}
+
+## get server private key
 data "aws_secretsmanager_secret" "vpn_private_key" {
   name = local.server_privatekey_name
 }
@@ -70,7 +81,7 @@ resource "kubernetes_config_map" "vpn_configmap" {
   }
 
   data = {
-    "wg0.conf" = "[Interface]\nAddress = ${local.server_address}\nListenPort = 51820\nPostUp = wg set wg0 private-key /etc/wireguard/privatekey && iptables -A FORWARD -s ${local.server_address} -d ${local.destination_subnets} -j ACCEPT && iptables -A FORWARD -s ${local.server_address} -j DROP && iptables -t nat -A POSTROUTING -s ${local.server_address} -o eth0 -j MASQUERADE\nPostDown = iptables -D FORWARD -s ${local.server_address} -d ${local.destination_subnets} -j ACCEPT && iptables -D FORWARD -s ${local.server_address} -j DROP && iptables -t nat -D POSTROUTING -s ${local.destination_subnets} -o eth0 -j MASQUERADE\n\n${local.client_peers}\n"
+    "wg0.conf" = "${data.template_file.vpn_server_conf.rendered}"
   }
 }
 
@@ -160,7 +171,7 @@ resource "kubernetes_deployment" "wireguard" {
 
         container {
           name    = "wireguard"
-          image   = "masipcat/wireguard-go:latest"
+          image   = "commitdev/wireguard-go:0.0.1"
           command = ["sh", "-c", "echo \"Public key '$(wg pubkey < /etc/wireguard/privatekey)'\" && /entrypoint.sh"]
 
           port {
