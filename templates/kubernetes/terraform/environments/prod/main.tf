@@ -42,3 +42,4 @@ module "kubernetes" {
     }
     # could be more policies defined here (if have)
   ]
+}
