@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 
-# Inputs:
-# keypair ID
-# keypair private key
-
-# Outputs:
-# aws secrets manager secret with decodable json containing the data.
+# Imports the specified CF Keypair data into AWS SecretsManager.
 
 PROGNAME=$(basename "$0")
 
@@ -19,6 +14,7 @@ function usage() {
 }
 
 PARSED_ARGUMENTS=$(getopt -n ${PROGNAME} -o h --long help -- "$@")
+
 while : ; do
     case "$1" in
         -h | --help)
