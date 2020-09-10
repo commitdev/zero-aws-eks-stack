@@ -1,18 +1,30 @@
 # Overview
 Your infrastructure should be up and running, your terraform repository is the source of truth for your infrastructure, here is [a list of components and resources][zero-resource-list] that comes with the EKS-stack
 
-# How to 
+# Cloudfront signed URLs
+If you've answered "yes" to:
+
+> Enable file uploads using S3 and Cloudfront signed URLs? (Will require manual creation of a Cloudfront keypair in AWS)
+
+Then you will need the root AWS account holder to run:
+
+    scripts/import-cf-keypair.sh
+
+This needs to be executed once for the project to setup an AWS secret.
+After it has successfully run once, it never needs to run again for this project.
+
+# How to
 ## Managing your Terraform
 #### Why terraform
 The repository follows infrastructure as code as a core principle, it allows repeatable and reproducible infrastructures and makes DevOps much more manageable; to learn more about it we suggest reading the [Terraform's workflow guide][tf-workflow].
 
 #### Intended workflows
-To make changes to the infrastructure you would modify the terraform code changing the components you wish to modify, then plan the changes with `terraform plan` to make sure you are making the desired changes; then apply the changes with `terraform apply` on your staging environment. Once you reach the satisfactory state, you should do the same on production environment and check-in the changes of your infrastructure code, as this repo should be the source of truth of your deployed infrastructure. 
+To make changes to the infrastructure you would modify the terraform code changing the components you wish to modify, then plan the changes with `terraform plan` to make sure you are making the desired changes; then apply the changes with `terraform apply` on your staging environment. Once you reach the satisfactory state, you should do the same on production environment and check-in the changes of your infrastructure code, as this repo should be the source of truth of your deployed infrastructure.
 Our infrastructure is divided into a few areas.
 1. Initial setup
   - [remote state][tf-remote-state]
   - [secrets][tf-secrets]
-2. Infrastructure 
+2. Infrastructure
   - [production][tf-production-env]
   - [staging][tf-staging-env]
 3. Kubernetes utilities
@@ -66,15 +78,15 @@ Please see [Link][zero-k8s-guide]
 This [architecture-diagram][architecture-diagram] displays the original setup you get from the terraform templates
 
 Commonly used links in AWS console
-|Resources  |Links| 
+|Resources  |Links|
 |---        |---|
-|Route 53   |https://console.aws.amazon.com/route53/home | 
+|Route 53   |https://console.aws.amazon.com/route53/home |
 |IAM        |https://console.aws.amazon.com/iam/home#/users|
 |ECR        |https://console.aws.amazon.com/ecr/repositories|
 |RDS        |https://console.aws.amazon.com/rds|
 
-### Teardown 
-Tearing down the infrastructure requires multiple steps, as some of the resources have protection mechanism so they're not accidentally deleted 
+### Teardown
+Tearing down the infrastructure requires multiple steps, as some of the resources have protection mechanism so they're not accidentally deleted
 
 _Note: the following steps are not reversible, tearing down the cluster results in lost data/resources._
 
@@ -126,4 +138,3 @@ make teardown-remote-state
 [zero-k8s-guide]: ./kubernetes/terraform/modules/kubernetes/README.md
 [zero-architecture-diagram]: https://github.com/commitdev/zero-aws-eks-stack/blob/master/docs/architecture-overview.svg
 [zero-resource-list]: https://github.com/commitdev/zero-aws-eks-stack/blob/master/docs/resources.md
-
