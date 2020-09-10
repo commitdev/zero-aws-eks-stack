@@ -52,6 +52,51 @@ The `irsa` module makes it easy to grant a pod to have a specific level of acces
 ```
 
 
+## WireGuard VPN support
+WireGuard® is an extremely simple yet fast and modern VPN that utilizes state-of-the-art cryptography. This integration can support users to access internal resourcessecurely. 
+
+### How to add user?
+- add user(s) information into infrastructure/kubernetes/terraform/environments/<environment>/main.tf
+```
+  # Wireguard configuration
+  vpn_server_address = "10.10.199.0/24"
+  vpn_client_publickeys = [
+    # name, IP, public key
+    ["Max C", "10.10.199.201/32", "/B3Q/Hlf+ILInjpehTLk9DZGgybdGdbm0SsG87OnWV0="],
+    ["Carter L", "10.10.199.202/32", "h2jMuaXNIlx7Z0a3owWFjPsAA8B+ZpQH3FbZK393+08="],
+  ]
+```
+in which, IPs should be within 10.10.x.x by default. To generate public key, please follow [WireGuard Official Website](https://www.wireguard.com/)
+
+### How to access internal servers via VPN?
+- get client VPN configuration from VPN server by running "wg-config.sh <client IP>"
+```
+$ kubectl -n vpn get pods | grep wireguard
+wireguard-556ccb8df7-jp9rt   1/1     Running   0          42m
+$ kubectl -n vpn exec -it wireguard-556ccb8df7-jp9rt -- -- /scripts/wg-config.sh 10.10.199.201/32
+#
+# This is a generated VPN(wireguard) client configuration based on your IP and public key. The only part you need to fill is <my private key> part
+# Steps:
+#  1. fill in <my private key> part
+#  2. copy & past all content to your client
+#  3. active client
+#  4. access to the destination, eg, mysql -h 10.10.10.79 -uxxx -p
+#
+
+[Interface]
+# VPN client side: for user "Max C"
+PrivateKey = <my private key>
+ListenPort = 34567
+Address = 10.10.199.201/32
+
+[Peer]
+# VPN server side (no need to change)
+PublicKey = 2vbBgwsJq4pLVmxoV0r3SyiFKy2qSGvptBByNnfzMGI=
+AllowedIPs = 10.10.10.0/24,10.10.11.0/24
+Endpoint = vpn.piggycloud-staging.me:51820
+```
+
+Note: at the first time of access, it will take a little longer time for establishing the channel. So you may just run a ping.
 
 ## Organization
 

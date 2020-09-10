@@ -48,6 +48,28 @@ data "template_file" "vpn_client_peers_section" {
   }
 }
 
+data "template_file" "vpn_client_peers_csv" {
+  template = file("${path.module}/files/wireguard-peer-csv.tpl")
+  count    = length(local.client_publickeys)
+
+  vars = {
+    tpl_client_name    = local.client_publickeys[count.index][0]
+    tpl_client_ip      = local.client_publickeys[count.index][1]
+    tpl_client_pub_key = local.client_publickeys[count.index][2]
+  }
+}
+
+# generate script for client to get own configuration
+data "template_file" "vpn_client_config_script" {
+  template = file("${path.module}/files/wireguard-client-config-script.tpl")
+
+  vars = {
+    tpl_destination_subnets = local.destination_subnets
+    tpl_client_endpoint_dns = local.client_endpoint_dns
+  }
+}
+
+
 ## get server private key
 data "aws_secretsmanager_secret" "vpn_private_key" {
   name = local.server_privatekey_name
@@ -82,7 +104,9 @@ resource "kubernetes_config_map" "vpn_configmap" {
   }
 
   data = {
-    "wg0.conf" = "${data.template_file.vpn_server_conf.rendered}"
+    "wg0.conf"      = "${data.template_file.vpn_server_conf.rendered}"
+    "wg0-peers.csv" = join("", "${data.template_file.vpn_client_peers_csv.*.rendered}")
+    "wg-config.sh"  = "${data.template_file.vpn_client_config_script.rendered}"
   }
 }
 
@@ -150,6 +174,23 @@ resource "kubernetes_deployment" "wireguard" {
         }
 
         volume {
+          name = "peercsv"
+
+          config_map {
+            name = "wg-configmap"
+          }
+        }
+
+        volume {
+          name = "clientscript"
+
+          config_map {
+            name         = "wg-configmap"
+            default_mode = "0744"
+          }
+        }
+
+        volume {
           name = "secret"
 
           secret {
@@ -202,6 +243,18 @@ resource "kubernetes_deployment" "wireguard" {
             name       = "cfgmap"
             mount_path = "/etc/wireguard/wg0.conf"
             sub_path   = "wg0.conf"
+          }
+
+          volume_mount {
+            name       = "peercsv"
+            mount_path = "/tmp/wg0-peers.csv"
+            sub_path   = "wg0-peers.csv"
+          }
+
+          volume_mount {
+            name       = "clientscript"
+            mount_path = "/scripts/wg-config.sh"
+            sub_path   = "wg-config.sh"
           }
 
           volume_mount {
