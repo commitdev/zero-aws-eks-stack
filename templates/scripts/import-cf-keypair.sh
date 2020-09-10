@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-# Imports the specified CF Keypair data into AWS SecretsManager.
-
 PROGNAME=$(basename "$0")
 
 function usage() {
     echo "Usage: ${PROGNAME} [ -h | --help ] ID FILE"
+    echo
+    echo "Imports the specified CF Keypair data into AWS SecretsManager."
     echo
     echo "ID: CloudFront Keypair ID (Access Key ID)"
     echo "FILE: CloudFront Keypair private key file"
@@ -44,4 +44,4 @@ aws secretsmanager \
     create-secret \
     --name <% .Name %>_cf_keypair \
     --region <% index .Params `region` %> \
-    --secret-string "{\"keypair_id\":\"${ID}\",\"keypair_secret\":\"${SECRET}\"}"
+    --secret-string "{\"keypair_id\":\"${ID}\",\"private_key\":\"${SECRET}\"}"
