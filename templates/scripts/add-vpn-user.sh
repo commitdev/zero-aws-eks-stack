@@ -1,9 +1,8 @@
 #!/bin/bash
 
-PROJECT=<% .Name %>
-CONTEXT=$(kubectl config current-context | cut -d"/" -f2)
+CLUSTER=$(kubectl config current-context | cut -d"/" -f2)
 
-# this is a local script for Dev to generate VPN configuration for project ${PROJECT}
+# this is a local script for Dev to generate VPN configuration for cluster ${CLUSTER}
 
 # get pod id for execution
 POD=$(kubectl -n vpn get pods | grep wireguard | cut -d' ' -f1)
@@ -32,9 +31,9 @@ while [[ "$existing_ips" =~ "$next_ip" ]]; do
 done
 
 # generate config file
-CONFIG_DIR=~/.wireguard/${PROJECT}
+CONFIG_DIR=~/.wireguard
 mkdir -p $CONFIG_DIR
-CONFIG_FILE=$CONFIG_DIR/wg-client-${CONTEXT}.conf
+CONFIG_FILE=$CONFIG_DIR/wg-client-${CLUSTER}.conf
 
 # Output TF line
 echo "Configuration generated at $CONFIG_FILE with:"

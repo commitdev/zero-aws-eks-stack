@@ -69,7 +69,7 @@ WireGuard® is an extremely simple yet fast and modern VPN that utilizes state-o
 
 To get the client info, with infrastructure/scripts/add-vpn-user.sh, you will get an auto-generated configuration file as well as client info needed as for above. Sample:
 ```
-Configuration generated at /Users/xxx.yyy/.wireguard/project-1/wg-client.conf with:
+Configuration generated at .wireguard/wg-client-<cluster-name>.conf with:
   - public key : yz6gNspLJE/HtftBwcj5x0yK2XG6+/SHIaZ****vFRc=
   - private key: G8FJTwIaqznXjb6znHkYOtlieRugWEc/LMC****UKXc=
   - client IP  : 10.10.199.203/32
