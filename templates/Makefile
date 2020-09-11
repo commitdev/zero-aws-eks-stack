@@ -1,7 +1,7 @@
 ENVIRONMENT ?= stage
 PROJECT = <% .Name %>
 
-apply: apply-remote-state apply-secrets apply-env apply-k8s-utils post-apply-setup
+apply: apply-remote-state apply-secrets apply-env update-k8s-conf pre-k8s apply-k8s-utils post-apply-setup
 
 apply-remote-state:
 	aws s3 ls $(PROJECT)-$(ENVIRONMENT)-terraform-state || (\
@@ -22,7 +22,13 @@ apply-env:
 	terraform init && \
 	terraform apply $(AUTO_APPROVE)
 
-apply-k8s-utils: update-k8s-conf
+pre-k8s:
+	@echo "Creating VPN private key..."
+	WGKEY=$(shell kubectl run -i --tty zero-k8s-utilities --image=commitdev/zero-k8s-utilities:0.0.3 --restart=Never -- wg genkey) && kubectl delete pod/zero-k8s-utilities && \
+	aws secretsmanager create-secret --name $(PROJECT)-$(ENVIRONMENT)-vpn-wg-privatekey-<% index .Params `randomSeed` %> --description "Auto-generated Wireguard VPN private key" --secret-string $$WGKEY
+	@echo "Done VPN private key creation"
+
+apply-k8s-utils:
 	cd kubernetes/terraform/environments/$(ENVIRONMENT) && \
 	terraform init && \
 	terraform apply $(AUTO_APPROVE)

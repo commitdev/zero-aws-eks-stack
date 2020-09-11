@@ -14,7 +14,7 @@ provider "kubernetes" {
   exec {
     api_version = "client.authentication.k8s.io/v1alpha1"
     command     = "aws"
-    args        = [
+    args = [
       "eks",
       "get-token",
       "--region",
@@ -22,6 +22,6 @@ provider "kubernetes" {
       "--cluster-name",
       var.cluster_name,
       "--role",
-      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.project}-kubernetes-admin-${var.environment}"]
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.project}-kubernetes-admin-${var.environment}"]
   }
 }

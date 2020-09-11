@@ -20,7 +20,7 @@ resource "helm_release" "cluster_autoscaler" {
   set {
     type  = "string"
     name  = "rbac.serviceAccountAnnotations.eks\\.amazonaws\\.com/role-arn"
-    value =  module.iam_assumable_role_cluster_autoscaler.this_iam_role_arn
+    value = module.iam_assumable_role_cluster_autoscaler.this_iam_role_arn
   }
   set {
     name  = "awsRegion"

@@ -1,14 +1,14 @@
 # IRSA support: allow backend service to have a specific policy via service-account and role
 
 # application_policy_list is passed from main.tf as below:
-  # application_policy_list = [
-  #   {
-  #     service_account = "backend-service"
-  #     namespace       = "my-app"
-  #     policy          = data.aws_iam_policy_document.resource_access_app1
-  #   }
-  #   # could be more here
-  # ]
+# application_policy_list = [
+#   {
+#     service_account = "backend-service"
+#     namespace       = "my-app"
+#     policy          = data.aws_iam_policy_document.resource_access_app1
+#   }
+#   # could be more here
+# ]
 
 # Create a role using oidc to map service accounts
 module "iam_assumable_role_irsa" {
@@ -32,10 +32,10 @@ resource "aws_iam_policy" "irsa" {
 
 # Create kubernetes service account
 resource "kubernetes_service_account" "irsa" {
-  count         = length(var.application_policy_list)
+  count = length(var.application_policy_list)
   metadata {
-    name        = var.application_policy_list[count.index].service_account
-    namespace   = var.application_policy_list[count.index].namespace
+    name      = var.application_policy_list[count.index].service_account
+    namespace = var.application_policy_list[count.index].namespace
     annotations = {
       "eks.amazonaws.com/role-arn" = module.iam_assumable_role_irsa[count.index].this_iam_role_arn
     }

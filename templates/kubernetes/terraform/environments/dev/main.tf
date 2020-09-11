@@ -16,11 +16,12 @@ module "kubernetes" {
 
   environment = "dev"
   region      = "<% index .Params `region` %>"
+  random_seed = "<% index .Params `randomSeed` %>"
 
   # Authenticate with the EKS cluster via the cluster id
   cluster_name = "<% .Name %>-dev-<% index .Params `region` %>"
 
-  external_dns_zone = "<% index .Params `stagingHostRoot` %>"
+  external_dns_zone     = "<% index .Params `stagingHostRoot` %>"
   external_dns_owner_id = "<% GenerateUUID %>" # randomly generated ID
 
   # Registration email for LetsEncrypt
@@ -37,5 +38,12 @@ module "kubernetes" {
       policy          = data.aws_iam_policy_document.resource_access_backendservice
     }
     # could be more policies defined here (if have)
+  ]
+
+  # Wireguard configuration
+  vpn_server_address = "10.10.254.0/24"
+  vpn_client_publickeys = [
+    ["Max C", "10.10.254.201/32", "/B3Q/Hlf+ILInjpehTLk9DZGgybdGdbm0SsG87OnWV0="],
+    ["Carter L", "10.10.254.202/32", "h2jMuaXNIlx7Z0a3owWFjPsAA8B+ZpQH3FbZK393+08="],
   ]
 }
