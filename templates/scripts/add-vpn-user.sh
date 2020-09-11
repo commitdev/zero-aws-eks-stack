@@ -1,6 +1,8 @@
 #!/bin/bash
 
 PROJECT=<% .Name %>
+CONTEXT=$(kubectl config current-context | cut -d"/" -f2)
+
 # this is a local script for Dev to generate VPN configuration for project ${PROJECT}
 
 # get pod id for execution
@@ -32,7 +34,7 @@ done
 # generate config file
 CONFIG_DIR=~/.wireguard/${PROJECT}
 mkdir -p $CONFIG_DIR
-CONFIG_FILE=$CONFIG_DIR/wg-client.conf
+CONFIG_FILE=$CONFIG_DIR/wg-client-${CONTEXT}.conf
 
 # Output TF line
 echo "Configuration generated at $CONFIG_FILE with:"
