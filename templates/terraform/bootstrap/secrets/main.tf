@@ -55,6 +55,7 @@ module "rds_master_secret_prod" {
 }
 
 module "sendgrid_api_key" {
+  count = <%if eq (index .Params `sendgridApiKey`) "" %>0<% else %>1<% end %>
   source = "commitdev/zero/aws//modules/secret"
   version = "0.0.2"
 
