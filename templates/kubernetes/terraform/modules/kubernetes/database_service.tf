@@ -8,10 +8,10 @@ resource "kubernetes_service" "app_db" {
   ## https://github.com/commitdev/zero-deployable-backend/blob/b2cee21982b1e6a0ac9996e2a1bf214e5bf10ab5/db-ops/create-db-user.sh#L6
   metadata {
     namespace = kubernetes_namespace.app_namespace.metadata[0].name
-    name = "database"
+    name      = "database"
   }
   spec {
-    type = "ExternalName"
+    type          = "ExternalName"
     external_name = data.aws_db_instance.database.address
   }
 }

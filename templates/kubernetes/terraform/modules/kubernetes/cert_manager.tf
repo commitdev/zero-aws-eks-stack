@@ -70,12 +70,12 @@ resource "helm_release" "cert_manager" {
   set {
     type  = "string"
     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value =  module.iam_assumable_role_cert_manager.this_iam_role_arn
+    value = module.iam_assumable_role_cert_manager.this_iam_role_arn
   }
   set {
     type  = "string"
     name  = "podAnnotations.eks\\.amazonaws\\.com/role-arn"
-    value =  module.iam_assumable_role_cert_manager.this_iam_role_arn
+    value = module.iam_assumable_role_cert_manager.this_iam_role_arn
   }
   set {
     name  = "securityContext.fsGroup"

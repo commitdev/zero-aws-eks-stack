@@ -1,10 +1,10 @@
 
 module "logging_cloudwatch" {
-  count              = var.logging_type == "cloudwatch" ? 1 : 0
-  source             = "./logging/cloudwatch"
-  environment        = var.environment
-  region             = var.region
-  cluster_name       = var.cluster_name
+  count        = var.logging_type == "cloudwatch" ? 1 : 0
+  source       = "./logging/cloudwatch"
+  environment  = var.environment
+  region       = var.region
+  cluster_name = var.cluster_name
 }
 
 module "logging_kibana" {
