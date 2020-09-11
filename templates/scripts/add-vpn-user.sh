@@ -2,7 +2,7 @@
 
 CLUSTER=$(kubectl config current-context | cut -d"/" -f2)
 
-# this is a local script for Dev to generate VPN configuration for cluster ${CLUSTER}
+# this is a local script for a system user to generate VPN configuration for cluster ${CLUSTER}
 
 # get pod id for execution
 POD=$(kubectl -n vpn get pods | grep wireguard | cut -d' ' -f1)
@@ -10,7 +10,7 @@ POD=$(kubectl -n vpn get pods | grep wireguard | cut -d' ' -f1)
 if [ -z "$POD" ]; then
   echo "Warning: No VPN service running yet"
   exit 1
-fi 
+fi
 EXEC="kubectl -n vpn exec -it $POD --"
 
 # get name
@@ -41,22 +41,20 @@ echo "  - public key : $client_public_key"
 echo "  - private key: $client_private_key"
 echo "  - client IP  : $next_ip/32"
 echo
-echo "Please ask DevOps to apply VPN server change with the following line appended to var.vpn_client_publickeys list:"
+echo "Please modify kubernetes/terraform/environments/<env>/main.tf and append the following line to var.vpn_client_publickeys."
+echo "Then apply the terraform, or ask an administrator to."
 echo
 printf '    ["%s", "%s", "%s"]' "$name" "$next_ip/32" "$client_public_key"
 echo
-
+echo "After this is done you should be able to open the wireguard client and activate the tunnel."
+echo "You can download the client at https://www.wireguard.com/install/"
+echo
+echo "When it is running you should be able to access internal resources, e.g. mysql -h 10.10.10.123"
 # generate client conf
 cat <<-EOF > ${CONFIG_FILE}
 
 #
 # This is a generated VPN(wireguard) client configuration
-#
-# Next Steps:
-#  1. apply VPN server change with following line in var.vpn_client_publickeys
-#     ["$name", "$next_ip/32", "$client_public_key"]
-#  2. put configuration into your wireguard client application and activate the channel
-#  3. access to the destination, eg. mysql -h 10.10.10.79 -uxxx -p
 #
 
 # Configuration content

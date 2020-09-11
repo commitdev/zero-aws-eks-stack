@@ -53,35 +53,28 @@ The `irsa` module makes it easy to grant a pod to have a specific level of acces
 
 
 ## WireGuard VPN support
-WireGuard® is an extremely simple yet fast and modern VPN that utilizes state-of-the-art cryptography. This integration can support users to access internal resources securely. 
+WireGuard® is an extremely simple yet fast and modern VPN that utilizes state-of-the-art cryptography. This allows users to access internal resources securely.
 
-- Add your client info (name, ip and public key) into "vpn_client_publickeys" list (under infrastructure/kubernetes/terraform/environments/<env>/main.tf).
+A WireGuard pod will be started inside the cluster and users can be added to it by appending lines to `kubernetes/terraform/environments/<env>/main.tf`:
 ```
-  # Wireguard configuration
-  vpn_server_address = "10.10.199.0/24"
   vpn_client_publickeys = [
     # name, IP, public key
-    ["Max C", "10.10.199.201/32", "/B3Q/Hlf+ILInjpehTLk9DZGgybdGdbm0SsG87OnWV0="],
-    ["Carter L", "10.10.199.202/32", "h2jMuaXNIlx7Z0a3owWFjPsAA8B+ZpQH3FbZK393+08="],
     ["Your Name", "10.10.199.203/32", "yz6gNspLJE/HtftBwcj5x0yK2XG6+/SHIaZ****vFRc="],
   ]
 ```
 
-To get the client info, with infrastructure/scripts/add-vpn-user.sh, you will get an auto-generated configuration file as well as client info needed as for above. Sample:
-```
-Configuration generated at .wireguard/wg-client-<cluster-name>.conf with:
-  - public key : yz6gNspLJE/HtftBwcj5x0yK2XG6+/SHIaZ****vFRc=
-  - private key: G8FJTwIaqznXjb6znHkYOtlieRugWEc/LMC****UKXc=
-  - client IP  : 10.10.199.203/32
+A new user can add themselves to the VPN server easily. Any user with access to the kubernetes cluster should be able to run the script `scripts/add-vpn-user.sh`
+This will ask for their name, and automatically generate a line like the one above, which they can then add to the terraform and apply themselves, or give the line to an administrator and ask them to apply it.
+The environment they are added to will be decided by the current `kubectl` context. You can see your current context with `kubectl config current-context`.
+A user will need to repeat this for each environment they need access to (for example, staging and production.)
 
-Please ask DevOps to apply VPN server change with the following line appended to var.vpn_client_publickeys list:
+*Note that this will try to detect the next available IP address for the user but you should still take care to ensure there are no duplicate IPs in the list.*
 
-    ["Your Name", "10.10.199.203/32", "yz6gNspLJE/HtftBwcj5x0yK2XG6+/SHIaZ****vFRc="]
-```
+It will also generate a WireGuard client config file on their local machine which will be properly populated with all the values to allow them to connect to the server.
 
-- Setup your client and access to internal server. You may access to the destination, eg, mysql -h 10.10.10.79 -uxxx -p
+The WireGuard client can be downloaded at [https://www.wireguard.com/install/](https://www.wireguard.com/install/)
 
-Note: at the first time of access, it will take a little longer time for establishing the channel. So you may just run a ping first.
+Once connected to the VPN, the user should have direct access to anything running inside the AWS VPC.
 
 ## Organization
 
