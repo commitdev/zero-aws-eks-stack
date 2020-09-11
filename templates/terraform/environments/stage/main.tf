@@ -39,6 +39,7 @@ module "stage" {
     "<% index .Params `stagingFrontendSubdomain` %><% index .Params `stagingHostRoot` %>",
   ]
   domain_name = "<% index .Params `stagingHostRoot` %>"
+  cf_signed_downloads = <% if eq (index .Params `fileUploads`) "yes" %>true<% else %>false<% end %>
 
   # This will save some money as there a cost associated to each NAT gateway, but if the AZ with the gateway
   # goes down, nothing in the private subnets will be able to reach the internet. Not recommended for production.

@@ -39,6 +39,7 @@ module "prod" {
     "<% index .Params `productionFrontendSubdomain` %><% index .Params `productionHostRoot` %>",
   ]
   domain_name = "<% index .Params `productionHostRoot` %>"
+  cf_signed_downloads = <% if eq (index .Params `fileUploads`) "yes" %>true<% else %>false<% end %>
 
   # DB configuration
   database = "<% index .Params `database` %>"
