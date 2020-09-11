@@ -11,7 +11,7 @@ apply-remote-state:
 	rm ./terraform.tfstate)
 
 apply-secrets:
-	aws iam list-access-keys --user-name $(PROJECT)-ci-user > /dev/null || (\
+	aws iam list-access-keys --user-name $(PROJECT)-ci-user > /dev/null 2>&1 || (\
 	cd terraform/bootstrap/secrets && \
 	terraform init && \
 	terraform apply $(AUTO_APPROVE) && \

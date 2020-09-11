@@ -113,6 +113,7 @@ resource "kubernetes_daemonset" "fluentd_cloudwatch" {
         }
         volume {
           name = "fluentdconf"
+          empty_dir {}
         }
         volume {
           name = "varlog"

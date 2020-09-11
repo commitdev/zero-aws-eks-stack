@@ -2,12 +2,6 @@ data "aws_db_instance" "database" {
   db_instance_identifier = "${var.project}-${var.environment}"
 }
 
-resource "kubernetes_namespace" "app_namespace" {
-  metadata {
-    name = var.project
-  }
-}
-
 resource "kubernetes_service" "app_db" {
   ## this should match the deployable backend's name/namespace
   ## it uses this service to connect and create application user

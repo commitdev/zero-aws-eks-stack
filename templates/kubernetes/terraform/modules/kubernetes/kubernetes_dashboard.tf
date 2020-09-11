@@ -72,7 +72,6 @@ resource "kubernetes_secret" "kubernetes_dashboard_key_holder" {
   metadata {
     name      = "kubernetes-dashboard-key-holder"
     namespace = kubernetes_namespace.kubernetes_dashboard.metadata[0].name
-    labels    = { k8s-app = "kubernetes-dashboard" }
   }
   type = "Opaque"
 }

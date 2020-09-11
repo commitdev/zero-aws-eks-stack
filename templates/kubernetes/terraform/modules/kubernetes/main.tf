@@ -21,3 +21,9 @@ module "ingress" {
   region                     = var.region
   load_balancer_ssl_cert_arn = ""
 }
+
+resource "kubernetes_namespace" "app_namespace" {
+  metadata {
+    name = var.project
+  }
+}
