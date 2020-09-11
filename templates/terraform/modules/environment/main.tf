@@ -71,6 +71,7 @@ module "s3_hosting" {
   # We need to wait for certificate validation to complete before using the certs
   depends_on = [module.assets_domains.certificate_validations]
 
+  cf_signed_downloads     = var.cf_signed_downloads
   buckets                 = var.s3_hosting_buckets
   project                 = var.project
   environment             = var.environment
