@@ -66,7 +66,7 @@ module "assets_domains" {
 
 module "s3_hosting" {
   source = "commitdev/zero/aws//modules/s3_hosting"
-  version = "0.0.1"
+  version = "0.0.3"
 
   # We need to wait for certificate validation to complete before using the certs
   depends_on = [module.assets_domains.certificate_validations]
