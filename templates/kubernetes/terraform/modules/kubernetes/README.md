@@ -53,10 +53,9 @@ The `irsa` module makes it easy to grant a pod to have a specific level of acces
 
 
 ## WireGuard VPN support
-WireGuard® is an extremely simple yet fast and modern VPN that utilizes state-of-the-art cryptography. This integration can support users to access internal resourcessecurely. 
+WireGuard® is an extremely simple yet fast and modern VPN that utilizes state-of-the-art cryptography. This integration can support users to access internal resources securely. 
 
-### How to add user?
-- add user(s) information into infrastructure/kubernetes/terraform/environments/<environment>/main.tf
+- Add your client info (name, ip and public key) into "vpn_client_publickeys" list (under infrastructure/kubernetes/terraform/environments/<env>/main.tf).
 ```
   # Wireguard configuration
   vpn_server_address = "10.10.199.0/24"
@@ -64,39 +63,25 @@ WireGuard® is an extremely simple yet fast and modern VPN that utilizes state-o
     # name, IP, public key
     ["Max C", "10.10.199.201/32", "/B3Q/Hlf+ILInjpehTLk9DZGgybdGdbm0SsG87OnWV0="],
     ["Carter L", "10.10.199.202/32", "h2jMuaXNIlx7Z0a3owWFjPsAA8B+ZpQH3FbZK393+08="],
+    ["Your Name", "10.10.199.203/32", "yz6gNspLJE/HtftBwcj5x0yK2XG6+/SHIaZ****vFRc="],
   ]
 ```
-in which, IPs should be within 10.10.x.x by default. To generate public key, please follow [WireGuard Official Website](https://www.wireguard.com/)
 
-### How to access internal servers via VPN?
-- get client VPN configuration from VPN server by running "wg-config.sh <client IP>"
+To get the client info, with infrastructure/scripts/add-vpn-user.sh, you will get an auto-generated configuration file as well as client info needed as for above. Sample:
 ```
-$ kubectl -n vpn get pods | grep wireguard
-wireguard-556ccb8df7-jp9rt   1/1     Running   0          42m
-$ kubectl -n vpn exec -it wireguard-556ccb8df7-jp9rt -- -- /scripts/wg-config.sh 10.10.199.201/32
-#
-# This is a generated VPN(wireguard) client configuration based on your IP and public key. The only part you need to fill is <my private key> part
-# Steps:
-#  1. fill in <my private key> part
-#  2. copy & past all content to your client
-#  3. active client
-#  4. access to the destination, eg, mysql -h 10.10.10.79 -uxxx -p
-#
+Configuration generated at /Users/xxx.yyy/.wireguard/project-1/wg-client.conf with:
+  - public key : yz6gNspLJE/HtftBwcj5x0yK2XG6+/SHIaZ****vFRc=
+  - private key: G8FJTwIaqznXjb6znHkYOtlieRugWEc/LMC****UKXc=
+  - client IP  : 10.10.199.203/32
 
-[Interface]
-# VPN client side: for user "Max C"
-PrivateKey = <my private key>
-ListenPort = 34567
-Address = 10.10.199.201/32
+Please ask DevOps to apply VPN server change with the following line appended to var.vpn_client_publickeys list:
 
-[Peer]
-# VPN server side (no need to change)
-PublicKey = 2vbBgwsJq4pLVmxoV0r3SyiFKy2qSGvptBByNnfzMGI=
-AllowedIPs = 10.10.10.0/24,10.10.11.0/24
-Endpoint = vpn.piggycloud-staging.me:51820
+    ["Your Name", "10.10.199.203/32", "yz6gNspLJE/HtftBwcj5x0yK2XG6+/SHIaZ****vFRc="]
 ```
 
-Note: at the first time of access, it will take a little longer time for establishing the channel. So you may just run a ping.
+- Setup your client and access to internal server. You may access to the destination, eg, mysql -h 10.10.10.79 -uxxx -p
+
+Note: at the first time of access, it will take a little longer time for establishing the channel. So you may just run a ping first.
 
 ## Organization
 
