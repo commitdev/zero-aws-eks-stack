@@ -1,3 +1,4 @@
+SHELL := /usr/bin/env bash
 ENVIRONMENT ?= stage
 PROJECT = <% .Name %>
 

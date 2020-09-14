@@ -91,7 +91,7 @@ Tearing down the infrastructure requires multiple steps, as some of the resource
 _Note: the following steps are not reversible, tearing down the cluster results in lost data/resources._
 
 ```
-export ENVIRONMENT=staging/production
+export ENVIRONMENT=stage/prod
 ```
 1. Navigate to your infrastructure repository (where this readme/makefile provided is located), we will remove the resources in a Last in First out order.
 ```
