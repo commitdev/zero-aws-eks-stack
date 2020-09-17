@@ -9,8 +9,10 @@ terraform {
 }
 
 provider "aws" {
-  region = "<% index .Params `region` %>"
+  region              = "<% index .Params `region` %>"
+  allowed_account_ids = ["<% index .Params `accountId` %>"]
 }
+
 
 # Provision kubernetes resources required to run services/applications
 module "kubernetes" {

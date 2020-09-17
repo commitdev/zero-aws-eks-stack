@@ -9,6 +9,11 @@ terraform {
   }
 }
 
+provider "aws" {
+  region              = "<% index .Params `region` %>"
+  allowed_account_ids = ["<% index .Params `accountId` %>"]
+}
+
 # Instantiate the staging environment
 module "stage" {
   source      = "../../modules/environment"

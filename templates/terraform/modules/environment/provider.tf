@@ -1,8 +1,3 @@
-provider "aws" {
-  region              = var.region
-  allowed_account_ids = var.allowed_account_ids
-}
-
 # Created by bootstrap/secrets
 data "aws_iam_role" "eks_cluster_creator" {
   name = "${var.project}-eks-cluster-creator"
