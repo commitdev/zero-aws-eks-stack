@@ -1,4 +1,6 @@
-# @TODO - sort out creating only a single user but multiple roles per env
+
+#
+# Kubernetes admin role
 
 # Create KubernetesAdmin role for aws-iam-authenticator
 resource "aws_iam_role" "kubernetes_admin_role" {
@@ -14,7 +16,7 @@ data "aws_iam_policy_document" "assumerole_root_policy" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      identifiers = [data.aws_caller_identity.current.account_id]
     }
   }
 
@@ -29,11 +31,14 @@ data "aws_iam_policy_document" "assumerole_root_policy" {
   }
 }
 
+
+#
+# CI User
+
 resource "aws_iam_user_policy_attachment" "circleci_ecr_access" {
   user       = data.aws_iam_user.ci_user.user_name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
 }
-
 
 # Allow the CI user to list and describe clusters
 data "aws_iam_policy_document" "eks_list_and_describe" {
@@ -50,9 +55,9 @@ data "aws_iam_policy_document" "eks_list_and_describe" {
 }
 
 resource "aws_iam_policy" "eks_list_and_describe_policy" {
-  name_prefix   = "eks-list-and-describe"
+  name_prefix = "eks-list-and-describe"
   description = "Policy to allow listing and describing EKS clusters for ${var.project} ${var.environment}"
-  policy = data.aws_iam_policy_document.eks_list_and_describe.json
+  policy      = data.aws_iam_policy_document.eks_list_and_describe.json
 }
 
 resource "aws_iam_user_policy_attachment" "ci_user_list_and_describe_policy" {
@@ -96,9 +101,9 @@ data "aws_iam_policy_document" "deploy_assets_policy" {
 }
 
 resource "aws_iam_policy" "deploy_assets_policy" {
-  name_prefix   = "ci-deploy-assets"
+  name_prefix = "ci-deploy-assets"
   description = "Policy to allow a CI user to deploy assets for ${var.project} ${var.environment}"
-  policy = data.aws_iam_policy_document.deploy_assets_policy.json
+  policy      = data.aws_iam_policy_document.deploy_assets_policy.json
 }
 
 resource "aws_iam_user_policy_attachment" "ci_s3_policy" {

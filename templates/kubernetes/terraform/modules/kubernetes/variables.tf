@@ -6,6 +6,11 @@ variable "project" {
   description = "The name of the project"
 }
 
+variable "allowed_account_ids" {
+  description = "The IDs of AWS accounts for this project, to protect against mistakenly applying to the wrong env"
+  type        = list(string)
+}
+
 variable "environment" {
   description = "Environment"
 }

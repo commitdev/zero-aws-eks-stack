@@ -1,5 +1,5 @@
 data "aws_secretsmanager_secret" "cf_keypair" {
-  name = "{var.project}_cf_keypair"
+  name = "${var.project}_cf_keypair"
 }
 
 data "aws_secretsmanager_secret_version" "cf_keypair" {
