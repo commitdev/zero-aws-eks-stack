@@ -69,7 +69,7 @@ resource "kubernetes_secret" "vpn_private_key" {
   }
 
   data = {
-    privatekey = jsondecode(data.aws_secretsmanager_secret_version.vpn_private_key.secret_string)["key"]
+    privatekey = data.aws_secretsmanager_secret_version.vpn_private_key.secret_string
   }
 
   type = "Opaque"
