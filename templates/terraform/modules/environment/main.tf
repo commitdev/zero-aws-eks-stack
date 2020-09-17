@@ -17,17 +17,21 @@ module "vpc" {
   environment             = var.environment
   region                  = var.region
   kubernetes_cluster_name = local.kubernetes_cluster_name
-  single_nat_gateway = var.vpc_use_single_nat_gateway
+  single_nat_gateway      = var.vpc_use_single_nat_gateway
 }
 
 # To get the current account id
 data "aws_caller_identity" "current" {}
+
 
 #
 # Provision the EKS cluster
 module "eks" {
   source = "commitdev/zero/aws//modules/eks"
   version = "0.0.2"
+  providers = {
+    aws = aws.for_eks
+  }
 
   project              = var.project
   environment          = var.environment

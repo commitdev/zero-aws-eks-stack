@@ -1,4 +1,6 @@
-# @TODO - sort out creating only a single user but multiple roles per env
+
+#
+# Kubernetes admin role
 
 # Create KubernetesAdmin role for aws-iam-authenticator
 resource "aws_iam_role" "kubernetes_admin_role" {
@@ -14,7 +16,7 @@ data "aws_iam_policy_document" "assumerole_root_policy" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      identifiers = [ data.aws_caller_identity.current.account_id ]
     }
   }
 
@@ -29,11 +31,14 @@ data "aws_iam_policy_document" "assumerole_root_policy" {
   }
 }
 
+
+#
+# CI User
+
 resource "aws_iam_user_policy_attachment" "circleci_ecr_access" {
   user       = data.aws_iam_user.ci_user.user_name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
 }
-
 
 # Allow the CI user to list and describe clusters
 data "aws_iam_policy_document" "eks_list_and_describe" {

@@ -57,6 +57,7 @@ teardown-secrets:
 	aws secretsmanager list-secrets --region <% index .Params `region` %> --query "SecretList[?Tags[?Key=='sendgrid' && Value=='$(PROJECT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region <% index .Params `region` %> --secret-id && \
 	aws iam delete-access-key --user-name $(PROJECT)-ci-user --access-key-id $(shell aws iam list-access-keys --user-name $(PROJECT)-ci-user --query "AccessKeyMetadata[0].AccessKeyId" | sed 's/"//g') && \
 	aws iam delete-user --user-name $(PROJECT)-ci-user
+	aws iam delete-role --role-name $(PROJECT)-eks-cluster-creator
 
 teardown-env:
 	cd terraform/environments/$(ENVIRONMENT) && \

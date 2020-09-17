@@ -1,15 +1,16 @@
-provider "aws" {
-  region  = "<% index .Params `region` %>"
-  allowed_account_ids = [ "<% index .Params `accountId` %>" ]
-}
 
+locals {
+  project = "<% .Name %>"
+  aws_account_id = "<% index .Params `accountId` %>"
+}
 
 terraform {
   required_version = ">= 0.13"
 }
 
-locals {
-  project = "<% .Name %>"
+provider "aws" {
+  region              = "<% index .Params `region` %>"
+  allowed_account_ids = [ local.aws_account_id ]
 }
 
 # Create the CI User
