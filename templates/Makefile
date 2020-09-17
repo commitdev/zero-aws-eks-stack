@@ -26,7 +26,7 @@ apply-env:
 pre-k8s:
 	@echo "Creating VPN private key..."
 	WGKEY=$(shell kubectl run -i --tty zero-k8s-utilities --image=commitdev/zero-k8s-utilities:0.0.3 --restart=Never -- wg genkey) && kubectl delete pod/zero-k8s-utilities && \
-	aws secretsmanager create-secret --name $(PROJECT)-$(ENVIRONMENT)-vpn-wg-privatekey-<% index .Params `randomSeed` %> --description "Auto-generated Wireguard VPN private key" --secret-string $$WGKEY
+	aws secretsmanager create-secret --region <% index .Params `region` %> --name $(PROJECT)-$(ENVIRONMENT)-vpn-wg-privatekey-<% index .Params `randomSeed` %> --description "Auto-generated Wireguard VPN private key" --secret-string $$WGKEY
 	@echo "Done VPN private key creation"
 
 apply-k8s-utils:
