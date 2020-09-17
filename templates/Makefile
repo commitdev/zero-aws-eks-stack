@@ -26,7 +26,7 @@ apply-env:
 pre-k8s:
 	@echo "Creating VPN private key..."
 	WGKEY=$(shell kubectl run -i --tty zero-k8s-utilities --image=commitdev/zero-k8s-utilities:0.0.3 --restart=Never -- wg genkey) && kubectl delete pod/zero-k8s-utilities && \
-	aws secretsmanager create-secret --name $(PROJECT)-$(ENVIRONMENT)-vpn-wg-privatekey-<% index .Params `randomSeed` %> --description "Auto-generated Wireguard VPN private key" --secret-string $$WGKEY
+	aws secretsmanager create-secret --region <% index .Params `region` %> --name $(PROJECT)-$(ENVIRONMENT)-vpn-wg-privatekey-<% index .Params `randomSeed` %> --description "Auto-generated Wireguard VPN private key" --secret-string $$WGKEY
 	@echo "Done VPN private key creation"
 
 apply-k8s-utils:
@@ -56,7 +56,8 @@ teardown-secrets:
 	aws secretsmanager list-secrets --region <% index .Params `region` %> --query "SecretList[?Tags[?Key=='rds' && Value=='$(PROJECT)-$(ENVIRONMENT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region <% index .Params `region` %> --secret-id && \
 	aws secretsmanager list-secrets --region <% index .Params `region` %> --query "SecretList[?Tags[?Key=='sendgrid' && Value=='$(PROJECT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region <% index .Params `region` %> --secret-id && \
 	aws iam delete-access-key --user-name $(PROJECT)-ci-user --access-key-id $(shell aws iam list-access-keys --user-name $(PROJECT)-ci-user --query "AccessKeyMetadata[0].AccessKeyId" | sed 's/"//g') && \
-	aws iam delete-user --user-name $(PROJECT)-ci-user
+	aws iam delete-user --user-name $(PROJECT)-ci-user && \
+	aws iam delete-role --role-name $(PROJECT)-eks-cluster-creator
 
 teardown-env:
 	cd terraform/environments/$(ENVIRONMENT) && \

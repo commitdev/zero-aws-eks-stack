@@ -65,11 +65,11 @@ resource "kubernetes_namespace" "vpn_namespace" {
 resource "kubernetes_secret" "vpn_private_key" {
   metadata {
     name      = "wg-secret"
-    namespace = local.namespace
+    namespace = kubernetes_namespace.vpn_namespace.metadata[0].name
   }
 
   data = {
-    privatekey = jsondecode(data.aws_secretsmanager_secret_version.vpn_private_key.secret_string)["key"]
+    privatekey = data.aws_secretsmanager_secret_version.vpn_private_key.secret_string
   }
 
   type = "Opaque"
@@ -78,7 +78,7 @@ resource "kubernetes_secret" "vpn_private_key" {
 resource "kubernetes_config_map" "vpn_configmap" {
   metadata {
     name      = "wg-configmap"
-    namespace = local.namespace
+    namespace = kubernetes_namespace.vpn_namespace.metadata[0].name
   }
 
   data = {
@@ -89,7 +89,7 @@ resource "kubernetes_config_map" "vpn_configmap" {
 resource "kubernetes_service" "wireguard" {
   metadata {
     name      = "wireguard"
-    namespace = local.namespace
+    namespace = kubernetes_namespace.vpn_namespace.metadata[0].name
 
     labels = {
       app = "wireguard"
@@ -121,7 +121,7 @@ resource "kubernetes_service" "wireguard" {
 resource "kubernetes_deployment" "wireguard" {
   metadata {
     name      = "wireguard"
-    namespace = local.namespace
+    namespace = kubernetes_namespace.vpn_namespace.metadata[0].name
   }
 
   spec {
