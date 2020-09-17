@@ -18,9 +18,10 @@ module "kubernetes" {
 
   project = "<% .Name %>"
 
-  environment = "stage"
-  region      = "<% index .Params `region` %>"
-  random_seed = "<% index .Params `randomSeed` %>"
+  environment         = "stage"
+  region              = "<% index .Params `region` %>"
+  allowed_account_ids = ["<% index .Params `accountId` %>"]
+  random_seed         = "<% index .Params `randomSeed` %>"
 
   # Authenticate with the EKS cluster via the cluster id
   cluster_name = "<% .Name %>-stage-<% index .Params `region` %>"
@@ -34,15 +35,18 @@ module "kubernetes" {
   # Logging configuration
   logging_type = "<% index .Params `loggingType` %>"
 
-  # Application policy list
+  # Application policy list - This allows applications running in kubernetes to have access to AWS resources.
+  # Specify the service account name, the namespace, and the policy that should be applied.
+  # This makes use of IRSA: https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/
   application_policy_list = [
     {
       service_account = "backend-service"
       namespace       = "<% .Name %>"
       policy          = data.aws_iam_policy_document.resource_access_backendservice
     }
-    # could be more policies defined here (if have)
+    # Add additional mappings here
   ]
+
 
   # Wireguard configuration
   vpn_server_address = "10.10.199.0/24"

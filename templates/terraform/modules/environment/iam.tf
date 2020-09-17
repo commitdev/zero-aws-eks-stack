@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "assumerole_root_policy" {
 
     principals {
       type        = "AWS"
-      identifiers = [ data.aws_caller_identity.current.account_id ]
+      identifiers = [data.aws_caller_identity.current.account_id]
     }
   }
 
@@ -55,9 +55,9 @@ data "aws_iam_policy_document" "eks_list_and_describe" {
 }
 
 resource "aws_iam_policy" "eks_list_and_describe_policy" {
-  name_prefix   = "eks-list-and-describe"
+  name_prefix = "eks-list-and-describe"
   description = "Policy to allow listing and describing EKS clusters for ${var.project} ${var.environment}"
-  policy = data.aws_iam_policy_document.eks_list_and_describe.json
+  policy      = data.aws_iam_policy_document.eks_list_and_describe.json
 }
 
 resource "aws_iam_user_policy_attachment" "ci_user_list_and_describe_policy" {
@@ -101,9 +101,9 @@ data "aws_iam_policy_document" "deploy_assets_policy" {
 }
 
 resource "aws_iam_policy" "deploy_assets_policy" {
-  name_prefix   = "ci-deploy-assets"
+  name_prefix = "ci-deploy-assets"
   description = "Policy to allow a CI user to deploy assets for ${var.project} ${var.environment}"
-  policy = data.aws_iam_policy_document.deploy_assets_policy.json
+  policy      = data.aws_iam_policy_document.deploy_assets_policy.json
 }
 
 resource "aws_iam_user_policy_attachment" "ci_s3_policy" {

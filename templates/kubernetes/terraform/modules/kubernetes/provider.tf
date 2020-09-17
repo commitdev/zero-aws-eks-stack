@@ -21,12 +21,12 @@ provider "aws" {
 
 data "aws_eks_cluster" "cluster" {
   provider = aws.for_eks
-  name = var.cluster_name
+  name     = var.cluster_name
 }
 
 data "aws_eks_cluster_auth" "cluster" {
   provider = aws.for_eks
-  name = var.cluster_name
+  name     = var.cluster_name
 }
 
 provider "kubernetes" {
