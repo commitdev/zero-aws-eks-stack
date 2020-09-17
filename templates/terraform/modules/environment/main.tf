@@ -47,6 +47,9 @@ module "eks" {
   worker_asg_min_size  = var.eks_worker_asg_min_size
   worker_asg_max_size  = var.eks_worker_asg_max_size
   worker_ami           = var.eks_worker_ami # EKS-Optimized AMI for your region: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
+
+  iam_role_arns        = module.iam_users.eks_iam_role_arns
+
 }
 
 
@@ -131,4 +134,15 @@ module "sendgrid" {
 
   zone_name                    = var.domain_name
   sendgrid_api_key_secret_name = var.sendgrid_api_key_secret_name
+}
+
+module "iam_users" {
+  source = "commitdev/zero/aws//modules//iam_users"
+  version = "0.0.1"
+
+  project               = var.project
+  environment           = var.environment
+
+  iam_users             = var.iam_users
+  iam_roles             = var.iam_roles
 }

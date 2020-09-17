@@ -143,3 +143,13 @@ variable "cf_signed_downloads" {
   description = "Enable Cloudfront signed URLs"
   default     = false
 }
+
+variable "iam_roles" {
+  type        = list(tuple([string, string]))
+  description = "IAM role list with policy"
+}
+
+variable "iam_users" {
+  type        = list(tuple([string, list(string)]))
+  description = "IAM user list with multiple roles assigned"
+}
