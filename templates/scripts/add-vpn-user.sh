@@ -25,7 +25,7 @@ client_public_key=$($EXEC "echo -n $client_private_key | wg pubkey")
 
 # get next available IP
 existing_ips=$($EXEC "cat /etc/wireguard/wg0.conf | grep AllowedIPs| cut -d\" \" -f3 | cut -d\"/\" -f1 | sort")
-last_ip=$(echo "$existing_ips" | tr -cd "[:alnum:].\n" | tail -1)
+last_ip=$(echo "$existing_ips" | tr -cd "[:alnum:]." | tail -1)
 next_ip=$last_ip
 while [[ "$existing_ips" =~ "$next_ip" ]]; do
   next_ip=${next_ip%.*}.$((${next_ip##*.}+1))
