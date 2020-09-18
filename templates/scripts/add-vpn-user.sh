@@ -70,7 +70,7 @@ Address = $next_ip/32
 # VPN server side
 PublicKey = $server_public_key
 AllowedIPs = 0.0.0.0/0
-Endpoint = vpn.$EXTERNAL_DNS:51820
+Endpoint = $EXTERNAL_DNS:51820
 
 EOF
 
