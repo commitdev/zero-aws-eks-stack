@@ -48,7 +48,7 @@ module "eks" {
   worker_asg_max_size  = var.eks_worker_asg_max_size
   worker_ami           = var.eks_worker_ami # EKS-Optimized AMI for your region: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
 
-  iam_role_arns        = module.iam_users.eks_iam_role_arns
+  iam_role_mapping     = module.iam_users.eks_iam_role_mapping
 
 }
 
