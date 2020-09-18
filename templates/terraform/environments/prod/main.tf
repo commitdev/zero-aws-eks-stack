@@ -63,8 +63,8 @@ module "prod" {
   sendgrid_enabled = <%if eq (index .Params `sendgridApiKey`) "" %>false<% else %>true<% end %>
   sendgrid_api_key_secret_name = "<% .Name %>-sendgrid-<% index .Params `randomSeed` %>"
 
-  # IAM roles and users
-  iam_roles = [
+  # Roles and Users configuration
+  roles = [
     {
       name   = "developer"
       policy = data.aws_iam_policy_document.developer_access.json
@@ -74,7 +74,7 @@ module "prod" {
       policy = data.aws_iam_policy_document.developer_access.json
     }
   ]
-  iam_users = [
+  users = [
     {
       name  = "dev1"
       roles = ["developer"]

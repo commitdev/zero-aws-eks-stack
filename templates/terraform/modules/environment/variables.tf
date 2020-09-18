@@ -144,18 +144,18 @@ variable "cf_signed_downloads" {
   default     = false
 }
 
-variable "iam_roles" {
-  type        = list(object({
+variable "roles" {
+  type = list(object({
     name   = string
     policy = string
   }))
-  description = "IAM role list with policy"
+  description = "Role list with policy"
 }
 
-variable "iam_users" {
-  type        = list(object({
+variable "users" {
+  type = list(object({
     name  = string
     roles = list(string)
   }))
-  description = "IAM user list with multiple roles assigned"
+  description = "User list with multiple roles granted"
 }
