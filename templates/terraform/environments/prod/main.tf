@@ -7,6 +7,13 @@ terraform {
     region         = "<% index .Params `region` %>"
     dynamodb_table = "<% .Name %>-prod-terraform-state-locks"
   }
+
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "~> 3.7"
+    }
+  }
 }
 
 locals {
@@ -59,11 +66,12 @@ module "prod" {
 
   # Hosting configuration. Each domain will have a bucket created for it, but may have mulitple aliases pointing to the same bucket.
   hosted_domains = [
-    { domain : local.domain_name, aliases : [] },
-    { domain : "<% index .Params `productionFrontendSubdomain` %>${local.domain_name}", aliases : [] },
+    { domain : local.domain_name, aliases : [], signed_urls: false },
+    { domain : "<% index .Params `productionFrontendSubdomain` %>${local.domain_name}", aliases : [], signed_urls: false },
+    <% if eq (index .Params `fileUploads`) "yes" %>{ domain : "files.${local.domain_name}", aliases : [], signed_urls: true },<% end %>
   ]
-  domain_name = "${local.domain_name}"
-  cf_signed_downloads = <% if eq (index .Params `fileUploads`) "yes" %>true<% else %>false<% end %>
+
+  domain_name = local.domain_name
 
   # DB configuration
   database = "<% index .Params `database` %>"
