@@ -65,12 +65,27 @@ module "prod" {
 
   # IAM roles and users
   iam_roles = [
-    ["developer", data.aws_iam_policy_document.developer_access.json],
-    ["operator",  data.aws_iam_policy_document.developer_access.json],
+    {
+      name   = "developer"
+      policy = data.aws_iam_policy_document.developer_access.json
+    },
+    {
+      name   = "operator"
+      policy = data.aws_iam_policy_document.developer_access.json
+    }
   ]
   iam_users = [
-    ["dev1",      ["developer"]],
-    ["devops1",   ["developer", "operator"]],
-    ["operator1", ["operator"]],
+    {
+      name  = "dev1"
+      roles = ["developer"]
+    },
+    {
+      name  = "devops1"
+      roles = ["developer", "operator"]
+    },
+    {
+      name  = "operator1"
+      roles = ["operator"]
+    }
   ]
 }

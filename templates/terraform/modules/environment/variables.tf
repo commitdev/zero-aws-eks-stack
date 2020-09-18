@@ -145,11 +145,17 @@ variable "cf_signed_downloads" {
 }
 
 variable "iam_roles" {
-  type        = list(tuple([string, string]))
+  type        = list(object({
+    name   = string
+    policy = string
+  }))
   description = "IAM role list with policy"
 }
 
 variable "iam_users" {
-  type        = list(tuple([string, list(string)]))
+  type        = list(object({
+    name  = string
+    roles = list(string)
+  }))
   description = "IAM user list with multiple roles assigned"
 }
