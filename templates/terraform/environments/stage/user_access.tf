@@ -7,7 +7,7 @@ data "aws_iam_policy_document" "developer_access" {
       "eks:List*",
       "eks:Describe*"
     ]
-    resources = ["arn:aws:eks:::cluster/piggycloud-me-stage-*"]
+    resources = ["arn:aws:eks:::cluster/<% .Name %>-stag*"]
   }
   # ECR
   statement {
@@ -24,6 +24,6 @@ data "aws_iam_policy_document" "developer_access" {
     actions = [
       "s3:ListBucket"
     ]
-    resources = ["arn:aws:s3:::piggycloud-staging.me"]
+    resources = ["arn:aws:s3:::<% .Name %>-stag*"]
   }
 }
