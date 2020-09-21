@@ -21,7 +21,7 @@ read name
 # collect keys
 server_public_key=$($EXEC "cat /etc/wireguard/privatekey | wg pubkey")
 client_private_key=$($EXEC "wg genkey")
-client_public_key=$($EXEC "echo -n $client_private_key | wg pubkey")
+client_public_key=$($EXEC "echo -n $client_private_key | wg pubkey | tr -d \"\r\n\f\"")
 
 # get next available IP
 existing_ips=$($EXEC "cat /etc/wireguard/wg0.conf | grep AllowedIPs| cut -d\" \" -f3 | cut -d\"/\" -f1 | sort")
@@ -45,7 +45,7 @@ echo
 echo "Please modify kubernetes/terraform/environments/<env>/main.tf and append the following line to var.vpn_client_publickeys."
 echo "Then apply the terraform, or ask an administrator to."
 echo
-printf '    ["%s", "%s", "%s"]' "$name" "$next_ip/32" "$client_public_key"
+printf '    ["%s", "%s", "%s"],' "$name" "$next_ip/32" "$client_public_key"
 echo
 echo "After this is done you should be able to open the wireguard client and activate the tunnel."
 echo "You can download the client at https://www.wireguard.com/install/"
