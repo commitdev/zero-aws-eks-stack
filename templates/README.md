@@ -73,6 +73,28 @@ Please see [Link][zero-k8s-guide]
 - AWS IAM integration with Kubernetes RBAC
 ...
 
+#### Sending Email with Sendgrid
+Setup: If you initialized your infrastructure with a sendgridApiKey, you should have a verified domain with Sendgrid once your infrastructure is setup. We should have created for you 3 route53 entries, and [verified you domain with sendgrid][sendgrid-domain-verification]
+
+Your sendgrid account should be configured, and you can send a test email as follow:
+```sh
+curl --request POST \
+  --url https://api.sendgrid.com/v3/mail/send \
+  --header 'authorization: Bearer <SENDGRID-API-KEY>' \
+  --header 'content-type: application/json' \
+  --data '{
+	"from": {"email": "test@mail.<verified-domain>"},
+  "personalizations": [{
+      "subject": "Hello, World!",
+      "to": [{
+        "email": "<receipient-email>"
+      }],
+	}],
+  "content": [{"type": "text/plain","value": "Hello, World!"}]
+}'
+```
+For Application use, see [Sendgrid resources][sendgrid-send-mail] on how to setup templates to send dynamic transactional emails. To setup emailing from your application deployment, you should create a kubernetes secret with your Sendgrid API Key(already stored in [AWS secret-manager](./terraform/bootstrap/secrets/main.tf)) in your application's namespace. Then mount the secret as an environment variable in your deployment.
+
 # Resources
 ###  Infrastructure
 This [architecture-diagram][architecture-diagram] displays the original setup you get from the terraform templates
@@ -138,3 +160,6 @@ make teardown-remote-state
 [zero-k8s-guide]: ./kubernetes/terraform/modules/kubernetes/README.md
 [zero-architecture-diagram]: https://github.com/commitdev/zero-aws-eks-stack/blob/master/docs/architecture-overview.svg
 [zero-resource-list]: https://github.com/commitdev/zero-aws-eks-stack/blob/master/docs/resources.md
+
+[sendgrid-domain-verification]: https://app.sendgrid.com/settings/sender_auth
+[sendgrid-send-mail]: https://sendgrid.api-docs.io/v3.0/mail-send/v3-mail-send
