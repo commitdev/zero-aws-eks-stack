@@ -74,7 +74,7 @@ Please see [Link][zero-k8s-guide]
 ...
 
 #### Sending Email with Sendgrid
-Setup: If you initialized your infrastructure with a sendgridApiKey, you should have a verified domain with Sendgrid once your infrastructure is setup. We should have created for you 3 route53 entries, and [verified you domain with sendgrid][sendgrid-domain-verification]
+Setup: If you initialized your infrastructure with a sendgridApiKey, you should have a verified domain with Sendgrid once your infrastructure is setup. We should have created 3 route53 entries for you, and [verified your domain with sendgrid][sendgrid-domain-verification]
 
 Your sendgrid account should be configured, and you can send a test email as follow:
 ```sh
