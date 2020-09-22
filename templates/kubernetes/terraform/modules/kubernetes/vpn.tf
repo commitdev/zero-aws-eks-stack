@@ -137,6 +137,8 @@ resource "kubernetes_deployment" "wireguard" {
       metadata {
         labels = {
           app = "wireguard"
+          # this hash is to update the deployment whenever configmap is updated with new users
+          configmap_version = sha1(data.template_file.vpn_server_conf.rendered)
         }
       }
 
