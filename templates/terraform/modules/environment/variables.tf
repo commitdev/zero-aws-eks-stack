@@ -44,9 +44,12 @@ variable "eks_worker_ami" {
   description = "The (EKS-optimized) AMI for EKS worker instances"
 }
 
-variable "s3_hosting_buckets" {
-  description = "S3 hosting buckets"
-  type = set(string)
+variable "hosted_domains" {
+  description = "Domains to host content for using S3 and Cloudfront. Requires a domain which will be the bucket name and the domain for the certificate, and optional aliases which will have records created for them and will be SubjectAltNames for the certificate. Only a single bucket and CF Distribution will be created per domain."
+  type = list( object( {
+    domain  = string
+    aliases = list(string)
+  } ) )
 }
 
 variable "domain_name" {

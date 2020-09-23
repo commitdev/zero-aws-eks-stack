@@ -6,25 +6,26 @@ CLUSTER=$(kubectl config current-context | cut -d"/" -f2)
 
 # get pod id for execution
 POD=$(kubectl -n vpn get pods | grep wireguard | cut -d' ' -f1)
+EXTERNAL_DNS=$(kubectl -nvpn get svc wireguard -o jsonpath='{.metadata.annotations.external-dns\.alpha\.kubernetes\.io/hostname}')
 
 if [ -z "$POD" ]; then
   echo "Warning: No VPN service running yet"
   exit 1
 fi
-EXEC="kubectl -n vpn exec -it $POD --"
+EXEC="kubectl -n vpn exec -it $POD -- /bin/bash -c"
 
 # get name
 echo -n "Enter your name: "
 read name
 
 # collect keys
-server_public_key=$($EXEC cat /etc/wireguard/privatekey | wg pubkey)
-client_private_key=$($EXEC wg genkey)
-client_public_key=$($EXEC echo -n $client_private_key | wg pubkey)
+server_public_key=$($EXEC "cat /etc/wireguard/privatekey | wg pubkey")
+client_private_key=$($EXEC "wg genkey")
+client_public_key=$($EXEC "echo -n $client_private_key | wg pubkey | tr -d \"\r\n\f\"")
 
 # get next available IP
-existing_ips=$($EXEC cat /etc/wireguard/wg0.conf | grep AllowedIPs| cut -d" " -f3 | cut -d"/" -f1 | sort)
-last_ip=$(echo "$existing_ips" | tail -1)
+existing_ips=$($EXEC "cat /etc/wireguard/wg0.conf | grep AllowedIPs| cut -d\" \" -f3 | cut -d\"/\" -f1 | sort")
+last_ip=$(echo "$existing_ips" | tr -cd "[:alnum:].\n" | tail -1)
 next_ip=$last_ip
 while [[ "$existing_ips" =~ "$next_ip" ]]; do
   next_ip=${next_ip%.*}.$((${next_ip##*.}+1))
@@ -44,7 +45,7 @@ echo
 echo "Please modify kubernetes/terraform/environments/<env>/main.tf and append the following line to var.vpn_client_publickeys."
 echo "Then apply the terraform, or ask an administrator to."
 echo
-printf '    ["%s", "%s", "%s"]' "$name" "$next_ip/32" "$client_public_key"
+printf '    ["%s", "%s", "%s"],' "$name" "$next_ip/32" "$client_public_key"
 echo
 echo "After this is done you should be able to open the wireguard client and activate the tunnel."
 echo "You can download the client at https://www.wireguard.com/install/"
@@ -68,8 +69,8 @@ Address = $next_ip/32
 [Peer]
 # VPN server side
 PublicKey = $server_public_key
-AllowedIPs = 0.0.0.0/0
-Endpoint = vpn.piggycloud-staging.me:51820
+AllowedIPs = 10.10.0.0/16
+Endpoint = $EXTERNAL_DNS:51820
 
 EOF
 

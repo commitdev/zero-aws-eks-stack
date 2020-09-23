@@ -3,6 +3,11 @@ data "aws_iam_role" "eks_cluster_creator" {
   name = "${var.project}-eks-cluster-creator"
 }
 
+provider "aws" {
+  alias = "for_cloudfront"
+  region = "us-east-1"
+}
+
 # Used only for EKS creation to tie "cluster creator" to a role instead of the user who runs terraform
 # This allows us to rely on credentials pulled from the EKS cluster instead of the user's local kube config
 provider "aws" {
