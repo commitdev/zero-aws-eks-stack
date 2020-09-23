@@ -1,6 +1,7 @@
 SHELL = /usr/bin/env bash
 ENVIRONMENT ?= stage
 PROJECT = <% .Name %>
+ROLE ?= admin
 export AWS_DEFAULT_REGION = <% index .Params `region` %>
 export AWS_PAGER =
 KUBE_CONTEXT := $(PROJECT)-$(ENVIRONMENT)-$(AWS_DEFAULT_REGION)
@@ -40,7 +41,7 @@ apply-k8s-utils:
 	terraform apply $(AUTO_APPROVE)
 
 update-k8s-conf:
-	aws eks --region $(AWS_DEFAULT_REGION) update-kubeconfig --role "arn:aws:iam::<% index .Params `accountId` %>:role/$(PROJECT)-kubernetes-admin-$(ENVIRONMENT)" --name $(KUBE_CONTEXT) --alias $(KUBE_CONTEXT)
+	aws eks --region $(AWS_DEFAULT_REGION) update-kubeconfig --role "arn:aws:iam::<% index .Params `accountId` %>:role/$(PROJECT)-kubernetes-$(ROLE)-$(ENVIRONMENT)" --name $(KUBE_CONTEXT) --alias $(KUBE_CONTEXT)
 
 post-apply-setup:
 	cd scripts && ENVIRONMENT=$(ENVIRONMENT) PROJECT=$(PROJECT) sh post-apply.sh

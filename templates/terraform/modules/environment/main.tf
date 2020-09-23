@@ -8,6 +8,31 @@ data "aws_iam_user" "ci_user" {
   user_name = "${var.project}-ci-user" # Should have been created in the bootstrap process
 }
 
+# get users from remote state of "shared"
+data "terraform_remote_state" "shared" {
+  backend = "s3"
+  config = {
+    bucket = "${var.project}-shared-terraform-state"
+    key    = "infrastructure/terraform/environments/shared/main"
+    region = "us-west-2"
+    encrypt = true
+    dynamodb_table = "${var.project}-shared-terraform-state-locks"
+  }
+}
+
+locals {
+  role_name_list = var.roles.*.name
+  users = [
+    for u in data.terraform_remote_state.shared.outputs.user_role_mapping : {
+      name  = u.name
+      roles = [
+        for r in u.roles :
+        r.name if contains(local.role_name_list, r.name) && contains(r.environments, var.environment)
+      ]
+    }
+  ]
+}
+
 
 module "vpc" {
   source  = "commitdev/zero/aws//modules/vpc"
@@ -145,6 +170,6 @@ module "user_access" {
   project     = var.project
   environment = var.environment
 
-  users = var.users
   roles = var.roles
+  users = local.users
 }

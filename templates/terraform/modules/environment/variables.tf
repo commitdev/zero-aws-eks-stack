@@ -149,16 +149,9 @@ variable "cf_signed_downloads" {
 
 variable "roles" {
   type = list(object({
-    name   = string
-    policy = string
+    name         = string
+    aws_policy   = string
+    k8s_policies = list(map(list(string)))
   }))
-  description = "Role list with policy"
-}
-
-variable "users" {
-  type = list(object({
-    name  = string
-    roles = list(string)
-  }))
-  description = "User list with multiple roles granted"
+  description = "Role list with policies"
 }

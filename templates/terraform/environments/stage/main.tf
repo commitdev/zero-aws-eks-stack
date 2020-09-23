@@ -68,29 +68,17 @@ module "stage" {
   sendgrid_enabled = <%if eq (index .Params `sendgridApiKey`) "" %>false<% else %>true<% end %>
   sendgrid_api_key_secret_name = "<% .Name %>-sendgrid-<% index .Params `randomSeed` %>"
 
-  # Roles and Users configuration
+  # Roles configuration
   roles = [
     {
-      name   = "developer"
-      policy = data.aws_iam_policy_document.developer_access.json
+      name         = "developer"
+      aws_policy   = data.aws_iam_policy_document.developer_access.json
+      k8s_policies = local.k8s_developer_access
     },
     {
-      name   = "operator"
-      policy = data.aws_iam_policy_document.developer_access.json
-    }
-  ]
-  users = [
-    {
-      name  = "dev1"
-      roles = ["developer"]
-    },
-    {
-      name  = "devops1"
-      roles = ["developer", "operator"]
-    },
-    {
-      name  = "operator1"
-      roles = ["operator"]
+      name         = "operator"
+      aws_policy   = data.aws_iam_policy_document.operator_access.json
+      k8s_policies = local.k8s_operator_access
     }
   ]
 }
