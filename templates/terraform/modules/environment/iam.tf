@@ -96,7 +96,7 @@ data "aws_iam_policy_document" "deploy_assets_policy" {
     actions = [
       "cloudfront:CreateInvalidation",
     ]
-    resources = formatlist("arn:aws:cloudfront::%s:distribution/%s", data.aws_caller_identity.current.account_id, module.s3_hosting.cloudfront_distribution_ids)
+    resources = formatlist("arn:aws:cloudfront::%s:distribution/%s", data.aws_caller_identity.current.account_id, module.s3_hosting[*].cloudfront_distribution_id)
   }
 }
 
