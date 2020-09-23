@@ -72,7 +72,7 @@ data "aws_iam_policy_document" "deploy_assets_policy" {
       "s3:ListBucket",
     ]
 
-    resources = formatlist("arn:aws:s3:::%s", var.s3_hosting_buckets)
+    resources = module.s3_hosting[*].bucket_arn
   }
 
   statement {
@@ -81,7 +81,7 @@ data "aws_iam_policy_document" "deploy_assets_policy" {
       "s3:GetBucketLocation",
     ]
 
-    resources = formatlist("arn:aws:s3:::%s/*", var.s3_hosting_buckets)
+    resources = formatlist("%s/*", module.s3_hosting[*].bucket_arn)
   }
 
   statement {

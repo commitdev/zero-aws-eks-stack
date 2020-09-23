@@ -52,35 +52,38 @@ module "eks" {
 
 module "wildcard_domain" {
   source  = "commitdev/zero/aws//modules/certificate"
-  version = "0.0.1"
+  version = "0.1.0"
 
-  region       = var.region
   zone_name    = var.domain_name
-  domain_names = ["*.${var.domain_name}"]
+  domain_name = "*.${var.domain_name}"
 }
 
 module "assets_domains" {
-  source  = "commitdev/zero/aws//modules/certificate"
-  version = "0.0.1"
+  source    = "commitdev/zero/aws//modules/certificate"
+  version   = "0.1.0"
+  count     = length(var.hosted_domains)
+  providers = {
+    aws = aws.for_cloudfront
+  }
 
-  region       = "us-east-1" # For CF, the cert must be in us-east-1
-  zone_name    = var.domain_name
-  domain_names = var.s3_hosting_buckets
+  zone_name         = var.domain_name
+  domain_name       = var.hosted_domains[count.index].domain
+  alternative_names = var.hosted_domains[count.index].aliases
 }
 
 module "s3_hosting" {
   source  = "commitdev/zero/aws//modules/s3_hosting"
-  version = "0.0.3"
+  version = "0.1.0"
+  count   = length(var.hosted_domains)
 
-  # We need to wait for certificate validation to complete before using the certs
-  depends_on = [module.assets_domains.certificate_validations]
-
-  cf_signed_downloads = var.cf_signed_downloads
-  buckets             = var.s3_hosting_buckets
-  project             = var.project
-  environment         = var.environment
-  certificate_arns    = module.assets_domains.certificate_arns
-  route53_zone_id     = module.assets_domains.route53_zone_id
+  cf_signed_downloads    = var.cf_signed_downloads
+  domain                 = var.hosted_domains[count.index].domain
+  aliases                = var.hosted_domains[count.index].aliases
+  project                = var.project
+  environment            = var.environment
+  certificate_arn        = module.assets_domains[count.index].certificate_arn
+  certificate_validation = module.assets_domains[count.index].certificate_validation
+  route53_zone_id        = module.assets_domains[count.index].route53_zone_id
 }
 
 module "db" {
