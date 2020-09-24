@@ -1,7 +1,7 @@
 locals {
   project     = "<% .Name %>"
   region      = "<% index .Params `region` %>"
-  account_id  = "<% index .Params `accountId` %>"]
+  account_id  = "<% index .Params `accountId` %>"
 }
 
 terraform {
