@@ -1,19 +1,19 @@
+terraform {
+  required_version = ">= 0.13"
+  backend "s3" {
+    bucket         = "<% .Name %>-stage-terraform-state"
+    key            = "infrastructure/terraform/environments/stage/main"
+    encrypt        = true
+    region         = "<% index .Params `region` %>"
+    dynamodb_table = "<% .Name %>-stage-terraform-state-locks"
+  }
+}
+
 locals {
   project     = "<% .Name %>"
   region      = "<% index .Params `region` %>"
   account_id  = "<% index .Params `accountId` %>"]
   domain_name = "<% index .Params `stagingHostRoot` %>"
-}
-
-terraform {
-  required_version = ">= 0.13"
-  backend "s3" {
-    bucket         = "${local.project}-stage-terraform-state"
-    key            = "infrastructure/terraform/environments/stage/main"
-    encrypt        = true
-    region         = local.region
-    dynamodb_table = "${local.project}-stage-terraform-state-locks"
-  }
 }
 
 provider "aws" {

@@ -1,18 +1,18 @@
+terraform {
+  required_version = ">= 0.13"
+  backend "s3" {
+    bucket         = "<% .Name %>-shared-terraform-state"
+    key            = "infrastructure/terraform/environments/shared/main"
+    encrypt        = true
+    region         = "<% index .Params `region` %>"
+    dynamodb_table = "<% .Name %>-shared-terraform-state-locks"
+  }
+}
+
 locals {
   project     = "<% .Name %>"
   region      = "<% index .Params `region` %>"
   account_id  = "<% index .Params `accountId` %>"
-}
-
-terraform {
-  required_version = ">= 0.13"
-  backend "s3" {
-    bucket         = "${local.project}-shared-terraform-state"
-    key            = "infrastructure/terraform/environments/shared/main"
-    encrypt        = true
-    region         = "${local.region}"
-    dynamodb_table = "${local.project}-shared-terraform-state-locks"
-  }
 }
 
 provider "aws" {
