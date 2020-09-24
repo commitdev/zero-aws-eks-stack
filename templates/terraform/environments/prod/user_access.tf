@@ -1,15 +1,5 @@
 # define AWS policy documents for developer
 data "aws_iam_policy_document" "developer_access" {
-  # IAM
-  statement {
-    effect = "Allow"
-    actions = [
-      "iam:ListRoles",
-      "sts:AssumeRole"
-    ]
-    resources = ["arn:aws:iam::<% index .Params `accountId` %>:role/<% .Name %>-kubernetes-developer-prod"]
-  }
-
   # EKS
   statement {
     effect    = "Allow"

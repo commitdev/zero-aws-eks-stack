@@ -155,3 +155,14 @@ variable "roles" {
   }))
   description = "Role list with policies"
 }
+
+variable "user_role_mapping" {
+  type = list(object({
+    name  = string
+    roles = list(object({
+      name         = string
+      environments = list(string)
+    }))
+  }))
+  description = "User-Roles mapping with environment"
+}

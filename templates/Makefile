@@ -6,7 +6,7 @@ export AWS_DEFAULT_REGION = <% index .Params `region` %>
 export AWS_PAGER =
 KUBE_CONTEXT := $(PROJECT)-$(ENVIRONMENT)-$(AWS_DEFAULT_REGION)
 
-apply: apply-remote-state apply-secrets apply-env update-k8s-conf pre-k8s apply-k8s-utils post-apply-setup
+apply: apply-remote-state apply-secrets apply-shared-env apply-env update-k8s-conf pre-k8s apply-k8s-utils post-apply-setup
 
 apply-remote-state:
 	aws s3 ls $(PROJECT)-$(ENVIRONMENT)-terraform-state > /dev/null 2>&1 || ( \
@@ -21,6 +21,11 @@ apply-secrets:
 	terraform init && \
 	terraform apply $(AUTO_APPROVE) && \
 	rm ./terraform.tfstate )
+
+apply-shared-env:
+       cd terraform/environments/shared; \
+       terraform init && \
+       terraform apply $(AUTO_APPROVE)
 
 apply-env:
 	cd terraform/environments/$(ENVIRONMENT); \

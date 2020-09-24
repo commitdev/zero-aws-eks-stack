@@ -14,6 +14,18 @@ provider "aws" {
   allowed_account_ids = ["<% index .Params `accountId` %>"]
 }
 
+# remote state of "shared"
+data "terraform_remote_state" "shared" {
+  backend = "s3"
+  config = {
+    bucket = "<% .Name %>-shared-terraform-state"
+    key    = "infrastructure/terraform/environments/shared/main"
+    region = "<% index .Params `region` %>"
+    encrypt = true
+    dynamodb_table = "<% .Name %>-shared-terraform-state-locks"
+  }
+}
+
 # Instantiate the production environment
 module "prod" {
   source      = "../../modules/environment"
@@ -76,4 +88,6 @@ module "prod" {
       k8s_policies = local.k8s_operator_access
     }
   ]
+
+  user_role_mapping = data.terraform_remote_state.shared.outputs.user_role_mapping
 }

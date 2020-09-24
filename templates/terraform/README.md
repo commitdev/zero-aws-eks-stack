@@ -105,12 +105,21 @@
 ## User Access
 
 You may want to add people for AWS and Kubernetes access.
- 1. Change user list with role and environment assignment in environments/shared/main.tf
- 2. Change user access policy in environments/<env>/user_access.tf
+ 1. Change user list with role and environment assignment in main.tf under `environments/shared`, then run:
+```
+make apply-shared-env
+```
+
+ 2. Change user access policy in user_access.tf` under `environments/<env>`, then run:
+```
+ENVIRONENT=<env> make apply-env
+```
+
 After applied, people can switch to assigned k8s context, in the root of the project, run:
 ```
-ROLE=developer make update-k8s-conf
+ROLE=<role> make update-k8s-conf
 ```
+then, run `kubectl -n <namespace> get pods` for confirmation.
 
 ## Upgrading an EKS Cluster
 
