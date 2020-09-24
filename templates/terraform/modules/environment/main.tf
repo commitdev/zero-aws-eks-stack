@@ -41,7 +41,7 @@ data "aws_caller_identity" "current" {}
 # Provision the EKS cluster
 module "eks" {
   source  = "commitdev/zero/aws//modules/eks"
-  version = "0.0.2"
+  version = "0.1.2"
   providers = {
     aws = aws.for_eks
   }
@@ -153,7 +153,7 @@ module "sendgrid" {
 
 module "user_access" {
   source = "commitdev/zero/aws//modules//user_access"
-  version = "0.0.1"
+  version = "0.1.2"
 
   project     = var.project
   environment = var.environment
