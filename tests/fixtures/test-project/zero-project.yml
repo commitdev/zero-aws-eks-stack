@@ -1,0 +1,26 @@
+# Templated zero-project.yml file
+name: test-project
+
+shouldPushRepositories: false
+
+modules:
+  zero-aws-eks-stack:
+    parameters:
+      accountId: "123456781234"
+      database: mysql
+      eksWorkerAMI: ami-06d3900b00136f924
+      fileUploads: "no"
+      loggingType: kibana
+      productionBackendSubdomain: api.
+      productionFrontendSubdomain: app.
+      productionHostRoot: zero-test.online
+      randomSeed: 08178BF6
+      region: us-east-2
+      sendgridApiKey: SOME_API_KEY
+      stagingBackendSubdomain: api-stage.
+      stagingFrontendSubdomain: app-stage.
+      stagingHostRoot: zero-test-stage.online
+    files:
+      dir: infrastructure
+      repo: github.com/commitdev-test/infrastructure
+      source: ../
