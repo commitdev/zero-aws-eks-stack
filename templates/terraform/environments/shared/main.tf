@@ -41,7 +41,7 @@ locals {
 #        { name = "operator", environments = ["stage", "prod"] }
 #      ]
 #    },
-#  ]
+  ]
 }
 
 ## Create users
