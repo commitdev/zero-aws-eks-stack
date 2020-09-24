@@ -23,9 +23,9 @@ apply-secrets:
 	rm ./terraform.tfstate )
 
 apply-shared-env:
-       cd terraform/environments/shared; \
-       terraform init && \
-       terraform apply $(AUTO_APPROVE)
+	cd terraform/environments/shared; \
+	terraform init && \
+	terraform apply $(AUTO_APPROVE)
 
 apply-env:
 	cd terraform/environments/$(ENVIRONMENT); \
