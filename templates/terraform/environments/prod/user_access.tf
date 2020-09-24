@@ -9,7 +9,7 @@ data "aws_iam_policy_document" "developer_access" {
   statement {
     effect    = "Allow"
     actions   = ["eks:DescribeCluster"]
-    resources = ["arn:aws:eks:<% index .Params `region` %>:<% index .Params `accountId` %>:cluster/<% .Name %>-prod*"]
+    resources = ["arn:aws:eks:${local.region}:${local.account_id}:cluster/${local.project}-stage*"]
   }
 
   # ECR
@@ -26,12 +26,12 @@ data "aws_iam_policy_document" "developer_access" {
   statement {
     effect    = "Allow"
     actions   = ["s3:ListBucket"]
-    resources = ["arn:aws:s3:::*<% index .Params `productionHostRoot` %>"]
+    resources = ["arn:aws:s3:::*${local.domain_name}"]
   }
   statement {
     effect    = "Allow"
     actions   = ["s3:GetObject"]
-    resources = ["arn:aws:s3:::*<% index .Params `productionHostRoot` %>/*"]
+    resources = ["arn:aws:s3:::*${local.domain_name}/*"]
   }
 }
 
@@ -44,14 +44,14 @@ data "aws_iam_policy_document" "operator_access" {
       "iam:ListRoles",
       "sts:AssumeRole"
     ]
-    resources = ["arn:aws:iam::<% index .Params `accountId` %>:role/<% .Name %>-kubernetes-operator-prod"]
+    resources = ["arn:aws:iam::${local.account_id}:role/${local.project}-kubernetes-operator-stage"]
   }
 
   # EKS
   statement {
     effect    = "Allow"
     actions   = ["eks:*"]
-    resources = ["arn:aws:eks:<% index .Params `region` %>:<% index .Params `accountId` %>:cluster/<% .Name %>-prod*"]
+    resources = ["arn:aws:eks:${local.region}:${local.account_id}:cluster/${local.project}-stage*"]
   }
 
   # ECR
@@ -65,12 +65,12 @@ data "aws_iam_policy_document" "operator_access" {
   statement {
     effect    = "Allow"
     actions   = ["s3:*"]
-    resources = ["arn:aws:s3:::*<% index .Params `productionHostRoot` %>"]
+    resources = ["arn:aws:s3:::*${local.domain_name}"]
   }
   statement {
     effect    = "Allow"
     actions   = ["s3:*"]
-    resources = ["arn:aws:s3:::*<% index .Params `productionHostRoot` %>/*"]
+    resources = ["arn:aws:s3:::*${local.domain_name}/*"]
   }
 }
 

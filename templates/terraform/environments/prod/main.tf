@@ -1,28 +1,35 @@
+locals {
+  project     = "<% .Name %>"
+  region      = "<% index .Params `region` %>"
+  account_id  = "<% index .Params `accountId` %>"]
+  domain_name = "<% index .Params `productionHostRoot` %>"
+}
+
 terraform {
   required_version = ">= 0.13"
   backend "s3" {
-    bucket         = "<% .Name %>-prod-terraform-state"
+    bucket         = "${local.project}-prod-terraform-state"
     key            = "infrastructure/terraform/environments/prod/main"
     encrypt        = true
-    region         = "<% index .Params `region` %>"
-    dynamodb_table = "<% .Name %>-prod-terraform-state-locks"
+    region         = local.region
+    dynamodb_table = "${local.project}-prod-terraform-state-locks"
   }
 }
 
 provider "aws" {
-  region              = "<% index .Params `region` %>"
-  allowed_account_ids = ["<% index .Params `accountId` %>"]
+  region              = local.region
+  allowed_account_ids = [local.account_id]
 }
 
 # remote state of "shared"
 data "terraform_remote_state" "shared" {
   backend = "s3"
   config = {
-    bucket = "<% .Name %>-shared-terraform-state"
+    bucket = "${local.project}-shared-terraform-state"
     key    = "infrastructure/terraform/environments/shared/main"
-    region = "<% index .Params `region` %>"
+    region = local.region
     encrypt = true
-    dynamodb_table = "<% .Name %>-shared-terraform-state-locks"
+    dynamodb_table = "${local.project}-shared-terraform-state-locks"
   }
 }
 
@@ -32,9 +39,9 @@ module "prod" {
   environment = "prod"
 
   # Project configuration
-  project             = "<% .Name %>"
-  region              = "<% index .Params `region` %>"
-  allowed_account_ids = ["<% index .Params `accountId` %>"]
+  project             = local.project
+  region              = local.region
+  allowed_account_ids = [local.account_id]
   random_seed         = "<% index .Params `randomSeed` %>"
 
   # ECR configuration
@@ -47,15 +54,15 @@ module "prod" {
   eks_worker_asg_max_size  = 4
 
   # EKS-Optimized AMI for your region: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
-  # https://<% index .Params `region` %>.console.aws.amazon.com/systems-manager/parameters/%252Faws%252Fservice%252Feks%252Foptimized-ami%252F1.17%252Famazon-linux-2%252Frecommended%252Fimage_id/description?region=<% index .Params `region` %>
+  # https://${local.region}.console.aws.amazon.com/systems-manager/parameters/%252Faws%252Fservice%252Feks%252Foptimized-ami%252F1.17%252Famazon-linux-2%252Frecommended%252Fimage_id/description?region=${local.region}
   eks_worker_ami = "<% index .Params `eksWorkerAMI` %>"
 
   # Hosting configuration. Each domain will have a bucket created for it, but may have mulitple aliases pointing to the same bucket.
   hosted_domains = [
-    { domain : "<% index .Params `productionHostRoot` %>", aliases : [] },
-    { domain : "<% index .Params `productionFrontendSubdomain` %><% index .Params `productionHostRoot` %>", aliases : [] },
+    { domain : local.domain_name, aliases : [] },
+    { domain : "<% index .Params `productionFrontendSubdomain` %>${local.domain_name}", aliases : [] },
   ]
-  domain_name = "<% index .Params `productionHostRoot` %>"
+  domain_name = "${local.domain_name}"
   cf_signed_downloads = <% if eq (index .Params `fileUploads`) "yes" %>true<% else %>false<% end %>
 
   # DB configuration
@@ -73,7 +80,7 @@ module "prod" {
   # See https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-limits.html
 
   sendgrid_enabled = <%if eq (index .Params `sendgridApiKey`) "" %>false<% else %>true<% end %>
-  sendgrid_api_key_secret_name = "<% .Name %>-sendgrid-<% index .Params `randomSeed` %>"
+  sendgrid_api_key_secret_name = "${local.project}-sendgrid-<% index .Params `randomSeed` %>"
 
   # Roles configuration
   roles = [
