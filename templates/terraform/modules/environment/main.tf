@@ -8,6 +8,19 @@ data "aws_iam_user" "ci_user" {
   user_name = "${var.project}-ci-user" # Should have been created in the bootstrap process
 }
 
+locals {
+  role_name_list = var.roles.*.name
+  users = [
+    for u in var.user_role_mapping : {
+      name  = u.name
+      roles = [
+        for r in u.roles :
+        r.name if contains(local.role_name_list, r.name) && contains(r.environments, var.environment)
+      ]
+    }
+  ]
+}
+
 
 module "vpc" {
   source  = "commitdev/zero/aws//modules/vpc"
@@ -28,7 +41,7 @@ data "aws_caller_identity" "current" {}
 # Provision the EKS cluster
 module "eks" {
   source  = "commitdev/zero/aws//modules/eks"
-  version = "0.0.2"
+  version = "0.1.2"
   providers = {
     aws = aws.for_eks
   }
@@ -47,6 +60,8 @@ module "eks" {
   worker_asg_min_size  = var.eks_worker_asg_min_size
   worker_asg_max_size  = var.eks_worker_asg_max_size
   worker_ami           = var.eks_worker_ami # EKS-Optimized AMI for your region: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
+
+  iam_role_mapping = module.user_access.eks_iam_role_mapping
 }
 
 
@@ -88,7 +103,7 @@ module "s3_hosting" {
 
 module "db" {
   source  = "commitdev/zero/aws//modules/database"
-  version = "0.0.1"
+  version = "0.1.1"
 
   project                   = var.project
   environment               = var.environment
@@ -111,7 +126,7 @@ module "ecr" {
 
 module "logging" {
   source  = "commitdev/zero/aws//modules/logging"
-  version = "0.0.1"
+  version = "0.1.0"
 
   count = var.logging_type == "kibana" ? 1 : 0
 
@@ -134,4 +149,15 @@ module "sendgrid" {
 
   zone_name                    = var.domain_name
   sendgrid_api_key_secret_name = var.sendgrid_api_key_secret_name
+}
+
+module "user_access" {
+  source = "commitdev/zero/aws//modules//user_access"
+  version = "0.1.2"
+
+  project     = var.project
+  environment = var.environment
+
+  roles = var.roles
+  users = local.users
 }

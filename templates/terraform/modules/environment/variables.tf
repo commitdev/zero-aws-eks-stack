@@ -146,3 +146,23 @@ variable "cf_signed_downloads" {
   description = "Enable Cloudfront signed URLs"
   default     = false
 }
+
+variable "roles" {
+  type = list(object({
+    name         = string
+    aws_policy   = string
+    k8s_policies = list(map(list(string)))
+  }))
+  description = "Role list with policies"
+}
+
+variable "user_role_mapping" {
+  type = list(object({
+    name  = string
+    roles = list(object({
+      name         = string
+      environments = list(string)
+    }))
+  }))
+  description = "User-Roles mapping with environment"
+}
