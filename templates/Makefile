@@ -51,7 +51,7 @@ update-k8s-conf:
 post-apply-setup:
 	cd scripts && ENVIRONMENT=$(ENVIRONMENT) PROJECT=$(PROJECT) sh post-apply.sh
 
-teardown: teardown-k8s-utils teardown-env teardown-secrets teardown-remote-state
+teardown: teardown-k8s-utils teardown-env teardown-shared-env teardown-secrets teardown-remote-state
 
 teardown-remote-state:
 	@echo "Deleting remote state is not reversible, are you sure you want to delete the resources? [y/N]:" ; read ans ; [ $${ans:-N} == "y" ] || exit 1
@@ -59,6 +59,13 @@ teardown-remote-state:
 	aws s3 rm s3://$(PROJECT)-$(ENVIRONMENT)-terraform-state --recursive
 	# TODO : This doesn't work because bucket versioning is enabled, we would need to loop through all versions of files and delete them manually
 	aws s3 rb s3://$(PROJECT)-$(ENVIRONMENT)-terraform-state --force
+
+teardown-shared-remote-state:
+	@echo "Deleting shared remote state is not reversible, are you sure you want to delete the resources? [y/N]:" ; read ans ; [ $${ans:-N} == "y" ] || exit 1
+	aws dynamodb delete-table --region $(AWS_DEFAULT_REGION) --table-name $(PROJECT)-shared-terraform-state-locks
+	aws s3 rm s3://$(PROJECT)-shared-terraform-state --recursive
+	# TODO : This doesn't work because bucket versioning is enabled, we would need to loop through all versions of files and delete them manually
+	aws s3 rb s3://$(PROJECT)-shared-terraform-state --force
 
 teardown-secrets:
 	@echo "Deleting secrets is not reversible, are you sure you want to delete the secrets? [y/N]:" ; read ans ; [ $${ans:-N} == "y" ] || exit 1
@@ -75,8 +82,12 @@ teardown-env:
 	cd terraform/environments/$(ENVIRONMENT) && \
 	terraform destroy
 
+teardown-shared-env:
+	cd terraform/environments/shared && \
+	terraform destroy
+
 teardown-k8s-utils:
 	cd kubernetes/terraform/environments/$(ENVIRONMENT) && \
 	terraform destroy
 
-.PHONY: apply apply-remote-state apply-secrets apply-env apply-k8s-utils teardown-k8s-utils teardown-env teardown-secrets teardown-remote-state
+.PHONY: apply apply-remote-state apply-secrets apply-env apply-k8s-utils teardown-k8s-utils teardown-env teardown-shared-env teardown-secrets teardown-remote-state teardown-shared-remote-state
