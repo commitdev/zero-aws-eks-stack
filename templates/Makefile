@@ -6,13 +6,20 @@ export AWS_DEFAULT_REGION = <% index .Params `region` %>
 export AWS_PAGER =
 KUBE_CONTEXT := $(PROJECT)-$(ENVIRONMENT)-$(AWS_DEFAULT_REGION)
 
-apply: apply-remote-state apply-secrets apply-shared-env apply-env update-k8s-conf pre-k8s apply-k8s-utils post-apply-setup
+apply: apply-remote-state apply-shared-remote-state apply-secrets apply-shared-env apply-env update-k8s-conf pre-k8s apply-k8s-utils post-apply-setup
 
 apply-remote-state:
 	aws s3 ls $(PROJECT)-$(ENVIRONMENT)-terraform-state > /dev/null 2>&1 || ( \
 	cd terraform/bootstrap/remote-state && \
 	terraform init && \
 	terraform apply -var "environment=$(ENVIRONMENT)" $(AUTO_APPROVE) && \
+	rm ./terraform.tfstate )
+
+apply-shared-remote-state:
+	aws s3 ls $(PROJECT)-shared-terraform-state > /dev/null 2>&1 || ( \
+	cd terraform/bootstrap/remote-state && \
+	terraform init && \
+	terraform apply -var "environment=shared" $(AUTO_APPROVE) && \
 	rm ./terraform.tfstate )
 
 apply-secrets:
@@ -51,7 +58,7 @@ update-k8s-conf:
 post-apply-setup:
 	cd scripts && ENVIRONMENT=$(ENVIRONMENT) PROJECT=$(PROJECT) sh post-apply.sh
 
-teardown: teardown-k8s-utils teardown-env teardown-shared-env teardown-secrets teardown-remote-state
+teardown: teardown-k8s-utils teardown-env teardown-shared-env teardown-secrets teardown-remote-state teardown-shared-remote-state
 
 teardown-remote-state:
 	@echo "Deleting remote state is not reversible, are you sure you want to delete the resources? [y/N]:" ; read ans ; [ $${ans:-N} == "y" ] || exit 1
