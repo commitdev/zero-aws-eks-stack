@@ -1,4 +1,5 @@
-# Templated zero-project.yml file
+# CI Test fixture
+# data used by github actions to template out terraform code, then running terraform validate
 name: test-project
 
 shouldPushRepositories: false
@@ -23,4 +24,6 @@ modules:
     files:
       dir: infrastructure
       repo: github.com/commitdev-test/infrastructure
+      ## This source is dependant on where the zero-project.yml is copied to
+      ## needs to resolve to the root of zero-aws-eks-stack equivalent to locate the /templates folder
       source: ../
