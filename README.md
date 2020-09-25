@@ -53,9 +53,9 @@ information. The tool will parse through configuration and fill in any
 template variables which need to be encoded into the terraform configuration.
 
 ### Testing and linting
-The codebase uses terraform validate as a basic sanity check, it uses a
-[fixture][ci-fixture] of reasonable values to fill-in the templates, and then runs
-`terraform init` and `terraform validate` against the environment and modules.
+The codebase uses terraform validate as a basic sanity check, it uses
+[an example zero-project.yml fixture][ci-fixture] to fill-in the templates, then runs
+`terraform init` and `terraform validate` against the templated out environment and modules.
 
 ### How much does this stack cost?
 The expected total monthly cost: $ 0.202 USD / hr or ~$150USD / month. The most
