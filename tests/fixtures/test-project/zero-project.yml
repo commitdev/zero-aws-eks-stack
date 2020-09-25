@@ -1,0 +1,29 @@
+# CI Test fixture
+# data used by github actions to template out terraform code, then running terraform validate
+name: test-project
+
+shouldPushRepositories: false
+
+modules:
+  zero-aws-eks-stack:
+    parameters:
+      accountId: "123456781234"
+      database: mysql
+      eksWorkerAMI: ami-06d3900b00136f924
+      fileUploads: "no"
+      loggingType: kibana
+      productionBackendSubdomain: api.
+      productionFrontendSubdomain: app.
+      productionHostRoot: zero-test.online
+      randomSeed: 08178BF6
+      region: us-east-2
+      sendgridApiKey: SOME_API_KEY
+      stagingBackendSubdomain: api-stage.
+      stagingFrontendSubdomain: app-stage.
+      stagingHostRoot: zero-test-stage.online
+    files:
+      dir: infrastructure
+      repo: github.com/commitdev-test/infrastructure
+      ## This source is dependant on where the zero-project.yml is copied to
+      ## needs to resolve to the root of zero-aws-eks-stack equivalent to locate the /templates folder
+      source: ../

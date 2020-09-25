@@ -1,0 +1,54 @@
+name: 'Validate Terraform'
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+
+jobs:
+  validate:
+    name: Validate Terraform
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: hashicorp/setup-terraform@v1
+
+    - name: Install Zero
+      id: install_zero
+      run: |
+        mkdir ${GITHUB_WORKSPACE}/bin
+        cd ${GITHUB_WORKSPACE}/bin
+        LATEST_ZERO_DOWNLOAD_URL=$(curl --silent "https://api.github.com/repos/commitdev/zero/releases/latest" | jq -r ".assets | .[]  | select(.name | contains(\"Linux_x86_64\")) | .browser_download_url")
+        ZERO_BINARY_FILE_NAME=$(curl --silent "https://api.github.com/repos/commitdev/zero/releases/latest" | jq -r ".assets | .[]  | select(.name | contains(\"Linux_x86_64\")) | .name")
+        curl -OJL $LATEST_ZERO_DOWNLOAD_URL
+        tar -xvf "./${ZERO_BINARY_FILE_NAME}"
+        ./zero version
+        echo "::add-path::${GITHUB_WORKSPACE}/bin"
+    - name: Copy test project structure
+      id: copy_test_dir
+      run: |
+        cp -r ${GITHUB_WORKSPACE}/tests/fixtures/test-project/ ${GITHUB_WORKSPACE}/temp-project
+    - name: zero create
+      id: zero_create
+      run: |
+        cd ${GITHUB_WORKSPACE}/temp-project
+        zero create
+    - name: Terraform Init and Validate
+      id: init_and_validate
+      run: |
+        INFRA_DIR=${GITHUB_WORKSPACE}/temp-project/infrastructure
+        ## Defining test targets per line, last line ends with double quote
+        TERRAFORM_TEST_TARGETS="${INFRA_DIR}/terraform/bootstrap/remote-state
+        ${INFRA_DIR}/terraform/bootstrap/secrets
+        ${INFRA_DIR}/terraform/environments/stage
+        ${INFRA_DIR}/terraform/environments/prod
+        ${INFRA_DIR}/kubernetes/terraform/environments/stage
+        ${INFRA_DIR}/kubernetes/terraform/environments/prod"
+
+        for dir in $TERRAFORM_TEST_TARGETS; do
+          echo "Linting ${dir}"
+          cd $dir
+          terraform init -backend=false
+          terraform validate -no-color
+        done
