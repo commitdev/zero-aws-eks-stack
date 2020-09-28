@@ -1,4 +1,6 @@
 # Overview
+[![Validation Status](https://github.com/commitdev/zero-aws-eks-stack/workflows/Validate%20Terraform/badge.svg)](https://github.com/commitdev/zero-aws-eks-stack/actions)
+
 A set of templates meant to work with [Zero], the templated result is a ready to scale infrastructure boilerplate built on top of AWS EKS baked with all best practices we have accumulated.
 
 ## Repository structure
