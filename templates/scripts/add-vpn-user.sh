@@ -42,7 +42,7 @@ vpc_cidr=$(aws ec2 describe-vpcs --filters Name=tag:Name,Values=${VPCNAME} | jq 
 
 # get DB server
 K8S_DBSERVER=database.${NAMESPACE}.svc.cluster.local
-AWS_DBSERVER=$(kubectl -n piggycloud2-me get svc -ojsonpath='{.items[0].spec.externalName}')
+AWS_DBSERVER=$(kubectl -n ${NAMESPACE} get svc -ojsonpath='{.items[0].spec.externalName}')
 
 # get Endpoint DNS
 EXTERNAL_DNS=$(kubectl -nvpn get svc wireguard -o jsonpath='{.metadata.annotations.external-dns\.alpha\.kubernetes\.io/hostname}')
