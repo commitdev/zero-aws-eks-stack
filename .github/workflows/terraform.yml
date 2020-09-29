@@ -34,21 +34,31 @@ jobs:
       run: |
         cd ${GITHUB_WORKSPACE}/temp-project
         zero create
-    - name: Terraform Init and Validate
-      id: init_and_validate
+    - name: Set validation targets
+      id: set_validation_targets
       run: |
         INFRA_DIR=${GITHUB_WORKSPACE}/temp-project/infrastructure
+
         ## Defining test targets per line, last line ends with double quote
-        TERRAFORM_TEST_TARGETS="${INFRA_DIR}/terraform/bootstrap/remote-state
+        echo "${INFRA_DIR}/terraform/bootstrap/remote-state
         ${INFRA_DIR}/terraform/bootstrap/secrets
         ${INFRA_DIR}/terraform/environments/stage
         ${INFRA_DIR}/terraform/environments/prod
         ${INFRA_DIR}/kubernetes/terraform/environments/stage
-        ${INFRA_DIR}/kubernetes/terraform/environments/prod"
-
-        for dir in $TERRAFORM_TEST_TARGETS; do
+        ${INFRA_DIR}/kubernetes/terraform/environments/prod" > ${GITHUB_WORKSPACE}/validation-targets.conf
+    - name: Terraform Init
+      id: terraform_init
+      run: |
+        for dir in $(cat ${GITHUB_WORKSPACE}/validation-targets.conf); do
           echo "Linting ${dir}"
           cd $dir
           terraform init -backend=false
+        done
+    - name: Terraform Validate
+      id: terraform_validate
+      run: |
+        for dir in $(cat ${GITHUB_WORKSPACE}/validation-targets.conf); do
+          echo "Validating ${dir}"
+          cd $dir
           terraform validate -no-color
         done

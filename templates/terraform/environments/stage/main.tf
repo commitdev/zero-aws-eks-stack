@@ -7,6 +7,13 @@ terraform {
     region         = "<% index .Params `region` %>"
     dynamodb_table = "<% .Name %>-stage-terraform-state-locks"
   }
+
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "~> 3.7"
+    }
+  }
 }
 
 locals {
@@ -57,13 +64,13 @@ module "stage" {
   # https://<% index .Params `region` %>.console.aws.amazon.com/systems-manager/parameters/%252Faws%252Fservice%252Feks%252Foptimized-ami%252F1.17%252Famazon-linux-2%252Frecommended%252Fimage_id/description?region=${local.region}
   eks_worker_ami = "<% index .Params `eksWorkerAMI` %>"
 
-  # Hosting configuration. Each domain will have a bucket created for it, but may have mulitple aliases pointing to the same bucket.
   hosted_domains = [
-    { domain : local.domain_name, aliases : [] },
-    { domain : "<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}", aliases : [] },
+    { domain : local.domain_name, aliases : [], signed_urls: false },
+    { domain : "<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}", aliases : [], signed_urls: false },
+    <% if eq (index .Params `fileUploads`) "yes" %>{ domain : "files.${local.domain_name}", aliases : [], signed_urls: true },<% end %>
   ]
+
   domain_name = local.domain_name
-  cf_signed_downloads = <% if eq (index .Params `fileUploads`) "yes" %>true<% else %>false<% end %>
 
   # This will save some money as there a cost associated to each NAT gateway, but if the AZ with the gateway
   # goes down, nothing in the private subnets will be able to reach the internet. Not recommended for production.
