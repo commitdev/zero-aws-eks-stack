@@ -64,13 +64,14 @@ echo
 echo "Please modify kubernetes/terraform/environments/<env>/main.tf and append the following line to var.vpn_client_publickeys."
 echo "Then apply the terraform, or ask an administrator to."
 echo
-printf '    ["%s", "%s", "%s"]\n' "$name" "$next_ip/32" "$client_public_key"
+printf '    ["%s", "%s", "%s"],\n' "$name" "$next_ip/32" "$client_public_key"
 echo
-echo "After this is done you should be able to open the wireguard client and activate the tunnel."
+echo "You can download the client at https://www.wireguard.com/install/"
+echo "After this is done you should be able to open the wireguard client, import a tunnel file from ~/.wireguard/ and activate the tunnel."
 echo
-echo "You can download the client at https://www.wireguard.com/install/. When it is running you should be able to access internal resources, eg. mysql -h <aws rds hostname>, and if anything, you could mention that you can connect to things inside both the VPC and the kubernetes cluster."
+echo "When it is running you should be able to access internal resources, eg. mysql -h <aws rds hostname>"
+echo "You will be able to connect to resources within both the VPC and the Kubernetes cluster."
 echo
-echo "Enjoy your VPN access journey!"
 
 # generate client conf
 cat <<-EOF > ${CONFIG_FILE}
