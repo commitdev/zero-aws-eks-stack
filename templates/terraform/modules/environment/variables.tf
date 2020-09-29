@@ -49,6 +49,7 @@ variable "hosted_domains" {
   type = list( object( {
     domain  = string
     aliases = list(string)
+    signed_urls = bool
   } ) )
 }
 
@@ -139,12 +140,6 @@ variable "sendgrid_enabled" {
 variable "sendgrid_api_key_secret_name" {
   description = "AWS secret manager's secret name storing the sendgrid api key"
   type  = string
-}
-
-variable "cf_signed_downloads" {
-  type        = bool
-  description = "Enable Cloudfront signed URLs"
-  default     = false
 }
 
 variable "roles" {
