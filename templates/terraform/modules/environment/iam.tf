@@ -3,7 +3,7 @@
 # Kubernetes admin role
 
 locals {
-  non_upload_buckets = [for bucket in module.s3_hosting : bucket if !bucket.cf_signed_downloads]
+  non_upload_buckets = [for bucket in module.s3_hosting : bucket if !bucket.cf_signing_enabled]
 }
 
 # Create KubernetesAdmin role for aws-iam-authenticator
