@@ -36,7 +36,6 @@ module "vpc" {
 # To get the current account id
 data "aws_caller_identity" "current" {}
 
-
 #
 # Provision the EKS cluster
 module "eks" {
@@ -91,7 +90,7 @@ module "s3_hosting" {
   version = "0.1.0"
   count   = length(var.hosted_domains)
 
-  cf_signed_downloads    = var.cf_signed_downloads
+  cf_signed_downloads    = var.hosted_domains[count.index].signed_urls
   domain                 = var.hosted_domains[count.index].domain
   aliases                = var.hosted_domains[count.index].aliases
   project                = var.project
