@@ -54,6 +54,19 @@ resource "aws_iam_user" "access_user" {
   }
 }
 
+
+# This is recommended to be enabled, ensuring that all users must use MFA
+# https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-cis-controls.html#securityhub-cis-controls-1.2
+resource "aws_iam_group_membership" "mfa_required_group" {
+  name = "mfa-required"
+
+  users = [
+    for user in local.users : user.name
+  ]
+
+  group = aws_iam_group.mfa_required.name
+}
+
 output "iam_users" {
   value = aws_iam_user.access_user
 }
