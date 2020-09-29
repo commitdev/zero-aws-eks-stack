@@ -83,5 +83,5 @@ resource "aws_iam_group" "mfa_required" {
 resource "aws_iam_group_policy" "mfa_required" {
   name   = "RequireMFA"
   group  = aws_iam_group.mfa_required.name
-  policy = data.aws_iam_policy_document.mfa_required_policy
+  policy = data.aws_iam_policy_document.mfa_required_policy.json
 }
