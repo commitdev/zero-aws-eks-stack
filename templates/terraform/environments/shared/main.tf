@@ -47,7 +47,7 @@ locals {
 ## Create users
 resource "aws_iam_user" "access_user" {
   count = length(local.users)
-  name  = "${local.project}-${local.users[count.index].name}"
+  name  = local.users[count.index].name
 
   tags = {
     for r in local.users[count.index].roles : "role:${r.name}" => join("/", r.environments)
@@ -65,6 +65,16 @@ resource "aws_iam_group_membership" "mfa_required_group" {
   ]
 
   group = aws_iam_group.mfa_required.name
+}
+
+resource "aws_iam_group_membership" "console_allowed_group" {
+  name = "console-allowed"
+
+  users = [
+    for user in local.users : user.name
+  ]
+
+  group = aws_iam_group.console_allowed.name
 }
 
 output "iam_users" {
