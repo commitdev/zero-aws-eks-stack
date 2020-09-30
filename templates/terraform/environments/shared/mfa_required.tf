@@ -50,7 +50,8 @@ data "aws_iam_policy_document" "mfa_required_policy" {
       "iam:CreateAccessKey",
       "iam:DeleteAccessKey",
       "iam:ListAccessKeys",
-      "iam:UpdateAccessKey"
+      "iam:UpdateAccessKey",
+      "iam:GetAccessKeyLastUsed",
     ]
     resources = [ "arn:aws:iam::${local.account_id}:user/$${aws:username}" ]
   }
@@ -65,6 +66,7 @@ data "aws_iam_policy_document" "mfa_required_policy" {
       "iam:ListMFADevices",
       "iam:ListVirtualMFADevices",
       "iam:ResyncMFADevice",
+      "iam:ChangePassword",
       "sts:GetSessionToken"
     ]
     resources = ["*"]
@@ -77,7 +79,7 @@ data "aws_iam_policy_document" "mfa_required_policy" {
 }
 
 resource "aws_iam_group" "mfa_required" {
-  name  = "mfa_required"
+  name  = "mfa-required"
 }
 
 resource "aws_iam_group_policy" "mfa_required" {

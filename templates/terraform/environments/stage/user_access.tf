@@ -9,7 +9,7 @@ data "aws_iam_policy_document" "developer_access" {
   statement {
     effect    = "Allow"
     actions   = ["eks:DescribeCluster"]
-    resources = ["arn:aws:eks:${local.region}:${local.account_id}:cluster/${local.project}-prod*"]
+    resources = ["arn:aws:eks:${local.region}:${local.account_id}:cluster/${local.project}-stage*"]
   }
 
   # ECR
@@ -44,14 +44,14 @@ data "aws_iam_policy_document" "operator_access" {
       "iam:ListRoles",
       "sts:AssumeRole"
     ]
-    resources = ["arn:aws:iam::${local.account_id}:role/${local.project}-kubernetes-operator-prod"]
+    resources = ["arn:aws:iam::${local.account_id}:role/${local.project}-kubernetes-operator-stage"]
   }
 
   # EKS
   statement {
     effect    = "Allow"
     actions   = ["eks:*"]
-    resources = ["arn:aws:eks:${local.region}:${local.account_id}:cluster/${local.project}-prod*"]
+    resources = ["arn:aws:eks:${local.region}:${local.account_id}:cluster/${local.project}-stage*"]
   }
 
   # ECR
