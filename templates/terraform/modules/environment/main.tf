@@ -102,7 +102,7 @@ module "s3_hosting" {
 
 module "db" {
   source  = "commitdev/zero/aws//modules/database"
-  version = "0.1.1"
+  version = "0.1.2"
 
   project                   = var.project
   environment               = var.environment
@@ -125,7 +125,7 @@ module "ecr" {
 
 module "logging" {
   source  = "commitdev/zero/aws//modules/logging"
-  version = "0.1.0"
+  version = "0.1.2"
 
   count = var.logging_type == "kibana" ? 1 : 0
 
@@ -152,7 +152,7 @@ module "sendgrid" {
 
 module "user_access" {
   source = "commitdev/zero/aws//modules//user_access"
-  version = "0.1.2"
+  version = "0.1.3"
 
   project     = var.project
   environment = var.environment
