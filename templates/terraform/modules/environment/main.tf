@@ -87,7 +87,7 @@ module "assets_domains" {
 
 module "s3_hosting" {
   source  = "commitdev/zero/aws//modules/s3_hosting"
-  version = "0.1.0"
+  version = "0.1.4"
   count   = length(var.hosted_domains)
 
   cf_signed_downloads    = var.hosted_domains[count.index].signed_urls
@@ -152,7 +152,7 @@ module "sendgrid" {
 
 module "user_access" {
   source = "commitdev/zero/aws//modules//user_access"
-  version = "0.1.2"
+  version = "0.1.3"
 
   project     = var.project
   environment = var.environment
