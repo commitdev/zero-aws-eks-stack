@@ -2,6 +2,10 @@
 #
 # Kubernetes admin role
 
+locals {
+  non_upload_buckets = [for bucket in module.s3_hosting : bucket if !bucket.cf_signing_enabled]
+}
+
 # Create KubernetesAdmin role for aws-iam-authenticator
 resource "aws_iam_role" "kubernetes_admin_role" {
   name               = "${var.project}-kubernetes-admin-${var.environment}"
@@ -81,7 +85,7 @@ data "aws_iam_policy_document" "deploy_assets_policy" {
       "s3:GetBucketLocation",
     ]
 
-    resources = formatlist("%s/*", module.s3_hosting[*].bucket_arn)
+    resources = formatlist("%s/*", local.non_upload_buckets[*].bucket_arn)
   }
 
   statement {
