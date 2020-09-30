@@ -33,7 +33,7 @@ module "kubernetes" {
 
   project = "<% .Name %>"
 
-  cf_signing_enabled = "<% index .Params `fileUploads` %>"
+  cf_signing_enabled = <% if eq (index .Params `fileUploads`) "yes" %>true<% else %>false<% end %>
 
   environment         = "stage"
 
