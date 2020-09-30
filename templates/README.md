@@ -133,6 +133,8 @@ make teardown-env
 make teardown-secrets
 ```
 6. Empty the s3 bucket for your terraform backend, http://s3.console.aws.amazon.com/s3/home
+    - \<name\>-shared-terraform-state
+    - \<name\>-\<environment\>-terraform-state
 7. teardown the dynamodb and terraform backend with the following command:
 ```
 make teardown-remote-state
