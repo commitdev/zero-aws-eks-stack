@@ -44,4 +44,5 @@ aws secretsmanager \
     create-secret \
     --name <% .Name %>_cf_keypair \
     --region <% index .Params `region` %> \
+    --tags '[{"Key":"cf_keypair","Value":"<% .Name %>"}]' \
     --secret-string "{\"keypair_id\":\"${ID}\",\"private_key\":\"${SECRET}\"}"
