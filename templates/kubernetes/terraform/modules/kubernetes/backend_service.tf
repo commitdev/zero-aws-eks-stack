@@ -7,10 +7,12 @@ data "aws_secretsmanager_secret_version" "cf_keypair" {
 }
 
 locals {
-  cf_keypair_json = jsondecode(data.aws_secretsmanager_secret_version.cf_keypair.secret_string)
+  cf_keypair_json = var.cf_signing_enabled ? jsondecode(data.aws_secretsmanager_secret_version.cf_keypair.secret_string) : ""
 }
 
 resource "kubernetes_secret" "cf_keypair" {
+  count = var.cf_signing_enabled ? 1 : 0
+
   metadata {
     name = "cf-keypair"
     namespace = kubernetes_namespace.app_namespace.metadata[0].name

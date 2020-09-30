@@ -30,6 +30,11 @@ provider "aws" {
 # Provision kubernetes resources required to run services/applications
 module "kubernetes" {
   source = "../../modules/kubernetes"
+
+  project = "<% .Name %>"
+
+  cf_signing_enabled = "<% index .Params `fileUploads` %>"
+
   environment         = "stage"
 
   project             = local.project
