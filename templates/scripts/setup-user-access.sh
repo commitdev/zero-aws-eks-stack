@@ -1,11 +1,12 @@
 #!/bin/bash
 
-# This script is to help create your local AWS and Kubernetes configuration
+#
+# This script is to help user to create local AWS and Kubernetes configurations
 # 
 # You should have the following information ready before running:
 # 1. your AWS user name
 # 2. your AWS access key
-# 3. user role
+# 3. your user role
 
 IAM_USERNAME=$1
 ROLE=$2

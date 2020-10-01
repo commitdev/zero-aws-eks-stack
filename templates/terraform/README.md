@@ -123,6 +123,19 @@ ENVIRONENT=<env> make apply-env
 ```
 This should detect that there was a new user created, and put them into the necessary group.
 
+ 3. To create initial temporary password for users, you may run:
+```
+script/setup-user-password.sh -g <group name>  # for users under a group
+or
+script/setup-user-password.sh -u <user name>   # for individual user
+
+```
+
+New users need to setup local configurations for resoruce access, run:
+```
+script/setup-user-access.sh <user name> <role> <environment>
+```
+
 
 ## Upgrading an EKS Cluster
 
