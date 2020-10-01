@@ -11,7 +11,8 @@ function usage() {
 }
 
 function warning_exit() {
-  echo "WARNING: $1" && exit 2
+  echo "WARNING: $1"
+  exit 2
 }
 
 function confirm() {
@@ -41,49 +42,54 @@ while getopts 'g:u:h' c
 do
   case $c in
     h) usage ;;
-    g) group=$OPTARG ;;
-    u) user=$OPTARG ;;
+    g) INPUT_GROUP=$OPTARG ;;
+    u) INPUT_USER=$OPTARG ;;
   esac
 done
 
-[[ -z "$group" ]] && [[ -z "$user" ]] && group="console-allowed" # set default group
+[[ -z "$INPUT_GROUP" ]] && [[ -z "$INPUT_USER" ]] && INPUT_GROUP="console-allowed" # set default group
 
-[[ -n "$group" ]] && [[ -n "$user" ]] && warning_exit "Can not input both group and user togeher"
+[[ -n "$INPUT_GROUP" ]] && [[ -n "$INPUT_USER" ]] && warning_exit "Can not input both group and user togeher"
 
 # Collect users in this group without password
-if [ -n "$group" ]; then 
-  nopass_users=$(aws iam get-group --group-name $group | jq ".Users[] | select(.PasswordLastUsed == null) | .UserName" | tr -d '"')
+function set_temp_password() {
+    user=$1
+    tpass=$(aws secretsmanager get-random-password --password-length 16 --require-each-included-type --output text)
+    aws iam get-login-profile --user-name $user >& /dev/null
+    if [ $? -eq 0 ]; then
+      aws iam update-login-profile --user-name $user --password "$tpass" --password-reset-required >& /dev/null
+    else
+      aws iam create-login-profile --user-name $user --password "$tpass" --password-reset-required >& /dev/null
+    fi
+    roles=$(aws iam list-groups-for-user --user-name $user | jq '.Groups[] | select(.Path == "/users/") | .GroupName' | tr -d "\"" | tr "\n" " ")
+    echo "  username:\"$tuser\", temporary password: \"$tpass\", roles: \"$roles\""
+}
+
+if [ -n "$INPUT_GROUP" ]; then 
+  nopass_users=$(aws iam get-group --group-name $INPUT_GROUP | jq ".Users[] | select(.PasswordLastUsed == null) | .UserName" | tr -d '"')
 
   [[ -z ${nopass_users} ]] && warning_exit "No avaialbe users"
 
-  echo "Detected the following users under group '$group':"
+  echo "Detected the following users under group '$INPUT_GROUP':"
   echo "------------------------"
   echo "$nopass_users"
   echo "------------------------"
   confirm "Will create temporary password for them. Do you want to continue?" || warning_exit "No actions applied"
 
   echo "Setting password..."
-  for user in $nopass_users; do
-    tpass=$(aws secretsmanager get-random-password --password-length 16 --require-each-included-type --output text) && \
-    aws iam create-login-profile --user-name $user --password "$tpass" --password-reset-required && \
-    echo "username:\"$user\", temporary password: \"$tpass\""
+  for tuser in $nopass_users; do
+    set_temp_password $tuser
   done
 fi
 
-if [ -n "$user" ]; then
-    tpass=$(aws secretsmanager get-random-password --password-length 16 --require-each-included-type --output text)
-    aws iam get-login-profile --user-name $user >& /dev/null
-    if [ $? -eq 0 ]; then
-      confirm "Will reset user \"$user\" password. Do you want to continue?" || warning_exit "No actions applied"
-      aws iam update-login-profile --user-name $user --password "$tpass" --password-reset-required
-    else
-      confirm "Will initialize user \"$user\" password. Do you want to continue?" || warning_exit "No actions applied"
-      aws iam create-login-profile --user-name $user --password "$tpass" --password-reset-required
-    fi
-    [[ $? -eq 0 ]] && echo "username:\"$user\", temporary password: \"$tpass\""
+if [ -n "$INPUT_USER" ]; then
+  confirm "Will reset user \"$INPUT_USER\" password. Do you want to continue?" || warning_exit "No actions applied"
+  set_temp_password $INPUT_USER
 fi
 
 AWS_ACCOUNT_ID=<% index .Params `accountId` %>
+echo
 echo "AWS console login: https://${AWS_ACCOUNT_ID}.signin.aws.amazon.com/console"
+echo
 
 echo "Setting done"
