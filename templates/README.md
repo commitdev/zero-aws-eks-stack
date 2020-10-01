@@ -40,12 +40,15 @@ For more information about the terraform in this repo, please see [Link][zero-tf
 
 Before using the cluster the first time you'll need to set up your local `kubectl` context:
 ```shell
-make update-k8s-conf
+$ make update-k8s-conf
+...
+Updated context <context name> in ~/.kube/config
+$ kubectl config set-context <context name>
 ```
 
 Then you should be able to run commands normally:
 ```shell
-kubectl get pods -A
+$ kubectl get pods -A
 ```
 
 
@@ -56,17 +59,9 @@ environment. The default environment is `staging`
 $ make ENVIRONMENT=<environment>
 ```
 
-### Set up an application
-Configure your k8s context
-
-```shell
-$ aws eks update-kubeconfig --name <cluster-name> --region us-east-1
-```
-
 #### Extra features built into my kubernetes cluster
 Outlines and best practices utilities that comes with your EKS cluster.
 Please see [Link][zero-k8s-guide]
-- Dashboards
 - Logging
 - Monitoring
 - Ingress / TLS certificates (auto provisioning)
@@ -78,7 +73,7 @@ Setup: If you initialized your infrastructure with a sendgridApiKey, you should 
 
 Your sendgrid account should be configured, and you can send a test email as follow:
 ```sh
-curl --request POST \
+$ curl --request POST \
   --url https://api.sendgrid.com/v3/mail/send \
   --header 'authorization: Bearer <SENDGRID-API-KEY>' \
   --header 'content-type: application/json' \
