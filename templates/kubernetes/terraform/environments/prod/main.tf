@@ -32,7 +32,6 @@ provider "aws" {
 # Provision kubernetes resources required to run services/applications
 module "kubernetes" {
   source = "../../modules/kubernetes"
-
   environment         = "prod"
 
   project             = local.project
