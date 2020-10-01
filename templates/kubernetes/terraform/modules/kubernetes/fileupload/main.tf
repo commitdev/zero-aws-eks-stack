@@ -15,7 +15,7 @@ locals {
 resource "kubernetes_secret" "cf_keypair" {
   metadata {
     name = "cf-keypair"
-    namespace = kubernetes_namespace.app_namespace.metadata[0].name
+    namespace = var.namespace
   }
 
   data = {
