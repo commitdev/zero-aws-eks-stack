@@ -6,31 +6,45 @@ terraform {
     region         = "<% index .Params `region` %>"
     dynamodb_table = "<% .Name %>-stage-terraform-state-locks"
   }
+
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "~> 3.7"
+    }
+  }
+}
+
+locals {
+  project     = "<% .Name %>"
+  region      = "<% index .Params `region` %>"
+  account_id  = "<% index .Params `accountId` %>"
+  domain_name = "<% index .Params `stagingHostRoot` %>"
 }
 
 provider "aws" {
-  region = "<% index .Params `region` %>"
+  region              = local.region
+  allowed_account_ids = [local.account_id]
 }
 
 # Provision kubernetes resources required to run services/applications
 module "kubernetes" {
   source = "../../modules/kubernetes"
-
-  project = "<% .Name %>"
-
   environment         = "stage"
-  region              = "<% index .Params `region` %>"
-  allowed_account_ids = ["<% index .Params `accountId` %>"]
+
+  project             = local.project
+  region              = local.region
+  allowed_account_ids = [local.account_id]
   random_seed         = "<% index .Params `randomSeed` %>"
 
   # Authenticate with the EKS cluster via the cluster id
-  cluster_name = "<% .Name %>-stage-<% index .Params `region` %>"
+  cluster_name = "${local.project}-stage-${local.region}"
 
-  external_dns_zone     = "<% index .Params `stagingHostRoot` %>"
-  external_dns_owner_id = "<% GenerateUUID %>" # randomly generated ID
+  external_dns_zone     = local.domain_name
+  external_dns_owner_id = "${local.project}-stage-${local.region}"
 
   # Registration email for LetsEncrypt
-  cert_manager_acme_registration_email = "devops@<% index .Params `stagingHostRoot` %>"
+  cert_manager_acme_registration_email = "devops@${local.domain_name}"
 
   # Logging configuration
   logging_type = "<% index .Params `loggingType` %>"
@@ -41,7 +55,7 @@ module "kubernetes" {
   application_policy_list = [
     {
       service_account = "backend-service"
-      namespace       = "<% .Name %>"
+      namespace       = local.project
       policy          = data.aws_iam_policy_document.resource_access_backendservice
     }
     # Add additional mappings here
