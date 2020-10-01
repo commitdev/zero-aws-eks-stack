@@ -43,7 +43,7 @@ pre-k8s:
 	@aws secretsmanager describe-secret --region $(AWS_DEFAULT_REGION) --secret-id $(PROJECT)-$(ENVIRONMENT)-vpn-wg-privatekey-<% index .Params `randomSeed` %> > /dev/null 2>&1 || ( \
 	echo "Creating VPN private key..." && \
 	kubectl run --context $(KUBE_CONTEXT) -i --tty zero-k8s-utilities --image=commitdev/zero-k8s-utilities:0.0.3 --restart=Never -- wg genkey | \
-	xargs aws secretsmanager create-secret --region $(AWS_DEFAULT_REGION) --name $(PROJECT)-$(ENVIRONMENT)-vpn-wg-privatekey-<% index .Params `randomSeed` %> --description "Auto-generated Wireguard VPN private key" --secret-string && \
+	xargs aws secretsmanager create-secret --region $(AWS_DEFAULT_REGION) --name $(PROJECT)-$(ENVIRONMENT)-vpn-wg-privatekey-<% index .Params `randomSeed` %> --description "Auto-generated Wireguard VPN private key" --tags '[{"Key":"wg","Value":"$(PROJECT)-$(ENVIRONMENT)"}]' --secret-string && \
 	kubectl delete --context $(KUBE_CONTEXT) pod/zero-k8s-utilities && \
 	echo "Done VPN private key creation" )
 
@@ -80,6 +80,7 @@ teardown-secrets:
 	aws secretsmanager list-secrets --region $(AWS_DEFAULT_REGION) --query "SecretList[?Tags[?Key=='rds' && Value=='$(PROJECT)-$(ENVIRONMENT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region $(AWS_DEFAULT_REGION) --secret-id || echo "Secret already removed"
 	aws secretsmanager list-secrets --region $(AWS_DEFAULT_REGION) --query "SecretList[?Tags[?Key=='sendgrid' && Value=='$(PROJECT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region $(AWS_DEFAULT_REGION) --secret-id || echo "Secret already removed"
 	aws secretsmanager list-secrets --region $(AWS_DEFAULT_REGION) --query "SecretList[?Tags[?Key=='cf_keypair' && Value=='$(PROJECT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region $(AWS_DEFAULT_REGION) --secret-id || echo "Secret already removed"
+	aws secretsmanager list-secrets --region $(AWS_DEFAULT_REGION) --query "SecretList[?Tags[?Key=='wg' && Value=='$(PROJECT)-$(ENVIRONMENT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region $(AWS_DEFAULT_REGION) --secret-id || echo "Secret already removed"
 	aws iam list-access-keys --user-name $(PROJECT)-ci-user --query "AccessKeyMetadata[0].AccessKeyId" --out text | xargs aws iam delete-access-key --user-name $(PROJECT)-ci-user --access-key-id
 	aws iam delete-user --user-name $(PROJECT)-ci-user
 	aws iam list-role-policies --role-name $(PROJECT)-eks-cluster-creator --query "PolicyNames"   | jq -r ".[]" | xargs -n1 aws iam delete-role-policy --role-name $(PROJECT)-eks-cluster-creator --policy-name
