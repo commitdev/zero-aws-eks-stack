@@ -1,7 +1,3 @@
-locals {
-  domain_name = "<% index .Params `stagingHostRoot` %>"
-}
-
 # define policy documents for backend services
 # sample policies
 data "aws_iam_policy_document" "resource_access_backendservice" {
