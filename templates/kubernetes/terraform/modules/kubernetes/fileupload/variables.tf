@@ -3,5 +3,5 @@ variable "project" {
 }
 
 variable "namespace" {
-  description = ""
+  description = "Name of the Kubernetes virtual cluster"
 }
