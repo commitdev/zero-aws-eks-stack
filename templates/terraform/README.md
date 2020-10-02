@@ -125,13 +125,13 @@ This should detect that there was a new user created, and put them into the nece
 
  3. To create initial temporary password for users, you may run:
 ```
-script/setup-user-password.sh
+script/create-temporary-passwords.sh
 ```
 You will get a list with username, termporary password and roles that the user is assigned to. Then, you can pass to the corresponding users.
 
   4. New users can check and setup local configurations for resoruce access by running:
 ```
-script/setup-user-access.sh <user name> <role> <environment>
+script/setup-local-config.sh <user name> <role> <environment (stage/prod)>
 ```
 
 
