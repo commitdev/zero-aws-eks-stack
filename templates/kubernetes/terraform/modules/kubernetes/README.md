@@ -20,9 +20,6 @@ A unified logging layer, Fluentd handles capturing all log output from your clus
 A collector of cluster-wide resource metrics.
 Used by things like HorizontalPodAutoscaler to determine the current usage of pods. Also allows the `kubectl top` command
 
-[Kubernetes Dashboard](https://github.com/kubernetes/dashboard)
-A web-based GUI for viewing and modifying resources in a Kubernetes cluster. Usage instructions below.
-
 
 ## AWS IAM / Kubernetes RBAC integration
 
@@ -85,16 +82,7 @@ Once connected to the VPN, the user should have direct access to anything runnin
     monitoring/ - Provision cluster monitoring (cloudwatch agent and fluentd).
 ```
 
+## GUI
 
-## Dashboard
-
-Kubernetes dashboard will be installed and can be reached by running the following:
-(MacOS specific - requires `kubectl`, `jq`)
-
-```
-kubectl get secret -o json -n kubernetes-dashboard $(kubectl get secret -n kubernetes-dashboard | grep dashboard-user-token | awk '{print $1}') | jq -r .data.token | base64 -D | pbcopy && \
-open "http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/login" && kubectl proxy
-```
-
-This will get the token from k8s secrets, copy it to your clipboard, open a browser to the dashboard, and forward the appropriate port.
-
+If you are interested in a GUI option for viewing / interacting with kubernetes, a good option is Lens[Lens](https://k8slens.dev/).
+It's free, open source, cross-platform, and has a great selection of features.
