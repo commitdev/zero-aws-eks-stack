@@ -91,6 +91,7 @@ module "s3_hosting" {
   count   = length(var.hosted_domains)
 
   cf_signed_downloads    = var.hosted_domains[count.index].signed_urls
+  cf_trusted_signers     = var.hosted_domains[count.index].trusted_signers
   domain                 = var.hosted_domains[count.index].domain
   aliases                = var.hosted_domains[count.index].aliases
   project                = var.project
