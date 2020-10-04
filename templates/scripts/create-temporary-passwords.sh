@@ -3,11 +3,9 @@
 #
 # This script to help Admin create password for new users
 #  - automatically detect users in group "console-allowed" and skip the ones who already have login profile
-#  - 
 #
 
-#AWS_ACCOUNT_ID=<% index .Params `accountId` %>
-AWS_ACCOUNT_ID=864003660840
+AWS_ACCOUNT_ID=<% index .Params `accountId` %>
 
 function usage() {
   echo "  Usage:"
