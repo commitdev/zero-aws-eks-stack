@@ -10,9 +10,9 @@ terraform {
 }
 
 locals {
-  project     = "<% .Name %>"
-  region      = "<% index .Params `region` %>"
-  account_id  = "<% index .Params `accountId` %>"
+  project    = "<% .Name %>"
+  region     = "<% index .Params `region` %>"
+  account_id = "<% index .Params `accountId` %>"
 }
 
 provider "aws" {
@@ -24,23 +24,23 @@ provider "aws" {
 locals {
   # Users configuration
   users = [
-#    {
-#      name  = "dev1"
-#      roles = [
-#        { name = "developer", environments = ["stage", "prod"] }
-#      ]
-#    }, {
-#      name  = "devops1"
-#      roles = [
-#        { name = "developer", environments = ["stage", "prod"] },
-#        { name = "operator",  environments = ["stage"] }
-#      ]
-#    }, {
-#      name  = "operator1"
-#      roles = [
-#        { name = "operator", environments = ["stage", "prod"] }
-#      ]
-#    },
+    #    {
+    #      name  = "dev1"
+    #      roles = [
+    #        { name = "developer", environments = ["stage", "prod"] }
+    #      ]
+    #    }, {
+    #      name  = "devops1"
+    #      roles = [
+    #        { name = "developer", environments = ["stage", "prod"] },
+    #        { name = "operator",  environments = ["stage"] }
+    #      ]
+    #    }, {
+    #      name  = "operator1"
+    #      roles = [
+    #        { name = "operator", environments = ["stage", "prod"] }
+    #      ]
+    #    },
   ]
 }
 
