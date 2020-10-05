@@ -17,11 +17,10 @@ terraform {
 }
 
 locals {
-  project             = "<% .Name %>"
-  region              = "<% index .Params `region` %>"
-  account_id          = "<% index .Params `accountId` %>"
-  domain_name         = "<% index .Params `productionHostRoot` %>"
-  app_protocol_prefix = "https://"
+  project     = "<% .Name %>"
+  region      = "<% index .Params `region` %>"
+  account_id  = "<% index .Params `accountId` %>"
+  domain_name = "<% index .Params `productionHostRoot` %>"
 }
 
 provider "aws" {
@@ -85,7 +84,7 @@ module "prod" {
       aliases : [],
       signed_urls: true,
       trusted_signers: ["self"],
-      cors_origins: ["${local.app_protocol_prefix}<% index .Params `productionFrontendSubdomain` %>${local.domain_name}"],
+      cors_origins: ["https://<% index .Params `productionFrontendSubdomain` %>${local.domain_name}"],
     },<% end %>
   ]
 
