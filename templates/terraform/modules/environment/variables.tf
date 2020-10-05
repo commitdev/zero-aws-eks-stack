@@ -50,6 +50,7 @@ variable "hosted_domains" {
     domain  = string
     aliases = list(string)
     signed_urls = bool
+    trusted_signers = list(string)
   } ) )
 }
 
