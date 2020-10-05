@@ -61,7 +61,7 @@ resource "aws_iam_group_membership" "mfa_required_group" {
   name = "mfa-required"
 
   users = [
-    for user in local.users : user.name
+    for user in aws_iam_user.access_user : user.name
   ]
 
   group = aws_iam_group.mfa_required.name
@@ -71,7 +71,7 @@ resource "aws_iam_group_membership" "console_allowed_group" {
   name = "console-allowed"
 
   users = [
-    for user in local.users : user.name
+    for user in aws_iam_user.access_user : user.name
   ]
 
   group = aws_iam_group.console_allowed.name
