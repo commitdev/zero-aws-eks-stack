@@ -92,6 +92,7 @@ module "s3_hosting" {
 
   cf_signed_downloads    = var.hosted_domains[count.index].signed_urls
   cf_trusted_signers     = var.hosted_domains[count.index].trusted_signers
+  allowed_cors_origins   = var.hosted_domains[count.index].cors_origins
   domain                 = var.hosted_domains[count.index].domain
   aliases                = var.hosted_domains[count.index].aliases
   project                = var.project

@@ -66,9 +66,25 @@ module "prod" {
 
   # Hosting configuration. Each domain will have a bucket created for it, but may have mulitple aliases pointing to the same bucket.
   hosted_domains = [
-    { domain : local.domain_name, aliases : [], signed_urls: false, trusted_signers: ["self"] },
-    { domain : "<% index .Params `productionFrontendSubdomain` %>${local.domain_name}", aliases : [], signed_urls: false, trusted_signers: ["self"] },
-    <% if eq (index .Params `fileUploads`) "yes" %>{ domain : "files.${local.domain_name}", aliases : [], signed_urls: true, trusted_signers: ["self"] },<% end %>
+    {
+      domain : local.domain_name, aliases : [],
+      signed_urls: false,
+      trusted_signers: ["self"],
+      cors_origin: [],
+    },
+    {
+      domain : "<% index .Params `productionFrontendSubdomain` %>${local.domain_name}",
+      aliases : [],
+      signed_urls: false,
+      trusted_signers: ["self"], cors_origin: [],
+    },
+    <% if eq (index .Params `fileUploads`) "yes" %>{
+      domain : "files.${local.domain_name}",
+      aliases : [],
+      signed_urls: true,
+      trusted_signers: ["self"],
+      cors_origin: ["<% index .Params `productionFrontendSubdomain` %>${local.domain_name}"],
+    },<% end %>
   ]
 
   domain_name = local.domain_name
