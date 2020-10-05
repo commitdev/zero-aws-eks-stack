@@ -87,11 +87,12 @@ module "assets_domains" {
 
 module "s3_hosting" {
   source  = "commitdev/zero/aws//modules/s3_hosting"
-  version = "0.1.5"
+  version = "0.1.6"
   count   = length(var.hosted_domains)
 
   cf_signed_downloads    = var.hosted_domains[count.index].signed_urls
   cf_trusted_signers     = var.hosted_domains[count.index].trusted_signers
+  allowed_cors_origins   = var.hosted_domains[count.index].cors_origins
   domain                 = var.hosted_domains[count.index].domain
   aliases                = var.hosted_domains[count.index].aliases
   project                = var.project

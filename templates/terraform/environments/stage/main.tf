@@ -65,9 +65,25 @@ module "stage" {
   eks_worker_ami = "<% index .Params `eksWorkerAMI` %>"
 
   hosted_domains = [
-    { domain : local.domain_name, aliases : [], signed_urls: false, trusted_signers: ["self"] },
-    { domain : "<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}", aliases : [], signed_urls: false, trusted_signers: ["self"] },
-    <% if eq (index .Params `fileUploads`) "yes" %>{ domain : "files.${local.domain_name}", aliases : [], signed_urls: true, trusted_signers: ["self"] },<% end %>
+    {
+      domain : local.domain_name,
+      aliases : [],
+      signed_urls: false,
+      trusted_signers: ["self"],
+      cors_origins: [] },
+    {
+      domain : "<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}",
+      aliases : [],
+      signed_urls: false,
+      trusted_signers: ["self"],
+      cors_origins: [] },
+    <% if eq (index .Params `fileUploads`) "yes" %>{
+      domain : "files.${local.domain_name}",
+      aliases : [],
+      signed_urls: true,
+      trusted_signers: ["self"],
+      cors_origins: ["<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}"],
+    },<% end %>
   ]
 
   domain_name = local.domain_name
