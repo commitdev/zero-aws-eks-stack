@@ -1,7 +1,7 @@
 # AWS policy documents for requiring MFA
 data "aws_iam_policy_document" "mfa_required_policy" {
   statement {
-    sid = "AllowViewAccountInfo"
+    sid    = "AllowViewAccountInfo"
     effect = "Allow"
     actions = [
       "iam:GetAccountPasswordPolicy",
@@ -12,39 +12,39 @@ data "aws_iam_policy_document" "mfa_required_policy" {
   }
 
   statement {
-    sid = "AllowManageOwnVirtualMFADevice"
+    sid    = "AllowManageOwnVirtualMFADevice"
     effect = "Allow"
     actions = [
       "iam:CreateVirtualMFADevice",
-      "iam:DeleteVirtualMFADevice"
+      "iam:DeleteVirtualMFADevice",
     ]
-    resources = [ "arn:aws:iam::${local.account_id}:mfa/$${aws:username}" ]
+    resources = ["arn:aws:iam::${local.account_id}:mfa/$${aws:username}"]
   }
 
   statement {
-    sid = "AllowManageOwnUserMFA"
+    sid    = "AllowManageOwnUserMFA"
     effect = "Allow"
     actions = [
       "iam:DeactivateMFADevice",
       "iam:EnableMFADevice",
       "iam:ListMFADevices",
-      "iam:ResyncMFADevice"
+      "iam:ResyncMFADevice",
     ]
-    resources = [ "arn:aws:iam::${local.account_id}:user/$${aws:username}" ]
+    resources = ["arn:aws:iam::${local.account_id}:user/$${aws:username}"]
   }
 
   statement {
-    sid = "AllowManageOwnPasswords"
+    sid    = "AllowManageOwnPasswords"
     effect = "Allow"
     actions = [
       "iam:ChangePassword",
       "iam:GetUser",
     ]
-    resources = [ "arn:aws:iam::${local.account_id}:user/$${aws:username}" ]
+    resources = ["arn:aws:iam::${local.account_id}:user/$${aws:username}"]
   }
 
   statement {
-    sid = "AllowManageOwnAccessKeys"
+    sid    = "AllowManageOwnAccessKeys"
     effect = "Allow"
     actions = [
       "iam:CreateAccessKey",
@@ -53,11 +53,11 @@ data "aws_iam_policy_document" "mfa_required_policy" {
       "iam:UpdateAccessKey",
       "iam:GetAccessKeyLastUsed",
     ]
-    resources = [ "arn:aws:iam::${local.account_id}:user/$${aws:username}" ]
+    resources = ["arn:aws:iam::${local.account_id}:user/$${aws:username}"]
   }
 
   statement {
-    sid = "DenyAllExceptListedIfNoMFA"
+    sid    = "DenyAllExceptListedIfNoMFA"
     effect = "Deny"
     not_actions = [
       "iam:CreateVirtualMFADevice",
@@ -67,7 +67,7 @@ data "aws_iam_policy_document" "mfa_required_policy" {
       "iam:ListVirtualMFADevices",
       "iam:ResyncMFADevice",
       "iam:ChangePassword",
-      "sts:GetSessionToken"
+      "sts:GetSessionToken",
     ]
     resources = ["*"]
     condition {
@@ -79,7 +79,7 @@ data "aws_iam_policy_document" "mfa_required_policy" {
 }
 
 resource "aws_iam_group" "mfa_required" {
-  name  = "mfa-required"
+  name = "mfa-required"
 }
 
 resource "aws_iam_group_policy" "mfa_required" {

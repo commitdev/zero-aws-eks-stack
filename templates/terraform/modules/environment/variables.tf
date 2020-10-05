@@ -46,18 +46,18 @@ variable "eks_worker_ami" {
 
 variable "hosted_domains" {
   description = "Domains to host content for using S3 and Cloudfront. Requires a domain which will be the bucket name and the domain for the certificate, and optional aliases which will have records created for them and will be SubjectAltNames for the certificate. Only a single bucket and CF Distribution will be created per domain."
-  type = list( object( {
-    domain  = string
-    aliases = list(string)
-    signed_urls = bool
+  type = list(object({
+    domain          = string
+    aliases         = list(string)
+    signed_urls     = bool
     trusted_signers = list(string)
-    cors_origins = list(string)
-  } ) )
+    cors_origins    = list(string)
+  }))
 }
 
 variable "domain_name" {
   description = "Domain to create a R53 Zone and ACM Cert for"
-  type = string
+  type        = string
 }
 
 variable "db_instance_class" {
@@ -75,7 +75,7 @@ variable "vpc_use_single_nat_gateway" {
 }
 
 variable "database" {
-  default = "postgres"
+  default     = "postgres"
   description = "Which database engine to use, currently supports postgres or mysql"
 }
 
@@ -86,7 +86,7 @@ variable "logging_type" {
   default     = "cloudwatch"
 
   validation {
-    condition     = (
+    condition = (
       var.logging_type == "cloudwatch" || var.logging_type == "kibana"
     )
     error_message = "Invalid value. Valid values are cloudwatch or kibana."
@@ -136,12 +136,12 @@ variable "enable_cluster_logging" {
 
 variable "sendgrid_enabled" {
   description = "If enabled, creates route53 entries for domain authentication"
-  type  = bool
+  type        = bool
 }
 
 variable "sendgrid_api_key_secret_name" {
   description = "AWS secret manager's secret name storing the sendgrid api key"
-  type  = string
+  type        = string
 }
 
 variable "roles" {
@@ -155,7 +155,7 @@ variable "roles" {
 
 variable "user_role_mapping" {
   type = list(object({
-    name  = string
+    name = string
     roles = list(object({
       name         = string
       environments = list(string)
