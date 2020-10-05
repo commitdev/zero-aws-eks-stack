@@ -70,19 +70,19 @@ module "stage" {
       aliases : [],
       signed_urls: false,
       trusted_signers: ["self"],
-      cors_origin: [] },
+      cors_origins: [] },
     {
       domain : "<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}",
       aliases : [],
       signed_urls: false,
       trusted_signers: ["self"],
-      cors_origin: [] },
+      cors_origins: [] },
     <% if eq (index .Params `fileUploads`) "yes" %>{
       domain : "files.${local.domain_name}",
       aliases : [],
       signed_urls: true,
       trusted_signers: ["self"],
-      cors_origin: ["<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}"],
+      cors_origins: ["<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}"],
     },<% end %>
   ]
 
