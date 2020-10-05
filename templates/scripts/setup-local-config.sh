@@ -74,7 +74,7 @@ if ! confirm_aws_profile ${MY_AWS_PROFILE}; then
   aws configure set --profile ${MY_AWS_PROFILE} region ${REGION}
 fi
 if ! confirm_aws_identity ${MY_AWS_PROFILE}; then
-  warning_exit "Your profile not be able to setup, please check"
+  warning_exit "Unable to set up your AWS configuration profile. Please contact an administrator."
 fi
 echo "Confirmed your AWS profile '${MY_AWS_PROFILE}'"
 echo
@@ -85,7 +85,7 @@ if ! confirm_k8s_context ${MY_K8S_CONTEXT}; then
   # setup or switch context
   AWS_PROFILE=${MY_AWS_PROFILE} aws eks --region ${REGION} update-kubeconfig --role "arn:aws:iam::${AWS_ACCOUNT_ID}:role/${PROJECT}-kubernetes-${ROLE}-${ENVIRONMENT}" --name ${MY_K8S_CONTEXT} --alias ${MY_K8S_CONTEXT}
   if ! confirm_k8s_context ${MY_K8S_CONTEXT}; then
-    warning_exit "Failed to setup your kubernetes context."
+    warning_exit "Unable to set up your Kubernetes context. Please contact an administrator."
   fi
 fi
 echo "Confirmed your Kubernetes context '${MY_K8S_CONTEXT}'"

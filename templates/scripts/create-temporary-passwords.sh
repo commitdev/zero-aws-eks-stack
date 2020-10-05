@@ -52,7 +52,7 @@ done
 
 [[ -z "$INPUT_GROUP" ]] && [[ -z "${INPUT_USER}" ]] && INPUT_GROUP="console-allowed" # set default group
 
-[[ -n "$INPUT_GROUP" ]] && [[ -n "${INPUT_USER}" ]] && warning_exit "Can not input both group and user togeher"
+[[ -n "$INPUT_GROUP" ]] && [[ -n "${INPUT_USER}" ]] && warning_exit "Can not input both group and user together"
 
 # Start
 echo "Your current AWS account is ${AWS_ACCOUNT_ID}"
@@ -79,7 +79,7 @@ if [ -n "$INPUT_GROUP" ]; then
 
   [[ -z ${target_users} ]] && warning_exit "No available users for password creation."
 
-  echo "Detected the following users available for termporary password creation:"
+  echo "Detected the following users available for temporary password creation:"
   echo "------------------------"
   for tuser in "${target_users[@]}"; do echo $tuser; done
   echo "------------------------"
