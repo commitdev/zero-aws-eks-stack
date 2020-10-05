@@ -17,10 +17,11 @@ terraform {
 }
 
 locals {
-  project     = "<% .Name %>"
-  region      = "<% index .Params `region` %>"
-  account_id  = "<% index .Params `accountId` %>"
-  domain_name = "<% index .Params `stagingHostRoot` %>"
+  project             = "<% .Name %>"
+  region              = "<% index .Params `region` %>"
+  account_id          = "<% index .Params `accountId` %>"
+  domain_name         = "<% index .Params `stagingHostRoot` %>"
+  app_protocol_prefix = "https://"
 }
 
 provider "aws" {
@@ -82,7 +83,7 @@ module "stage" {
       aliases : [],
       signed_urls: true,
       trusted_signers: ["self"],
-      cors_origins: ["<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}"],
+      cors_origins: ["${local.app_protocol_prefix}<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}"],
     },<% end %>
   ]
 
