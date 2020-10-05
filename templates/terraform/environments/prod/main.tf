@@ -76,7 +76,8 @@ module "prod" {
       domain : "<% index .Params `productionFrontendSubdomain` %>${local.domain_name}",
       aliases : [],
       signed_urls: false,
-      trusted_signers: ["self"], cors_origin: [],
+      trusted_signers: ["self"],
+      cors_origin: [],
     },
     <% if eq (index .Params `fileUploads`) "yes" %>{
       domain : "files.${local.domain_name}",
