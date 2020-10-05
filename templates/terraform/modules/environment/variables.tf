@@ -51,7 +51,7 @@ variable "hosted_domains" {
     aliases = list(string)
     signed_urls = bool
     trusted_signers = list(string)
-    cors_origins = list(string)
+    cors_origin = list(string)
   } ) )
 }
 
