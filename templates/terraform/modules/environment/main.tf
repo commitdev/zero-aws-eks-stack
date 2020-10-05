@@ -12,7 +12,7 @@ locals {
   role_name_list = var.roles.*.name
   users = [
     for u in var.user_role_mapping : {
-      name  = u.name
+      name = u.name
       roles = [
         for r in u.roles :
         r.name if contains(local.role_name_list, r.name) && contains(r.environments, var.environment)
@@ -68,14 +68,14 @@ module "wildcard_domain" {
   source  = "commitdev/zero/aws//modules/certificate"
   version = "0.1.0"
 
-  zone_name    = var.domain_name
+  zone_name   = var.domain_name
   domain_name = "*.${var.domain_name}"
 }
 
 module "assets_domains" {
-  source    = "commitdev/zero/aws//modules/certificate"
-  version   = "0.1.0"
-  count     = length(var.hosted_domains)
+  source  = "commitdev/zero/aws//modules/certificate"
+  version = "0.1.0"
+  count   = length(var.hosted_domains)
   providers = {
     aws = aws.for_cloudfront
   }
@@ -153,7 +153,7 @@ module "sendgrid" {
 }
 
 module "user_access" {
-  source = "commitdev/zero/aws//modules//user_access"
+  source  = "commitdev/zero/aws//modules//user_access"
   version = "0.1.3"
 
   project     = var.project

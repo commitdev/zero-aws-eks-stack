@@ -4,7 +4,7 @@ data "aws_iam_role" "eks_cluster_creator" {
 }
 
 provider "aws" {
-  alias = "for_cloudfront"
+  alias  = "for_cloudfront"
   region = "us-east-1"
 }
 

@@ -1,11 +1,11 @@
 provider "aws" {
-  region  = "<% index .Params `region` %>"
-  allowed_account_ids = [ "<% index .Params `accountId` %>" ]
+  region              = "<% index .Params `region` %>"
+  allowed_account_ids = ["<% index .Params `accountId` %>"]
 }
 
 resource "aws_s3_bucket" "terraform_remote_state" {
-  bucket  = "<% .Name %>-${var.environment}-terraform-state"
-  acl     = "private"
+  bucket = "<% .Name %>-${var.environment}-terraform-state"
+  acl    = "private"
 
   versioning {
     enabled = true
