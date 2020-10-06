@@ -165,7 +165,7 @@ module "user_access" {
 
 module "cloudtrail" {
   source = "commitdev/zero/aws//modules/cloudtrail"
-  version = "0.1.4"
+  version = "0.1.7"
 
   count = var.cloudtrail_enabled ? 1 : 0
 
