@@ -46,14 +46,14 @@ locals {
 
 ## Create users
 resource "aws_iam_user" "access_user" {
-  count = length(local.users)
-  name  = local.users[count.index].name
+  for_each = { for u in local.users : u.name => u.roles }
+
+  name = each.key
 
   tags = {
-    for r in local.users[count.index].roles : "role:${r.name}" => join("/", r.environments)
+    for r in each.value : "role:${r.name}" => join("/", r.environments)
   }
 }
-
 
 # This is recommended to be enabled, ensuring that all users must use MFA
 # https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-cis-controls.html#securityhub-cis-controls-1.2
