@@ -84,7 +84,7 @@ module "prod" {
       aliases : [],
       signed_urls: true,
       trusted_signers: ["self"],
-      cors_origins: ["<% index .Params `productionFrontendSubdomain` %>${local.domain_name}"],
+      cors_origins: ["https://<% index .Params `productionFrontendSubdomain` %>${local.domain_name}"],
     },<% end %>
   ]
 

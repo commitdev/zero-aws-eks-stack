@@ -82,7 +82,7 @@ module "stage" {
       aliases : [],
       signed_urls: true,
       trusted_signers: ["self"],
-      cors_origins: ["<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}"],
+      cors_origins: ["https://<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}"],
     },<% end %>
   ]
 
