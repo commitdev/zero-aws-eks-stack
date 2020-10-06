@@ -127,6 +127,9 @@ module "stage" {
   user_role_mapping = data.terraform_remote_state.shared.outputs.user_role_mapping
 
   # Cloud trail configuration
+  ## Enable AWS CloudTrail to help you audit governance, compliance, and operational risk of your AWS account, with logs stored in S3 bucket.
   cloudtrail_enabled = true
+
+  ## To specify whether to publish events from global services such as IAM and non-API events - https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/EventTypes.html. Note: as this may increase your cost, set it off by default.
   cloudtrail_include_global_service_events = false
 }

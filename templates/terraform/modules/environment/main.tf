@@ -153,7 +153,7 @@ module "sendgrid" {
 }
 
 module "user_access" {
-  source  = "commitdev/zero/aws//modules//user_access"
+  source  = "commitdev/zero/aws//modules/user_access"
   version = "0.1.3"
 
   project     = var.project
@@ -164,7 +164,7 @@ module "user_access" {
 }
 
 module "cloudtrail" {
-  source = "commitdev/zero/aws//modules//cloudtrail"
+  source = "commitdev/zero/aws//modules/cloudtrail"
   version = "0.1.4"
 
   count = var.cloudtrail_enabled ? 1 : 0
