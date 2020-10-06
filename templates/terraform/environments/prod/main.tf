@@ -122,4 +122,8 @@ module "prod" {
   ]
 
   user_role_mapping = data.terraform_remote_state.shared.outputs.user_role_mapping
+
+  # Cloud trail configuration
+  cloudtrail_enabled = true
+  cloudtrail_include_global_service_events = false
 }
