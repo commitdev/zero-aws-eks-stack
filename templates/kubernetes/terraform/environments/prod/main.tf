@@ -16,10 +16,11 @@ terraform {
 }
 
 locals {
-  project     = "<% .Name %>"
-  region      = "<% index .Params `region` %>"
-  account_id  = "<% index .Params `accountId` %>"
-  domain_name = "<% index .Params `productionHostRoot` %>"
+  project      = "<% .Name %>"
+  region       = "<% index .Params `region` %>"
+  account_id   = "<% index .Params `accountId` %>"
+  domain_name  = "<% index .Params `productionHostRoot` %>"
+  file_uploads = <% if eq (index .Params `fileUploads`) "yes" %>true<% else %>false<% end %>
 }
 
 provider "aws" {
@@ -37,6 +38,7 @@ module "kubernetes" {
   region              = local.region
   allowed_account_ids = [local.account_id]
   random_seed         = "<% index .Params `randomSeed` %>"
+  cf_signing_enabled  = local.file_uploads
 
   # Authenticate with the EKS cluster via the cluster id
   cluster_name = "${local.project}-prod-${local.region}"

@@ -69,3 +69,8 @@ variable "vpn_client_publickeys" {
   type        = list(tuple([string, string, string]))
   description = "VPN List of client name, IP and public key"
 }
+
+variable "cf_signing_enabled" {
+  type = bool
+  description = "Enable CloudFront signed URLs"
+}
