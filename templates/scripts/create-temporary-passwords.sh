@@ -64,7 +64,7 @@ function set_temp_password() {
     tpass=$(aws secretsmanager get-random-password --password-length 16 --require-each-included-type --output text)
     aws iam create-login-profile --user-name $user --password "$tpass" --password-reset-required >& /dev/null
     roles=$(aws iam list-groups-for-user --user-name $user | jq '.Groups[] | select(.Path == "/users/") | .GroupName' | tr -d "\"" | tr "\n" " ")
-    echo "  username:\"$tuser\", temporary password: \"$tpass\", roles: \"$roles\""
+    echo "  username:\"$user\", temporary password: \"$tpass\", roles: \"$roles\""
 }
 
 if [ -n "$INPUT_GROUP" ]; then 
