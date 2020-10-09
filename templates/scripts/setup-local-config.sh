@@ -14,13 +14,13 @@ REGION=<% index .Params `region` %>
 
 # common functions
 function usage() {
-  echo "You should have the following information ready before running:
-  echo "  1. your AWS user name
-  echo "  2. your AWS access and secret key
-  echo "  3. your user role (("developer", "operator", etc.))
+  echo "You should have the following information ready before running:"
+  echo "  1. your AWS user name"
+  echo "  2. your AWS access and secret key"
+  echo "  3. your user role ('developer', 'operator', etc.)"
   echo
   echo "Usage:"
-  echo "  $0 <iam_username> <role> <environment (stage/prod)>
+  echo "  $0 <iam_username> <role> <environment (stage/prod)>"
   exit 1
 }
 
