@@ -72,6 +72,18 @@ data "aws_iam_policy_document" "operator_access" {
     actions   = ["s3:*"]
     resources = ["arn:aws:s3:::*${local.domain_name}/*"]
   }
+
+  # CloudTrail
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = ["arn:aws:s3:::${local.project}-stage-cloudtrail"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:GetObject", "s3:PutObject"]
+    resources = ["arn:aws:s3:::${local.project}-stage-cloudtrail/*"]
+  }
 }
 
 
