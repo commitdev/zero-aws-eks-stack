@@ -87,7 +87,7 @@ module "assets_domains" {
 
 module "s3_hosting" {
   source  = "commitdev/zero/aws//modules/s3_hosting"
-  version = "0.1.6"
+  version = "0.1.9"
   count   = length(var.hosted_domains)
 
   cf_signed_downloads    = var.hosted_domains[count.index].signed_urls
@@ -165,7 +165,7 @@ module "user_access" {
 
 module "cloudtrail" {
   source = "commitdev/zero/aws//modules/cloudtrail"
-  version = "0.1.7"
+  version = "0.1.9"
 
   count = var.cloudtrail_enabled ? 1 : 0
 
