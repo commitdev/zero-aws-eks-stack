@@ -162,15 +162,3 @@ module "user_access" {
   roles = var.roles
   users = local.users
 }
-
-module "cloudtrail" {
-  source = "commitdev/zero/aws//modules/cloudtrail"
-  version = "0.1.9"
-
-  count = var.cloudtrail_enabled ? 1 : 0
-
-  project     = var.project
-  environment = var.environment
-
-  include_global_service_events = var.cloudtrail_include_global_service_events
-}
