@@ -102,7 +102,7 @@
  make update-k8s-conf
  ```
 
-If a user has a role other than admin (dev, operations, etc.) they can specify it here as well: 
+If a user has a role other than admin (dev, operations, etc.) they can specify it here as well:
 ```
  ROLE=<role> make update-k8s-conf
  ```
@@ -199,4 +199,19 @@ The number of shards can’t exceed 1000 per node. If it reaches that limit, new
 The best place to view this is the AWS console for Elasticsearch.
 
 If the free space gets too low, the EBS volume can be resized by changing the value in Terraform, and it will be resized with no downtime.
+<% end %>
+
+<% if eq (index .Params `metricsType`) "prometheus" %>
+## Metrics with Prometheus and Grafana
+
+[Prometheus](https://prometheus.io/) is a metrics collection and storage sytem with great support for Kubernetes and a thriving community.
+
+[Grafana](https://grafana.com/) is an observability tool which provides visibility into metrics from a variety of sources.
+
+Both are being installed by the "Prometheus Operator" tool which allows a k8s-native way of interacting with prometheus.
+
+To view your grafana dashboard you should be able to connect to the VPN and load [https://grafana.metrics.svc.cluster.local](https://grafana.metrics.svc.cluster.local) in your browser.
+You can log in with the default username and password which will be `admin`/`<% .Name %>` after which you can create new users, or connect a G-Suite or other federated login system.
+
+If you have a service in kubernetes you want to monitor for stats, you should be able to easily integrate a Prometheus library for your language to expose the stats, and then you can use the Prometheus Operator [ServiceMonitor](https://coreos.com/blog/the-prometheus-operator.html) resource to automatically pull metrics for you.
 <% end %>

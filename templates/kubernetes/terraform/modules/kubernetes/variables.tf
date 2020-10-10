@@ -12,7 +12,7 @@ variable "allowed_account_ids" {
 }
 
 variable "environment" {
-  description = "Environment"
+  description = "Environment (prod/stage)"
 }
 
 variable "random_seed" {
@@ -54,6 +54,19 @@ variable "logging_type" {
   }
 }
 
+variable "metrics_type" {
+  description = "Which application logging mechanism to use (prometheus, none)"
+  type        = string
+  default     = "none"
+
+  validation {
+    condition = (
+      var.metrics_type == "prometheus" || var.metrics_type == "none"
+    )
+    error_message = "Invalid value. Valid values are none or prometheus."
+  }
+}
+
 variable "application_policy_list" {
   description = "Application policies"
   type        = list
@@ -73,4 +86,10 @@ variable "vpn_client_publickeys" {
 variable "cf_signing_enabled" {
   type = bool
   description = "Enable CloudFront signed URLs"
+}
+
+variable "internal_domain" {
+  description = "Internal domain to create records in"
+  type        = string
+  default     = ""
 }

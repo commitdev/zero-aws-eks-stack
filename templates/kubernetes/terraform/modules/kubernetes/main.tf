@@ -15,6 +15,15 @@ module "logging_kibana" {
   elasticsearch_domain = "${var.project}-${var.environment}-logging"
 }
 
+module "metrics_prometheus" {
+  count           = var.metrics_type == "prometheus" ? 1 : 0
+  source          = "./metrics/prometheus"
+  project         = var.project
+  environment     = var.environment
+  region          = var.region
+  internal_domain = var.internal_domain
+}
+
 module "ingress" {
   source                     = "./ingress"
   environment                = var.environment
