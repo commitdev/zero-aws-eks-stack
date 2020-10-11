@@ -81,7 +81,8 @@ resource "aws_iam_group_membership" "console_allowed_group" {
 module "cloudtrail" {
   source = "commitdev/zero/aws//modules/cloudtrail"
 
-  trail_name = "${local.project}-management-events"
+  project    = local.project
+  trail_name = "management-events"
 
   ## To specify whether to publish events from global services such as IAM and non-API events - https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/EventTypes.html. Note: as this may increase your cost, set it off by default.
   include_global_service_events = false
