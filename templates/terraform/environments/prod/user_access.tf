@@ -78,6 +78,7 @@ data "aws_iam_policy_document" "operator_access" {
     effect    = "Allow"
     actions   = ["s3:ListBucket"]
     resources = ["arn:aws:s3:::${data.terraform_remote_state.shared.outputs.cloudtrail_bucket_id}"]
+
   }
   statement {
     effect    = "Allow"
