@@ -163,12 +163,3 @@ variable "user_role_mapping" {
   }))
   description = "User-Roles mapping with environment"
 }
-
-variable "cloudtrail_enabled" {
-  description = "If enabled, create cloudtrail and related S3 bucket"
-  type        = bool
-}
-
-variable "cloudtrail_include_global_service_events" {
-  description = "Specifies whether the trail is publishing events from global services such as IAM to the log files"
-}
