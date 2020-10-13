@@ -44,7 +44,7 @@ dns_server=$(k8s_exec "cat /etc/resolv.conf | grep nameserver | tail -1 | cut -d
 # get CIDRs for allowed IP subnets
 VPCNAME=${CLUSTER%-$REGION}-vpc
 vpc_cidr=$(aws ec2 describe-vpcs --filters Name=tag:Name,Values=${VPCNAME} | jq -r '.Vpcs[].CidrBlock')
-[[ -z "$vpc_cidr" ]] && vpc_cidr = "10.10.0.0/16"
+[[ -z "$vpc_cidr" ]] && vpc_cidr="10.10.0.0/16"
 k8s_cidr = "172.16.0.0/12"
 
 # get Endpoint DNS
