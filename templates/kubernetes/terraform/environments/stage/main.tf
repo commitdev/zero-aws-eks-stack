@@ -48,8 +48,10 @@ module "kubernetes" {
   # Registration email for LetsEncrypt
   cert_manager_acme_registration_email = "devops@${local.domain_name}"
 
-  # Logging configuration
+  # Logging and Metrics configuration
   logging_type = "<% index .Params `loggingType` %>"
+  metrics_type = "<% index .Params `metricsType` %>"
+  internal_domain = "" # TODO: Add internal domain support
 
   # Application policy list - This allows applications running in kubernetes to have access to AWS resources.
   # Specify the service account name, the namespace, and the policy that should be applied.

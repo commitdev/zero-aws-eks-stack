@@ -12,6 +12,7 @@ modules:
       eksWorkerAMI: ami-06d3900b00136f924
       fileUploads: "no"
       loggingType: kibana
+      metricsType: prometheus
       productionBackendSubdomain: api.
       productionFrontendSubdomain: app.
       productionHostRoot: zero-test.online

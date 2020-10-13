@@ -24,7 +24,7 @@ locals {
 
 module "vpc" {
   source  = "commitdev/zero/aws//modules/vpc"
-  version = "0.0.1"
+  version = "0.1.11"
 
   project                 = var.project
   environment             = var.environment

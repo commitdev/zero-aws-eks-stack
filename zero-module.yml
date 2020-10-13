@@ -1,5 +1,5 @@
 name: zero-aws-eks-stack
-description: 'zero module for a basic AWS kubernetes stack on EKS'
+description: 'zero module for an AWS kubernetes stack on EKS'
 author: 'Commit'
 
 template:
@@ -71,6 +71,11 @@ parameters:
     options:
       - "cloudwatch"
       - "kibana"
+  - field: metricsType
+    label: Additional application metrics method to configure. Metrics are available through CloudWatch, but choosing prometheus will install Prometheus and Grafana, for a richer metrics experience. No additional infrastructure is required, but a number of prometheus pods will need to exist in the cluster, utilizing some resources.
+    options:
+      - "none"
+      - "prometheus"
   - field: sendgridApiKey
     label: "API key to setup email integration (optional: leave blank to opt-out of Sendgrid setup)"
     info: Signup at https://signup.sendgrid.com or create an API key from https://app.sendgrid.com/settings/api_keys. Sendgrid is an email delivery service enabling transactional email sending and more.

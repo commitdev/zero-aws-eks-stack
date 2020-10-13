@@ -68,21 +68,23 @@ module "stage" {
     {
       domain : local.domain_name,
       aliases : [],
-      signed_urls: false,
-      trusted_signers: ["self"],
-      cors_origins: [] },
+      signed_urls : false,
+      trusted_signers : ["self"],
+      cors_origins : [],
+    },
     {
       domain : "<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}",
       aliases : [],
-      signed_urls: false,
-      trusted_signers: ["self"],
-      cors_origins: [] },
+      signed_urls : false,
+      trusted_signers : ["self"],
+      cors_origins : [],
+    },
     <% if eq (index .Params `fileUploads`) "yes" %>{
       domain : "files.${local.domain_name}",
       aliases : [],
-      signed_urls: true,
-      trusted_signers: ["self"],
-      cors_origins: ["https://<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}"],
+      signed_urls : true,
+      trusted_signers : ["self"],
+      cors_origins : ["https://<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}"],
     },<% end %>
   ]
 
