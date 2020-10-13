@@ -55,7 +55,7 @@ variable "logging_type" {
 }
 
 variable "metrics_type" {
-  description = "Which application logging mechanism to use (prometheus, none)"
+  description = "Which application metrics mechanism to use (prometheus, none)"
   type        = string
   default     = "none"
 
