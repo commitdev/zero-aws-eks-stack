@@ -1,0 +1,118 @@
+
+## Using default values from https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
+##
+grafana:
+
+  persistence:
+    enabled: true
+
+  # Custom Dashboard
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: 'custom-dashboard'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: true
+        editable: false
+        options:
+          path: /var/lib/grafana/dashboards/custom-dashboard
+
+  dashboards:
+    custom-dashboard:
+      rds:
+        json: |
+          {
+            "annotations": {
+              "list": [
+                {
+                  "builtIn": 1,
+                  "datasource": "-- Grafana --",
+                  "enable": true,
+                  "hide": true,
+                  "iconColor": "rgba(0, 211, 255, 1)",
+                  "name": "Annotations & Alerts",
+                  "type": "dashboard"
+                }
+              ]
+            },
+            "description": "Example Dashboard",
+            "editable": true,
+            "gnetId": null,
+            "graphTooltip": 0,
+            "id": 34,
+            "iteration": 1583449832758,
+            "links": [],
+            "panels": [],
+            "schemaVersion": 21,
+            "style": "dark",
+            "tags": [],
+            "templating": {
+              "list": []
+            },
+            "time": {
+              "from": "now-2d",
+              "to": "now"
+            },
+            "timepicker": {
+              "refresh_intervals": [
+                "5s",
+                "10s",
+                "30s",
+                "1m",
+                "5m",
+                "15m",
+                "30m",
+                "1h",
+                "2h",
+                "1d"
+              ]
+            },
+            "timezone": "",
+            "title": "Example Dashboard",
+            "uid": "Example",
+            "version": 1
+          }
+
+## Manages Prometheus and Alertmanager components
+##
+prometheusOperator:
+  securityContext:
+    fsGroup: 65534
+    runAsGroup: 65534
+    runAsNonRoot: true
+    runAsUser: 65534
+
+## Deploy a Prometheus instance
+##
+prometheus:
+  ## Settings affecting prometheusSpec
+  ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#prometheusspec
+  ##
+  prometheusSpec:
+    ## Enable compression of the write-ahead log using Snappy.
+    ##
+    walCompression: true
+
+    ## Number of Prometheus replicas desired
+    ##
+    replicas: 1
+
+    ## Prometheus StorageSpec for persistent data
+    ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/user-guides/storage.md
+    ##
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          volumeMode: Filesystem
+
+    ## SecurityContext holds pod-level security attributes and common container settings.
+    ## This defaults to non root user with uid 1000 and gid 2000.
+    ## https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md
+    ##
+    securityContext:
+      runAsNonRoot: false
+      runAsUser: 0
+      fsGroup: 0
