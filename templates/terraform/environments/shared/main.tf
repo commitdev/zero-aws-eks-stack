@@ -96,6 +96,6 @@ output "user_role_mapping" {
   value = local.users
 }
 
-output "cloudtrail_s3_bucket" {
+output "cloudtrail_bucket_id" {
   value = module.cloudtrail.cloudtrail_bucket_id
 }
