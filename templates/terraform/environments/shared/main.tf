@@ -77,10 +77,25 @@ resource "aws_iam_group_membership" "console_allowed_group" {
   group = aws_iam_group.console_allowed.name
 }
 
+# Enable AWS CloudTrail to help you audit governance, compliance, and operational risk of your AWS account, with logs stored in S3 bucket.
+module "cloudtrail" {
+  source = "commitdev/zero/aws//modules/cloudtrail"
+  version = "0.1.7"
+
+  project = local.project
+
+  ## To specify whether to publish events from global services such as IAM and non-API events - https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/EventTypes.html. Note: as this may increase your cost, set it off by default.
+  include_global_service_events = false
+}
+
 output "iam_users" {
   value = aws_iam_user.access_user
 }
 
 output "user_role_mapping" {
   value = local.users
+}
+
+output "cloudtrail_s3_bucket" {
+  value = module.cloudtrail.cloudtrail_bucket_id
 }
