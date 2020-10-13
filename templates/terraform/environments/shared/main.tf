@@ -80,7 +80,7 @@ resource "aws_iam_group_membership" "console_allowed_group" {
 # Enable AWS CloudTrail to help you audit governance, compliance, and operational risk of your AWS account, with logs stored in S3 bucket.
 module "cloudtrail" {
   source = "commitdev/zero/aws//modules/cloudtrail"
-  version = "0.1.7"
+  version = "0.1.10"
 
   project = local.project
 
