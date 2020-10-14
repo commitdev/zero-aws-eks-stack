@@ -41,10 +41,11 @@ done
 # get DNS server setting
 dns_server=$(k8s_exec "cat /etc/resolv.conf | grep nameserver | tail -1 | cut -d\" \" -f2 | tr -d \"\r\n\f\"")
 
-# get VPC CIDR for allowed IP subnet
+# get CIDRs for allowed IP subnets
 VPCNAME=${CLUSTER%-$REGION}-vpc
 vpc_cidr=$(aws ec2 describe-vpcs --filters Name=tag:Name,Values=${VPCNAME} | jq -r '.Vpcs[].CidrBlock')
-[[ -z "$vpc_cidr" ]] && vpc_cidr = "10.10.0.0/16"
+[[ -z "$vpc_cidr" ]] && vpc_cidr="10.10.0.0/16"
+k8s_cidr = "172.16.0.0/12"
 
 # get Endpoint DNS
 EXTERNAL_DNS=$(kubectl -nvpn get svc wireguard -o jsonpath='{.metadata.annotations.external-dns\.alpha\.kubernetes\.io/hostname}')
@@ -91,7 +92,7 @@ DNS = $dns_server
 [Peer]
 # VPN server side
 PublicKey = $server_public_key
-AllowedIPs = $vpc_cidr, $dns_server/32
+AllowedIPs = $vpc_cidr, $k8s_cidr, $dns_server/32
 Endpoint = $EXTERNAL_DNS:51820
 
 EOF
