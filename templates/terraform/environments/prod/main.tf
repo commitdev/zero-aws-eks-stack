@@ -65,6 +65,7 @@ module "prod" {
   # https://<% index .Params `region` %>.console.aws.amazon.com/systems-manager/parameters/%252Faws%252Fservice%252Feks%252Foptimized-ami%252F1.17%252Famazon-linux-2%252Frecommended%252Fimage_id/description?region=<% index .Params `region` %>
   eks_worker_ami = "<% index .Params `eksWorkerAMI` %>"
 
+  # Hosting configuration. Each domain will have a bucket created for it, but may have mulitple aliases pointing to the same bucket.
   hosted_domains = [
     {
       domain : local.domain_name,

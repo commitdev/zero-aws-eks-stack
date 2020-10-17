@@ -128,6 +128,7 @@ module "cloudtrail" {
   include_global_service_events = false
 }
 
+# Outputs
 output "iam_users" {
   value = aws_iam_user.access_user
 }
