@@ -23,7 +23,7 @@ apply-shared-remote-state:
 	rm ./terraform.tfstate )
 
 apply-secrets:
-        aws secretsmanager list-secrets --filters "Key=name,Values=$(PROJECT)-$(ENVIRONMENT)-rds-<% index .Params `randomSeed` %>" > /dev/null 2>&1 || ( \
+	aws secretsmanager list-secrets --filters "Key=name,Values=$(PROJECT)-$(ENVIRONMENT)-rds-<% index .Params `randomSeed` %>" > /dev/null 2>&1 || ( \
 	cd terraform/bootstrap/secrets && \
 	terraform init && \
 	terraform apply $(AUTO_APPROVE) && \

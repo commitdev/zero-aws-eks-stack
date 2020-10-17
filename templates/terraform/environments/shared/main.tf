@@ -77,7 +77,6 @@ resource "aws_iam_group_membership" "mfa_required_group" {
 
   users = [
     for user in local.users : user.name if contains(user.global_roles, "mfa-required")
-
   ]
 
   group = aws_iam_group.mfa_required.name
@@ -89,7 +88,7 @@ resource "aws_iam_group_membership" "console_allowed_group" {
   name = "console-allowed"
 
   users = [
-    for user in aws_iam_user.access_user : user.name
+    for user in local.users : user.name if contains(user.global_roles, "console-allowed")
   ]
 
   group = aws_iam_group.console_allowed.name

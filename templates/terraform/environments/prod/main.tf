@@ -21,6 +21,7 @@ locals {
   region      = "<% index .Params `region` %>"
   account_id  = "<% index .Params `accountId` %>"
   domain_name = "<% index .Params `productionHostRoot` %>"
+  random_seed = "<% index .Params `randomSeed` %>"
 }
 
 provider "aws" {
@@ -49,7 +50,7 @@ module "prod" {
   project             = local.project
   region              = local.region
   allowed_account_ids = [local.account_id]
-  random_seed         = "<% index .Params `randomSeed` %>"
+  random_seed         = local.random_seed
 
   # ECR configuration
   ecr_repositories = [] # Should be created by the staging environment
@@ -64,7 +65,6 @@ module "prod" {
   # https://<% index .Params `region` %>.console.aws.amazon.com/systems-manager/parameters/%252Faws%252Fservice%252Feks%252Foptimized-ami%252F1.17%252Famazon-linux-2%252Frecommended%252Fimage_id/description?region=<% index .Params `region` %>
   eks_worker_ami = "<% index .Params `eksWorkerAMI` %>"
 
-  # Hosting configuration. Each domain will have a bucket created for it, but may have mulitple aliases pointing to the same bucket.
   hosted_domains = [
     {
       domain : local.domain_name,
@@ -114,13 +114,22 @@ module "prod" {
       name         = "developer"
       aws_policy   = data.aws_iam_policy_document.developer_access.json
       k8s_policies = local.k8s_developer_access
+      k8s_groups   = local.k8s_developer_groups
     },
     {
       name         = "operator"
       aws_policy   = data.aws_iam_policy_document.operator_access.json
       k8s_policies = local.k8s_operator_access
+      k8s_groups   = local.k8s_operator_groups
+    },
+    {
+      name         = "deployer"
+      aws_policy   = data.aws_iam_policy_document.deployer_access.json
+      k8s_policies = local.k8s_deployer_access
+      k8s_groups   = local.k8s_deployer_groups
     }
   ]
 
   user_role_mapping = data.terraform_remote_state.shared.outputs.user_role_mapping
+  ci_users          = data.terraform_remote_state.shared.outputs.ci_users
 }
