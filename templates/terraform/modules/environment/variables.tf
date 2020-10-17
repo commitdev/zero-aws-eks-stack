@@ -149,6 +149,7 @@ variable "roles" {
     name         = string
     aws_policy   = string
     k8s_policies = list(map(list(string)))
+    k8s_groups   = list(string)
   }))
   description = "Role list with policies"
 }
@@ -162,4 +163,9 @@ variable "user_role_mapping" {
     }))
   }))
   description = "User-Roles mapping with environment"
+}
+
+variable "ci_users" {
+  description = "CI Users"
+  type        = list(string)
 }

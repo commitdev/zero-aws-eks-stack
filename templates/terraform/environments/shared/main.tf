@@ -10,9 +10,10 @@ terraform {
 }
 
 locals {
-  project    = "<% .Name %>"
-  region     = "<% index .Params `region` %>"
-  account_id = "<% index .Params `accountId` %>"
+  project     = "<% .Name %>"
+  region      = "<% index .Params `region` %>"
+  account_id  = "<% index .Params `accountId` %>"
+  random_seed = "<% index .Params `randomSeed` %>"
 }
 
 provider "aws" {
@@ -24,27 +25,40 @@ provider "aws" {
 locals {
   # Users configuration
   users = [
-    #    {
+        {
+          name  = "${local.project}-ci-user-shared"
+          roles = [
+            { name = "deployer", environments = ["stage", "prod"] }
+          ]
+          global_roles       = ["console-allowed"]
+          create_access_keys = true
+    #    }, {
     #      name  = "dev1"
     #      roles = [
     #        { name = "developer", environments = ["stage", "prod"] }
     #      ]
+    #      global_roles       = ["mfa-required", "console-allowed"]
+    #      create_access_keys = false
     #    }, {
     #      name  = "devops1"
     #      roles = [
     #        { name = "developer", environments = ["stage", "prod"] },
     #        { name = "operator",  environments = ["stage"] }
     #      ]
+    #      global_roles       = ["mfa-required", "console-allowed"]
+    #      create_access_keys = false
     #    }, {
     #      name  = "operator1"
     #      roles = [
     #        { name = "operator", environments = ["stage", "prod"] }
     #      ]
-    #    },
+    #      global_roles       = ["mfa-required", "console-allowed"]
+    #      create_access_keys = false
+        },
   ]
 }
 
-## Create users
+# Create users
 resource "aws_iam_user" "access_user" {
   for_each = { for u in local.users : u.name => u.roles }
 
@@ -55,16 +69,20 @@ resource "aws_iam_user" "access_user" {
   }
 }
 
-# This is recommended to be enabled, ensuring that all users must use MFA
-# https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-cis-controls.html#securityhub-cis-controls-1.2
+## assign users to MFA-Required group
+## This is recommended to be enabled, ensuring that all users must use MFA
+## https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-cis-controls.html#securityhub-cis-controls-1.2
 resource "aws_iam_group_membership" "mfa_required_group" {
   name = "mfa-required"
 
   users = [
-    for user in aws_iam_user.access_user : user.name
+    for user in local.users : user.name if contains(user.global_roles, "mfa-required")
+
   ]
 
   group = aws_iam_group.mfa_required.name
+
+  depends_on = [ aws_iam_user.access_user ]
 }
 
 resource "aws_iam_group_membership" "console_allowed_group" {
@@ -75,6 +93,29 @@ resource "aws_iam_group_membership" "console_allowed_group" {
   ]
 
   group = aws_iam_group.console_allowed.name
+
+  depends_on = [ aws_iam_user.access_user ]
+}
+
+## Create access/secret key pair and save to secret manager
+resource "aws_iam_access_key" "access_user" {
+  for_each = { for u in local.users : u.name => u.roles if u.create_access_keys}
+
+  user = aws_iam_user.access_user[each.key].name
+
+  depends_on = [ aws_iam_user.access_user ]
+}
+
+module "secret_keys" {
+  source  = "commitdev/zero/aws//modules/secret"
+  version = "0.0.2"
+
+  for_each = aws_iam_access_key.access_user
+
+  name   = "${each.value.user}-aws-keys${local.random_seed}"
+  type   = "map"
+  values = map("access_key_id", each.value.id, "secret_key", each.value.secret)
+  tags   = map("project", local.project)
 }
 
 # Enable AWS CloudTrail to help you audit governance, compliance, and operational risk of your AWS account, with logs stored in S3 bucket.
@@ -93,7 +134,18 @@ output "iam_users" {
 }
 
 output "user_role_mapping" {
-  value = local.users
+  value = [
+    for u in local.users: {
+      name  = u.name
+      roles = u.roles
+    }
+  ]
+}
+
+output "ci_users" {
+  value = [
+    for u in local.users: u.name if contains(u.roles.*.name, "deployer")
+  ]
 }
 
 output "cloudtrail_bucket_id" {

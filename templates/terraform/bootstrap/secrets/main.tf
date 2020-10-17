@@ -13,28 +13,6 @@ provider "aws" {
   allowed_account_ids = [local.aws_account_id]
 }
 
-# Create the CI User
-resource "aws_iam_user" "ci_user" {
-  name = "${local.project}-ci-user"
-}
-
-# Create a keypair to be used by CI systems
-resource "aws_iam_access_key" "ci_user" {
-  user = aws_iam_user.ci_user.name
-}
-
-# Add the keys to AWS secrets manager
-module "ci_user_keys" {
-  source  = "commitdev/zero/aws//modules/secret"
-  version = "0.0.2"
-
-
-  name   = "ci-user-aws-keys<% index .Params `randomSeed` %>"
-  type   = "map"
-  values = map("access_key_id", aws_iam_access_key.ci_user.id, "secret_key", aws_iam_access_key.ci_user.secret)
-  tags   = map("project", local.project)
-}
-
 module "rds_master_secret_stage" {
   source  = "commitdev/zero/aws//modules/secret"
   version = "0.0.2"

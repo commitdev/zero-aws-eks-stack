@@ -5,7 +5,9 @@ locals {
 }
 
 data "aws_iam_user" "ci_user" {
-  user_name = "${var.project}-ci-user" # Should have been created in the bootstrap process
+  count = length(var.ci_users)
+
+  user_name = var.ci_users[count.index]
 }
 
 locals {
@@ -122,7 +124,7 @@ module "ecr" {
 
   environment      = var.environment
   ecr_repositories = var.ecr_repositories
-  ecr_principals   = [data.aws_iam_user.ci_user.arn]
+  ecr_principals   = data.aws_iam_user.ci_user.*.arn
 }
 
 module "logging" {
@@ -161,4 +163,15 @@ module "user_access" {
 
   roles = var.roles
   users = local.users
+}
+
+
+output "s3_hosting" {
+  value = [
+    for p in module.s3_hosting : {
+      cloudfront_distribution_id = p.cloudfront_distribution_id
+      bucket_arn                 = p.bucket_arn
+      cf_signing_enabled         = p.cf_signing_enabled
+    }
+  ]
 }

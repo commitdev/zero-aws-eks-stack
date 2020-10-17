@@ -86,6 +86,80 @@ data "aws_iam_policy_document" "operator_access" {
   }
 }
 
+# define AWS policy documents for deployer
+locals {
+  non_upload_buckets = [for p in module.stage.s3_hosting : p if ! p.cf_signing_enabled]
+}
+
+data "aws_iam_policy_document" "deployer_access" {
+  # deploy_assets_policy - Allow the deployers read/write access to the frontend assets bucket and CF invalidations
+  statement {
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = module.stage.s3_hosting[*].bucket_arn
+  }
+
+  statement {
+    actions = [
+      "s3:*Object",
+      "s3:GetBucketLocation",
+    ]
+
+    resources = formatlist("%s/*", local.non_upload_buckets[*].bucket_arn)
+  }
+
+  statement {
+    actions = [
+      "cloudfront:ListDistributions",
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    actions = [
+      "cloudfront:CreateInvalidation",
+    ]
+    resources = formatlist("arn:aws:cloudfront::%s:distribution/%s", local.account_id, module.stage.s3_hosting[*].cloudfront_distribution_id)
+  }
+
+  # EKS - Allow the CI user to list and describe clusters
+  statement {
+    actions = [
+      "eks:ListUpdates",
+      "eks:ListClusters",
+      "eks:DescribeUpdate",
+      "eks:DescribeCluster",
+    ]
+
+    resources = ["*"]
+  }
+
+  # ECR - Allow the deployers to manage ECR
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecr:GetAuthorizationToken",
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:GetRepositoryPolicy",
+      "ecr:DescribeRepositories",
+      "ecr:ListImages",
+      "ecr:DescribeImages",
+      "ecr:BatchGetImage",
+      "ecr:GetLifecyclePolicy",
+      "ecr:GetLifecyclePolicyPreview",
+      "ecr:ListTagsForResource",
+      "ecr:DescribeImageScanFindings",
+      "ecr:InitiateLayerUpload",
+      "ecr:UploadLayerPart",
+      "ecr:CompleteLayerUpload",
+    ]
+    resources = ["*"]
+  }
+}
 
 
 locals {
@@ -101,6 +175,7 @@ locals {
       resources  = ["deployments", "configmaps", "pods", "services", "endpoints"]
     }
   ]
+  k8s_developer_groups = ["${local.project}-kubernetes-developer-stage"]
 
   # define Kubernetes policy for operator
   k8s_operator_access = [
@@ -110,4 +185,15 @@ locals {
       resources  = ["deployments", "configmaps", "pods", "secrets", "services", "endpoints"]
     }
   ]
+  k8s_operator_groups = ["${local.project}-kubernetes-operator-stage"]
+
+  # define Kubernetes policy for deployer: To Be Refined later
+  k8s_deployer_access = [
+    {
+      verbs      = ["exec", "create", "list", "get", "delete", "patch", "update"]
+      api_groups = [""]
+      resources  = ["deployments", "configmaps", "pods", "secrets", "services", "endpoints"]
+    }
+  ]
+  k8s_deployer_groups = ["system:master"]
 }
