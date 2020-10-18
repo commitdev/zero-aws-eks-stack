@@ -175,7 +175,6 @@ locals {
       resources  = ["deployments", "configmaps", "pods", "services", "endpoints"]
     }
   ]
-  k8s_developer_groups = ["${local.project}-kubernetes-developer-stage"]
 
   # define Kubernetes policy for operator
   k8s_operator_access = [
@@ -185,7 +184,6 @@ locals {
       resources  = ["deployments", "configmaps", "pods", "secrets", "services", "endpoints"]
     }
   ]
-  k8s_operator_groups = ["${local.project}-kubernetes-operator-stage"]
 
   # define Kubernetes policy for deployer: To Be Refined later
   k8s_deployer_access = [
@@ -195,5 +193,4 @@ locals {
       resources  = ["deployments", "configmaps", "pods", "secrets", "services", "endpoints"]
     }
   ]
-  k8s_deployer_groups = ["system:master"]
 }

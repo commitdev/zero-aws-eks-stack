@@ -142,12 +142,6 @@ output "user_role_mapping" {
   ]
 }
 
-output "ci_users" {
-  value = [
-    for u in local.users: u.name if contains(u.roles.*.name, "deployer")
-  ]
-}
-
 output "cloudtrail_bucket_id" {
   value = module.cloudtrail.cloudtrail_bucket_id
 }

@@ -2,6 +2,28 @@
 
 locals {
   kubernetes_cluster_name = "${var.project}-${var.environment}-${var.region}"
+
+  users = [
+    for u in var.user_role_mapping : {
+      name = u.name
+      roles = [
+        for r in u.roles :
+        r.name if contains(var.roles.*.name, r.name) && contains(r.environments, var.environment)
+      ]
+    }
+  ]
+
+  ci_users = [
+    for u in local.users: u.name if contains(u.roles, "deployer")
+  ]
+
+  eks_iam_role_mapping = [
+    for m in module.user_access.eks_iam_role_mapping : {
+      arn    = m.arn
+      name   = m.name
+      groups = length(regexall(".*deployer.*", m.name)) > 0 ? [ "system:master" ] : [ m.name ]
+    }
+  ]
 }
 
 data "aws_iam_user" "ci_user" {
@@ -9,20 +31,6 @@ data "aws_iam_user" "ci_user" {
 
   user_name = var.ci_users[count.index]
 }
-
-locals {
-  role_name_list = var.roles.*.name
-  users = [
-    for u in var.user_role_mapping : {
-      name = u.name
-      roles = [
-        for r in u.roles :
-        r.name if contains(local.role_name_list, r.name) && contains(r.environments, var.environment)
-      ]
-    }
-  ]
-}
-
 
 module "vpc" {
   source  = "commitdev/zero/aws//modules/vpc"
@@ -62,7 +70,7 @@ module "eks" {
   worker_asg_max_size  = var.eks_worker_asg_max_size
   worker_ami           = var.eks_worker_ami # EKS-Optimized AMI for your region: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
 
-  iam_role_mapping = module.user_access.eks_iam_role_mapping
+  iam_role_mapping = local.eks_iam_role_mapping
 }
 
 

@@ -115,22 +115,18 @@ module "prod" {
       name         = "developer"
       aws_policy   = data.aws_iam_policy_document.developer_access.json
       k8s_policies = local.k8s_developer_access
-      k8s_groups   = local.k8s_developer_groups
     },
     {
       name         = "operator"
       aws_policy   = data.aws_iam_policy_document.operator_access.json
       k8s_policies = local.k8s_operator_access
-      k8s_groups   = local.k8s_operator_groups
     },
     {
       name         = "deployer"
       aws_policy   = data.aws_iam_policy_document.deployer_access.json
       k8s_policies = local.k8s_deployer_access
-      k8s_groups   = local.k8s_deployer_groups
     }
   ]
 
   user_role_mapping = data.terraform_remote_state.shared.outputs.user_role_mapping
-  ci_users          = data.terraform_remote_state.shared.outputs.ci_users
 }
