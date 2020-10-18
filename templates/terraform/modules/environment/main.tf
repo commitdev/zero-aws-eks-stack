@@ -27,9 +27,9 @@ locals {
 }
 
 data "aws_iam_user" "ci_user" {
-  count = length(var.ci_users)
+  count = length(local.ci_users)
 
-  user_name = var.ci_users[count.index]
+  user_name = local.ci_users[count.index]
 }
 
 module "vpc" {
