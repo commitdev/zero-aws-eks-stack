@@ -188,9 +188,9 @@ locals {
   # define Kubernetes policy for deployer: To Be Refined later
   k8s_deployer_access = [
     {
-      verbs      = ["exec", "create", "list", "get", "delete", "patch", "update"]
-      api_groups = [""]
-      resources  = ["deployments", "configmaps", "pods", "secrets", "services", "endpoints"]
+      verbs      = ["*"]
+      api_groups = ["*"]
+      resources  = ["*"]
     }
   ]
 }

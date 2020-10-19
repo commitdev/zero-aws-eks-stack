@@ -21,7 +21,7 @@ locals {
     for m in module.user_access.eks_iam_role_mapping : {
       arn    = m.arn
       name   = m.name
-      groups = length(regexall(".*deployer.*", m.name)) > 0 ? [ "system:master" ] : [ m.name ]
+      groups = [ m.name ]
     }
   ]
 }
