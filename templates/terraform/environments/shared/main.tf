@@ -26,7 +26,7 @@ locals {
   # Users configuration
   users = [
         {
-          name  = "${local.project}-ci-user-shared"
+          name  = "${local.project}-ci-user"
           roles = [
             { name = "deployer", environments = ["stage", "prod"] }
           ]
