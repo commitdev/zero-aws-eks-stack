@@ -92,13 +92,15 @@ locals {
   # define Kubernetes policy for developer
   k8s_developer_access = [
     {
-      verbs      = ["exec"]
+      verbs      = ["exec", "list"]
       api_groups = [""]
-      resources  = ["pods", "pods/exec", "pods/log", "pods/portforward"]
+      resources  = ["pods", "pods/exec", "pods/portforward"]
       }, {
       verbs      = ["get", "list", "watch"]
-      api_groups = [""]
-      resources  = ["deployments", "configmaps", "pods", "services", "endpoints"]
+      api_groups = ["*"]
+      resources = ["deployments", "configmaps", "pods", "pods/log", "pods/status", "jobs", "cronjobs", "services",
+        "daemonsets", "endpoints", "namespaces", "events", "ingresses", "horizontalpodautoscalers", "horizontalpodautoscalers/status"
+      ]
     }
   ]
 
@@ -106,8 +108,11 @@ locals {
   k8s_operator_access = [
     {
       verbs      = ["exec", "create", "list", "get", "delete", "patch", "update"]
-      api_groups = [""]
-      resources  = ["deployments", "configmaps", "pods", "secrets", "services", "endpoints"]
+      api_groups = ["*"]
+      resources = ["deployments", "configmaps", "pods", "pods/exec", "pods/log", "pods/status", "pods/portforward",
+        "jobs", "cronjobs", "secrets", "services", "daemonsets", "endpoints", "namespaces", "events", "ingresses",
+        "horizontalpodautoscalers", "horizontalpodautoscalers/status"
+      ]
     }
   ]
 }
