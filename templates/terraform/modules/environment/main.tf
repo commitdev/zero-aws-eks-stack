@@ -13,11 +13,11 @@ locals {
     }
   ]
 
-  eks_iam_role_mapping = [
-    for m in module.user_access.eks_iam_role_mapping : {
-      arn    = m.arn
-      name   = m.name
-      groups = [ m.name ]
+  kubernetes_iam_role_mapping = [
+    for r in module.user_access.iam_assumerole_arns : {
+      iam_role_arn  = r.arn
+      k8s_role_name = r.name
+      k8s_groups    = [ r.name ]
     }
   ]
 }
@@ -64,7 +64,7 @@ module "eks" {
   worker_asg_max_size  = var.eks_worker_asg_max_size
   worker_ami           = var.eks_worker_ami # EKS-Optimized AMI for your region: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
 
-  iam_role_mapping = local.eks_iam_role_mapping
+  iam_role_mapping = local.kubernetes_iam_role_mapping
 }
 
 
