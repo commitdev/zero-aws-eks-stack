@@ -13,10 +13,6 @@ locals {
     }
   ]
 
-  ci_users = [
-    for u in local.users: u.name if contains(u.roles, "deployer")
-  ]
-
   eks_iam_role_mapping = [
     for m in module.user_access.eks_iam_role_mapping : {
       arn    = m.arn
@@ -27,9 +23,7 @@ locals {
 }
 
 data "aws_iam_user" "ci_user" {
-  count = length(local.ci_users)
-
-  user_name = local.ci_users[count.index]
+  user_name = var.ci_user_name
 }
 
 module "vpc" {
@@ -132,7 +126,7 @@ module "ecr" {
 
   environment      = var.environment
   ecr_repositories = var.ecr_repositories
-  ecr_principals   = data.aws_iam_user.ci_user.*.arn
+  ecr_principals   = [data.aws_iam_user.ci_user.arn]
 }
 
 module "logging" {

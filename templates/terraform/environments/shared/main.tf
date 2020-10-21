@@ -24,13 +24,14 @@ provider "aws" {
 # Instantiate the environment
 locals {
   # Users configuration
+  ci_user_name = "${local.project}-ci-user"
   users = [
         {
-          name  = "${local.project}-ci-user"
+          name  = local.ci_user_name
           roles = [
             { name = "deployer", environments = ["stage", "prod"] }
           ]
-          global_roles       = ["console-allowed"]
+          global_roles       = []
           create_access_keys = true
     #    }, {
     #      name  = "dev1"
@@ -140,6 +141,10 @@ output "user_role_mapping" {
       roles = u.roles
     }
   ]
+}
+
+output "ci_user_name" {
+  value = local.ci_user_name
 }
 
 output "cloudtrail_bucket_id" {

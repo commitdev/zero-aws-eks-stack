@@ -129,4 +129,5 @@ module "prod" {
   ]
 
   user_role_mapping = data.terraform_remote_state.shared.outputs.user_role_mapping
+  ci_user_name      = data.terraform_remote_state.shared.outputs.ci_user_name
 }
