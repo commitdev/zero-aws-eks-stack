@@ -56,7 +56,7 @@ module "prod" {
   ecr_repositories = [] # Should be created by the staging environment
 
   # EKS configuration
-  eks_cluster_version      = "1.17"
+  eks_cluster_version      = "1.18"
   eks_worker_instance_type = "t3.medium"
   eks_worker_asg_min_size  = 2
   eks_worker_asg_max_size  = 4
