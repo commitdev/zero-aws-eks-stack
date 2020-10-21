@@ -33,14 +33,16 @@ locals {
           ]
           global_roles       = []
           create_access_keys = true
-    #    }, {
+    #    },
+    #    {
     #      name  = "dev1"
     #      roles = [
     #        { name = "developer", environments = ["stage", "prod"] }
     #      ]
     #      global_roles       = ["mfa-required", "console-allowed"]
     #      create_access_keys = false
-    #    }, {
+    #    },
+    #    {
     #      name  = "devops1"
     #      roles = [
     #        { name = "developer", environments = ["stage", "prod"] },
@@ -48,7 +50,8 @@ locals {
     #      ]
     #      global_roles       = ["mfa-required", "console-allowed"]
     #      create_access_keys = false
-    #    }, {
+    #    },
+    #    {
     #      name  = "operator1"
     #      roles = [
     #        { name = "operator", environments = ["stage", "prod"] }

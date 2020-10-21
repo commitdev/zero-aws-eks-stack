@@ -14,7 +14,7 @@ locals {
   ]
 
   kubernetes_iam_role_mapping = [
-    for r in module.user_access.iam_assumerole_arns : {
+    for r in module.user_access.eks_iam_role_mapping : {
       iam_role_arn  = r.arn
       k8s_role_name = r.name
       k8s_groups    = [ r.name ]
@@ -44,7 +44,7 @@ data "aws_caller_identity" "current" {}
 # Provision the EKS cluster
 module "eks" {
   source  = "commitdev/zero/aws//modules/eks"
-  version = "0.1.2"
+  version = "0.1.12"
   providers = {
     aws = aws.for_eks
   }
@@ -108,7 +108,7 @@ module "s3_hosting" {
 
 module "db" {
   source  = "commitdev/zero/aws//modules/database"
-  version = "0.1.2"
+  version = "0.1.12"
 
   project                   = var.project
   environment               = var.environment
@@ -158,7 +158,7 @@ module "sendgrid" {
 
 module "user_access" {
   source  = "commitdev/zero/aws//modules/user_access"
-  version = "0.1.8"
+  version = "0.1.12"
 
   project     = var.project
   environment = var.environment
