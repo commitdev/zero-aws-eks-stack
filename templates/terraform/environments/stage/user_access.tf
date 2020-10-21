@@ -190,12 +190,15 @@ locals {
     }
   ]
 
-  # define Kubernetes policy for deployer: To Be Refined later
+  # define Kubernetes policy for deployer
   k8s_deployer_access = [
     {
-      verbs      = ["*"]
+      verbs      = ["exec", "create", "list", "get", "delete", "patch", "update"]
       api_groups = ["*"]
-      resources  = ["*"]
+      resources = ["deployments", "configmaps", "pods", "pods/exec", "pods/log", "pods/status", "pods/portforward",
+        "jobs", "cronjobs", "secrets", "services", "daemonsets", "endpoints", "namespaces", "events", "ingresses",
+        "horizontalpodautoscalers", "horizontalpodautoscalers/status"
+      ]
     }
   ]
 }
