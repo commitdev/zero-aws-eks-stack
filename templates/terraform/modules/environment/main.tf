@@ -169,6 +169,7 @@ module "user_access" {
 
 
 output "s3_hosting" {
+  description = "used by access policy for s3 hosting bucket"
   value = [
     for p in module.s3_hosting : {
       cloudfront_distribution_id = p.cloudfront_distribution_id
