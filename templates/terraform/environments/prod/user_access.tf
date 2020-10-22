@@ -181,7 +181,7 @@ locals {
   # define Kubernetes policy for operator
   k8s_operator_access = [
     {
-      verbs      = ["exec", "create", "list", "get", "delete", "patch", "update"]
+      verbs      = ["exec", "create", "list", "get", "delete", "patch", "update", "watch"]
       api_groups = ["*"]
       resources = ["deployments", "configmaps", "pods", "pods/exec", "pods/log", "pods/status", "pods/portforward",
         "jobs", "cronjobs", "secrets", "services", "daemonsets", "endpoints", "namespaces", "events", "ingresses",
@@ -193,12 +193,17 @@ locals {
   # define Kubernetes policy for deployer
   k8s_deployer_access = [
     {
-      verbs      = ["exec", "create", "list", "get", "delete", "patch", "update"]
+      verbs      = ["create", "list", "get", "delete", "patch", "update", "watch"]
       api_groups = ["*"]
-      resources = ["deployments", "configmaps", "pods", "pods/exec", "pods/log", "pods/status", "pods/portforward",
-        "jobs", "cronjobs", "secrets", "services", "daemonsets", "endpoints", "namespaces", "events", "ingresses",
+      resources = ["deployments", "configmaps", "pods", "pods/log", "pods/status",
+        "jobs", "cronjobs", "services", "daemonsets", "endpoints", "namespaces", "events", "ingresses",
         "horizontalpodautoscalers", "horizontalpodautoscalers/status"
       ]
+    },
+    {
+      verbs      = ["create", "delete", "patch", "update"]
+      api_groups = ["*"]
+      resources  = ["secrets"]
     }
   ]
 }
