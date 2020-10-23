@@ -23,7 +23,7 @@ apply-shared-remote-state:
 	rm ./terraform.tfstate )
 
 apply-secrets:
-	aws iam list-access-keys --user-name $(PROJECT)-ci-user > /dev/null 2>&1 || ( \
+	aws secretsmanager list-secrets --filters "Key=name,Values=$(PROJECT)-$(ENVIRONMENT)-rds-<% index .Params `randomSeed` %>" > /dev/null 2>&1 || ( \
 	cd terraform/bootstrap/secrets && \
 	terraform init && \
 	terraform apply $(AUTO_APPROVE) && \
@@ -81,8 +81,6 @@ teardown-secrets:
 	aws secretsmanager list-secrets --region $(AWS_DEFAULT_REGION) --query "SecretList[?Tags[?Key=='sendgrid' && Value=='$(PROJECT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region $(AWS_DEFAULT_REGION) --secret-id || echo "Secret already removed"
 	aws secretsmanager list-secrets --region $(AWS_DEFAULT_REGION) --query "SecretList[?Tags[?Key=='cf_keypair' && Value=='$(PROJECT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region $(AWS_DEFAULT_REGION) --secret-id || echo "Secret already removed"
 	aws secretsmanager list-secrets --region $(AWS_DEFAULT_REGION) --query "SecretList[?Tags[?Key=='wg' && Value=='$(PROJECT)-$(ENVIRONMENT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region $(AWS_DEFAULT_REGION) --secret-id || echo "Secret already removed"
-	aws iam list-access-keys --user-name $(PROJECT)-ci-user --query "AccessKeyMetadata[0].AccessKeyId" --out text | xargs aws iam delete-access-key --user-name $(PROJECT)-ci-user --access-key-id
-	aws iam delete-user --user-name $(PROJECT)-ci-user
 	aws iam list-role-policies --role-name $(PROJECT)-eks-cluster-creator --query "PolicyNames"   | jq -r ".[]" | xargs -n1 aws iam delete-role-policy --role-name $(PROJECT)-eks-cluster-creator --policy-name
 	aws iam list-attached-role-policies --role-name $(PROJECT)-eks-cluster-creator --query "AttachedPolicies[].PolicyArn" | jq -r ".[]" | xargs -n1 aws iam detach-role-policy --role-name $(PROJECT)-eks-cluster-creator --policy-arn
 	aws iam delete-role --role-name $(PROJECT)-eks-cluster-creator

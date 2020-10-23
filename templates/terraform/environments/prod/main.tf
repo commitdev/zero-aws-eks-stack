@@ -21,6 +21,7 @@ locals {
   region      = "<% index .Params `region` %>"
   account_id  = "<% index .Params `accountId` %>"
   domain_name = "<% index .Params `productionHostRoot` %>"
+  random_seed = "<% index .Params `randomSeed` %>"
 }
 
 provider "aws" {
@@ -49,7 +50,7 @@ module "prod" {
   project             = local.project
   region              = local.region
   allowed_account_ids = [local.account_id]
-  random_seed         = "<% index .Params `randomSeed` %>"
+  random_seed         = local.random_seed
 
   # ECR configuration
   ecr_repositories = [] # Should be created by the staging environment
@@ -119,8 +120,14 @@ module "prod" {
       name         = "operator"
       aws_policy   = data.aws_iam_policy_document.operator_access.json
       k8s_policies = local.k8s_operator_access
+    },
+    {
+      name         = "deployer"
+      aws_policy   = data.aws_iam_policy_document.deployer_access.json
+      k8s_policies = local.k8s_deployer_access
     }
   ]
 
   user_role_mapping = data.terraform_remote_state.shared.outputs.user_role_mapping
+  ci_user_name      = data.terraform_remote_state.shared.outputs.ci_user_name
 }

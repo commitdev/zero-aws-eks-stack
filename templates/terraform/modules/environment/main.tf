@@ -2,25 +2,29 @@
 
 locals {
   kubernetes_cluster_name = "${var.project}-${var.environment}-${var.region}"
-}
 
-data "aws_iam_user" "ci_user" {
-  user_name = "${var.project}-ci-user" # Should have been created in the bootstrap process
-}
-
-locals {
-  role_name_list = var.roles.*.name
   users = [
     for u in var.user_role_mapping : {
       name = u.name
       roles = [
         for r in u.roles :
-        r.name if contains(local.role_name_list, r.name) && contains(r.environments, var.environment)
+        r.name if contains(var.roles.*.name, r.name) && contains(r.environments, var.environment)
       ]
+    }
+  ]
+
+  kubernetes_iam_role_mapping = [
+    for r in module.user_access.eks_iam_role_mapping : {
+      iam_role_arn  = r.arn
+      k8s_role_name = r.name
+      k8s_groups    = [ r.name ]
     }
   ]
 }
 
+data "aws_iam_user" "ci_user" {
+  user_name = var.ci_user_name
+}
 
 module "vpc" {
   source  = "commitdev/zero/aws//modules/vpc"
@@ -40,7 +44,7 @@ data "aws_caller_identity" "current" {}
 # Provision the EKS cluster
 module "eks" {
   source  = "commitdev/zero/aws//modules/eks"
-  version = "0.1.2"
+  version = "0.1.12"
   providers = {
     aws = aws.for_eks
   }
@@ -60,7 +64,7 @@ module "eks" {
   worker_asg_max_size  = var.eks_worker_asg_max_size
   worker_ami           = var.eks_worker_ami # EKS-Optimized AMI for your region: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
 
-  iam_role_mapping = module.user_access.eks_iam_role_mapping
+  iam_role_mapping = local.kubernetes_iam_role_mapping
 }
 
 
@@ -104,7 +108,7 @@ module "s3_hosting" {
 
 module "db" {
   source  = "commitdev/zero/aws//modules/database"
-  version = "0.1.2"
+  version = "0.1.12"
 
   project                   = var.project
   environment               = var.environment
@@ -154,11 +158,23 @@ module "sendgrid" {
 
 module "user_access" {
   source  = "commitdev/zero/aws//modules/user_access"
-  version = "0.1.8"
+  version = "0.1.12"
 
   project     = var.project
   environment = var.environment
 
   roles = var.roles
   users = local.users
+}
+
+
+output "s3_hosting" {
+  description = "used by access policy for s3 hosting bucket"
+  value = [
+    for p in module.s3_hosting : {
+      cloudfront_distribution_id = p.cloudfront_distribution_id
+      bucket_arn                 = p.bucket_arn
+      cf_signing_enabled         = p.cf_signing_enabled
+    }
+  ]
 }

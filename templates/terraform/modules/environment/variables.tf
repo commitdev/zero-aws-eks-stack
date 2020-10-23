@@ -163,3 +163,8 @@ variable "user_role_mapping" {
   }))
   description = "User-Roles mapping with environment"
 }
+
+variable "ci_user_name" {
+  type        = string
+  description = "CI user name" 
+}
