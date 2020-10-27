@@ -113,12 +113,14 @@ module "secret_keys" {
   source  = "commitdev/zero/aws//modules/secret"
   version = "0.0.2"
 
-  for_each = aws_iam_access_key.access_user
+  for_each = { for u in local.users : u.name => u.roles if u.create_access_keys}
 
-  name   = "${each.value.user}-aws-keys${local.random_seed}"
+  name   = "${each.key}-aws-keys${local.random_seed}"
   type   = "map"
-  values = map("access_key_id", each.value.id, "secret_key", each.value.secret)
+  values = map("access_key_id", aws_iam_access_key.access_user[each.key].id, "secret_key", aws_iam_access_key.access_user[each.key].secret)
   tags   = map("project", local.project)
+
+  depends_on = [ aws_iam_access_key.access_user ]
 }
 
 # Enable AWS CloudTrail to help you audit governance, compliance, and operational risk of your AWS account, with logs stored in S3 bucket.
