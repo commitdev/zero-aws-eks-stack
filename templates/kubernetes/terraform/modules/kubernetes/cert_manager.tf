@@ -25,7 +25,7 @@ data "local_file" "cert_manager" {
 # Install the cert manager Custom Resource Definitions (this can't be done via helm/terraform)
 resource "null_resource" "cert_manager" {
   triggers = {
-    manifest_sha1 = "${sha1("${data.local_file.cert_manager.content}")}"
+    manifest_sha1 = sha1(data.local_file.cert_manager.content)
   }
   # local exec call requires kubeconfig to be updated
   provisioner "local-exec" {
@@ -37,7 +37,7 @@ resource "null_resource" "cert_manager" {
 
 # Cert-manager issuer manifest
 data "template_file" "cert_manager_issuer" {
-  template = "${file("${path.module}/files/cert_manager_issuer.yaml.tpl")}"
+  template = file("${path.module}/files/cert_manager_issuer.yaml.tpl")
   vars = {
     name                    = local.cluster_issuer_name
     environment             = var.environment
@@ -52,7 +52,7 @@ data "template_file" "cert_manager_issuer" {
 # does not have support for custom resources.
 resource "null_resource" "cert_manager_issuer" {
   triggers = {
-    manifest_sha1 = "${sha1("${data.template_file.cert_manager_issuer.rendered}")}"
+    manifest_sha1 = sha1(data.template_file.cert_manager_issuer.rendered)
   }
   # local exec call requires kubeconfig to be updated
   provisioner "local-exec" {
