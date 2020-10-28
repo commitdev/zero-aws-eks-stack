@@ -13,7 +13,7 @@ data "aws_db_instance" "main" {
   db_instance_identifier = "${var.project}-${var.environment}"
 }
 data "aws_secretsmanager_secret" "rds_master" {
-  name = "${var.project}-${var.environment}-rds-E4979217"
+  name = "${var.project}-${var.environment}-rds-${var.random_seed}"
 }
 data "aws_secretsmanager_secret_version" "rds_master" {
   secret_id = data.aws_secretsmanager_secret.rds_master.id
