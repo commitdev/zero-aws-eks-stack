@@ -8,7 +8,10 @@ module "fileupload" {
   namespace = kubernetes_namespace.app_namespace.metadata[0].name
 }
 
-# Create dabatase application user
+
+# Create a database user for the backend application to use. The user/password will be stored as a kubernetes secret which the application can load at run time.
+
+## collect master user/secret
 data "aws_db_instance" "main" {
   db_instance_identifier = "${var.project}-${var.environment}"
 }
@@ -19,23 +22,23 @@ data "aws_secretsmanager_secret_version" "rds_master" {
   secret_id = data.aws_secretsmanager_secret.rds_master.id
 }
 
-## generate new random app password if password version changed
+## generate new random app password if username or password version changed
+locals {
+  db_app_user     = var.project
+  db_app_password = random_password.db_app_user.result
+}
 resource "random_password" "db_app_user" {
   length = 16
   special = true
   override_special = "_%@"
 
   keepers = {
-    version = var.db_app_password_version
+    user     = local.db_app_user
+    password = var.db_app_password_version
   }
 }
 
-locals {
-  db_app_user     = data.aws_db_instance.main.db_name
-  db_app_password = random_password.db_app_user.result
-}
-
-## create db user
+## create default RDS user for application
 module "db_app_user" {
 <% if eq (index .Params `database`) "mysql" %>
   source = "./db_user/mysql"
@@ -54,6 +57,7 @@ module "db_app_user" {
   db_app_password    = local.db_app_password
 }
 
+## store user/pass into kubernetes secret for application to load at runtime
 resource "kubernetes_secret" "db_app_user" {
   metadata {
     name      = var.project

@@ -24,9 +24,9 @@ resource "kubernetes_secret" "db_create_users" {
 
   data = {
     "create-user.sql" = <<-EOF
-      DROP USER IF EXISTS ${var.db_app_user};
-      CREATE USER ${var.db_app_user} IDENTIFIED BY "${var.db_app_password}";
-      GRANT ALL PRIVILEGES ON ${var.db_name}.* TO ${var.db_app_user};
+      DROP USER IF EXISTS "${var.db_app_user}";
+      CREATE USER "${var.db_app_user}" IDENTIFIED BY "${var.db_app_password}";
+      GRANT ALL PRIVILEGES ON ${var.db_name}.* TO "${var.db_app_user}";
 EOF
     "RDS_MASTER_PASSWORD" = var.db_master_password
   }
