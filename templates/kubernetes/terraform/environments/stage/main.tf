@@ -65,6 +65,9 @@ module "kubernetes" {
     # Add additional mappings here
   ]
 
+  # Version of default database user password for application to access database - change the version if you want to renew the password
+  db_app_password_version = "v1.0"
+
 
   # Wireguard configuration
   vpn_server_address = "10.10.199.0/24"

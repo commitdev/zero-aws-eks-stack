@@ -93,3 +93,9 @@ variable "internal_domain" {
   type        = string
   default     = ""
 }
+
+variable "db_app_password_version" {
+  description = "Version of DB application user password to trigger password renew"
+  type        = string
+  default     = "v1.0"
+}

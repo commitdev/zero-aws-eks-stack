@@ -8,7 +8,7 @@ module "fileupload" {
   namespace = kubernetes_namespace.app_namespace.metadata[0].name
 }
 
-# Handle default application user
+# Create dabatase application user
 data "aws_db_instance" "main" {
   db_instance_identifier = "${var.project}-${var.environment}"
 }
@@ -19,36 +19,40 @@ data "aws_secretsmanager_secret_version" "rds_master" {
   secret_id = data.aws_secretsmanager_secret.rds_master.id
 }
 
-locals {
-  db_params = {
-    db_endpoint        = data.aws_db_instance.main.endpoint
-    db_host            = data.aws_db_instance.main.address
-    db_master_user     = data.aws_db_instance.main.master_username
-    db_master_password = data.aws_secretsmanager_secret_version.rds_master.secret_string
-    db_name            = data.aws_db_instance.main.db_name
+## generate new random app password if password version changed
+resource "random_password" "db_app_user" {
+  length = 16
+  special = true
+  override_special = "_%@"
 
-    db_app_user     = data.aws_db_instance.main.db_name
-    #db_app_password = var.db_app_password
-    db_app_password = "YjN2dW5zWXRSNjVBx"
+  keepers = {
+    version = var.db_app_password_version
   }
 }
 
-## Create user
-<% if eq (index .Params `database`) "mysql" %>{
-module "mysql_db" {
-  source = "./mysql"
-
-  db_params = local.db_params
+locals {
+  db_app_user     = data.aws_db_instance.main.db_name
+  db_app_password = random_password.db_app_user.result
 }
-}<% end %>
 
-<% if eq (index .Params `database`) "postgres" %>{
-module "postgresql_db" {
-  source = "./postgresql"
+## create db user
+module "db_app_user" {
+<% if eq (index .Params `database`) "mysql" %>
+  source = "./db_user/mysql"
+<% end %>
+<% if eq (index .Params `database`) "postgres" %>
+  source = "./db_user/postgresql"
+<% end %>
 
-  db_params = local.db_params
+  namespace          = var.project
+  db_endpoint        = data.aws_db_instance.main.endpoint
+  db_host            = data.aws_db_instance.main.address
+  db_master_user     = data.aws_db_instance.main.master_username
+  db_master_password = data.aws_secretsmanager_secret_version.rds_master.secret_string
+  db_name            = data.aws_db_instance.main.db_name
+  db_app_user        = local.db_app_user
+  db_app_password    = local.db_app_password
 }
-}<% end %>
 
 resource "kubernetes_secret" "db_app_user" {
   metadata {
@@ -57,8 +61,8 @@ resource "kubernetes_secret" "db_app_user" {
   }
 
   data = {
-    DATABASE_USERNAME = local.db_params.db_app_user
-    DATABASE_PASSWORD = local.db_params.db_app_password
+    DATABASE_USERNAME = local.db_app_user
+    DATABASE_PASSWORD = local.db_app_password
   }
 
   type = "Opaque"
