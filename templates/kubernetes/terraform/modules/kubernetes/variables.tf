@@ -95,7 +95,7 @@ variable "internal_domain" {
 }
 
 variable "db_app_password_version" {
-  description = "Version of DB application user password to trigger password renew"
+  description = "Version of DB application user password. Note: if it changes, it will fully recreate the user with newly auto-generated password, and that any changes made to the user will be lost."
   type        = string
   default     = "v1.0"
 }
