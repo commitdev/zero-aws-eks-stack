@@ -47,7 +47,8 @@ module "db_app_user" {
   source = "./db_user/postgresql"
 <% end %>
 
-  namespace          = var.project
+  namespace = kubernetes_namespace.app_namespace.metadata[0].name
+
   db_endpoint        = data.aws_db_instance.main.endpoint
   db_host            = data.aws_db_instance.main.address
   db_master_user     = data.aws_db_instance.main.master_username
