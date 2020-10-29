@@ -90,6 +90,16 @@ $ curl --request POST \
 ```
 For Application use, see [Sendgrid resources][sendgrid-send-mail] on how to setup templates to send dynamic transactional emails. To setup emailing from your application deployment, you should create a kubernetes secret with your Sendgrid API Key(already stored in [AWS secret-manager](./terraform/bootstrap/secrets/main.tf)) in your application's namespace. Then mount the secret as an environment variable in your deployment.
 
+#### Application Database user creation
+Using environment variables injected from Zero, it will fetch the RDS master password from AWS secret manager
+- creates a namespace
+- creates a job with a SQL query file mounted generating an application user
+- creating a secret in the application namespace in your EKS cluster
+- removing the RDS master password for security reasons
+
+_Note: the user creation only happens once during `zero apply`, for details see the `make create-db-user` command. If you want to renew the user/password, you can run the script `sh dp-ops/create-db-user.sh` manually.
+
+
 # Resources
 ###  Infrastructure
 This [architecture-diagram][architecture-diagram] displays the original setup you get from the terraform templates
