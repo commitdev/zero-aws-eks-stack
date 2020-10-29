@@ -29,10 +29,10 @@ variable "db_name" {
 
 variable "db_app_user" {
   type        = string
-  description = "database appliaction user name"
+  description = "database application user name"
 }
 
 variable "db_app_password" {
   type        = string
-  description = "database appliaction user password"
+  description = "database application user password"
 }

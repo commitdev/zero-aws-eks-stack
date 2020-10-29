@@ -61,7 +61,7 @@ module "db_app_user" {
 resource "kubernetes_secret" "db_app_user" {
   metadata {
     name      = var.project
-    namespace = var.project
+    namespace = kubernetes_namespace.app_namespace.metadata[0].name
   }
 
   data = {
