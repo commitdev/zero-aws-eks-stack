@@ -1,9 +1,7 @@
 SHELL := /bin/bash
 
-run: create-db-user
+run:
 	cd $(PROJECT_DIR) && AUTO_APPROVE="-auto-approve" make
-
-create-db-user:
 	kubectl -n ${PROJECT_NAME} get secrets ${PROJECT_NAME} > /dev/null 2>&1 || ( \
 	export REGION=${region}; \
 	export SEED=${randomSeed}; \
