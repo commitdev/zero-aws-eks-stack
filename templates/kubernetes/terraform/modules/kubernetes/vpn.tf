@@ -82,7 +82,7 @@ resource "kubernetes_config_map" "vpn_configmap" {
   }
 
   data = {
-    "wg0.conf"      = "${data.template_file.vpn_server_conf.rendered}"
+    "wg0.conf"      = data.template_file.vpn_server_conf.rendered
   }
 }
 
