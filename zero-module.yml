@@ -94,3 +94,9 @@ parameters:
     options:
       - "yes"
       - "no"
+  - field: userAuth
+    label: Enable user management using Kratos and authentication using the Oathkeeper access proxy?
+    default: yes
+    options:
+      - "yes"
+      - "no"
