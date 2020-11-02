@@ -1,0 +1,6 @@
+SPDXVersion: SPDX-2.1
+DataLicense: CC0-1.0
+PackageName: zero-aws-eks-stack
+PackageOriginator: Commit
+PackageHomePage: https://github.com/commitdev/zero-aws-eks-stack/
+PackageLicenseDeclared: Apache-2.0
