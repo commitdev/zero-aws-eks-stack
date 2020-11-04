@@ -91,9 +91,9 @@ $ curl --request POST \
 For Application use, see [Sendgrid resources][sendgrid-send-mail] on how to setup templates to send dynamic transactional emails. To setup emailing from your application deployment, you should create a kubernetes secret with your Sendgrid API Key(already stored in [AWS secret-manager](./terraform/bootstrap/secrets/main.tf)) in your application's namespace. Then mount the secret as an environment variable in your deployment.
 
 #### Application database user creation
-A database user will automatically be created for a backend application with a random password, and the credentials will be stored in a kubernetes secret so they are available to the application.
+A database user will automatically be created for a backend application with a random password, and the credentials will be stored in a kubernetes secret in the application namespace so they are available to the application.
 
-_Note: the user creation only happens once during `zero apply`. If you want to run this process again to create a new password, you can run the script `sh dp-ops/create-db-user.sh` manually, though be aware that this will cause the user and its privileges to be removed and recreated, and may disrupt your application until it is restarted.
+_Note: the user creation only happens once during `zero apply`. The creation happens in the script `zero-aws-eks-stack/dp-ops/create-db-user.sh`. This script should most likely not be run again as it could remove any subsequent changes to the db user or kubernetes secret._
 
 
 # Resources

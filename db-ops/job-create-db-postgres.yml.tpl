@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: db-ops
+
 ---
 apiVersion: v1
 kind: Secret
@@ -9,33 +10,26 @@ metadata:
   name: db-create-users
   namespace: db-ops
 type: Opaque
-stringData: 
+stringData:
+  RDS_MASTER_PASSWORD: $MASTER_RDS_PASSWORD
   create-user.sql: |
-    REVOKE ALL PRIVILEGES ON DATABASE $DB_NAME FROM $DB_APP_USERNAME;
-    DROP USER $DB_APP_USERNAME;
+    SELECT 'CREATE DATABASE $DB_NAME' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$DB_NAME');\gexec
+    SELECT 'REVOKE ALL PRIVILEGES ON DATABASE $DB_NAME FROM $DB_APP_USERNAME;' WHERE EXISTS (SELECT FROM pg_roles WHERE rolname = '$DB_APP_USERNAME');\gexec
+    SELECT 'DROP USER $DB_APP_USERNAME;' WHERE EXISTS (SELECT FROM pg_user WHERE usename = '$DB_APP_USERNAME');\gexec
     CREATE USER $DB_APP_USERNAME WITH ENCRYPTED PASSWORD '$DB_APP_PASSWORD';
     GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_APP_USERNAME;
-  RDS_MASTER_PASSWORD: $MASTER_RDS_PASSWORD
+
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: $PROJECT_NAME
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: $PROJECT_NAME
-  namespace: $PROJECT_NAME
-type: Opaque
-stringData: 
-  DATABASE_USERNAME: $DB_APP_USERNAME
-  DATABASE_PASSWORD: $DB_APP_PASSWORD
+  name: $NAMESPACE
+
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: db-create-users-$JOB_ID
+  name: db-create-users-$NAMESPACE-$JOB_ID
   namespace: db-ops
 spec:
   template:
@@ -43,11 +37,11 @@ spec:
       containers:
       - name: create-rds-user
         image: $DOCKER_IMAGE_TAG
-        command: 
+        command:
         - sh
-        args: 
-        - '-c' 
-        - psql -U$MASTER_RDS_USERNAME -h $DB_ENDPOINT $DB_NAME -a -f/db-ops/create-user.sql > /dev/null
+        args:
+        - '-c'
+        - psql -U$MASTER_RDS_USERNAME -h $DB_ENDPOINT postgres -v ON_ERROR_STOP=1 -a -f/db-ops/create-user.sql > /dev/null
         env:
         - name: PGPASSWORD
           valueFrom:
@@ -64,6 +58,7 @@ spec:
             secretName: db-create-users
       restartPolicy: Never
   backoffLimit: 1
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -85,7 +80,7 @@ spec:
       containers:
       - command:
         - sh
-        args: 
+        args:
         - "-c"
         # long running task so the pod doesn't exit with 0
         - tail -f /dev/null

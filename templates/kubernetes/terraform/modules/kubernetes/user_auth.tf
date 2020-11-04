@@ -73,12 +73,18 @@ resource "helm_release" "kratos" {
     file("${path.module}/files/kratos-values.yml")
   ]
 
+  # This secret contains db credentials created during the initial zero apply stage
   set {
-    name = "kratos.config.dsn"
-    # SQLite can be used for testing but there is no persistent storage set up for it
-    value = "sqlite:///var/lib/sqlite/db.sqlite?_fk=true&mode=rwc"
-    # value = "${local.db_type}://${kubernetes_service.app_db.metadata[0].name}.${kubernetes_service.app_db.metadata[0].namespace}"
+    name  = "secret.nameOverride"
+    value = var.project
   }
+
+  # set {
+  #   name = "kratos.config.dsn"
+  #   # SQLite can be used for testing but there is no persistent storage set up for it
+  #   value = "sqlite:///var/lib/sqlite/db.sqlite?_fk=true&mode=rwc"
+  #   # value = "${local.db_type}://${kubernetes_service.app_db.metadata[0].name}.${kubernetes_service.app_db.metadata[0].namespace}"
+  # }
 
   set {
     name  = "kratos.config.serve.public.base_url"

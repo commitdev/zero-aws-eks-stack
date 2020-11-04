@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: db-ops
+
 ---
 apiVersion: v1
 kind: Secret
@@ -9,32 +10,25 @@ metadata:
   name: db-create-users
   namespace: db-ops
 type: Opaque
-stringData: 
+stringData:
+  RDS_MASTER_PASSWORD: $MASTER_RDS_PASSWORD
   create-user.sql: |
-    DROP USER '$DB_APP_USERNAME';
+    CREATE DATABASE IF NOT EXISTS $DB_NAME;
+    DROP USER IF EXISTS '$DB_APP_USERNAME';
     CREATE USER '$DB_APP_USERNAME' IDENTIFIED BY '$DB_APP_PASSWORD';
     GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_APP_USERNAME';
-  RDS_MASTER_PASSWORD: $MASTER_RDS_PASSWORD
+
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: $PROJECT_NAME
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: $PROJECT_NAME
-  namespace: $PROJECT_NAME
-type: Opaque
-stringData: 
-  DATABASE_USERNAME: $DB_APP_USERNAME
-  DATABASE_PASSWORD: $DB_APP_PASSWORD
+  name: $NAMESPACE
+
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: db-create-users-$JOB_ID
+  name: db-create-users-$NAMESPACE-$JOB_ID
   namespace: db-ops
 spec:
   template:
@@ -42,11 +36,11 @@ spec:
       containers:
       - name: create-rds-user
         image: $DOCKER_IMAGE_TAG
-        command: 
+        command:
         - sh
-        args: 
-        - '-c' 
-        - mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT $DB_NAME < /db-ops/create-user.sql
+        args:
+        - '-c'
+        - mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT mysql < /db-ops/create-user.sql
         env:
         - name: DB_ENDPOINT
           value: $DB_ENDPOINT
@@ -67,6 +61,7 @@ spec:
             secretName: db-create-users
       restartPolicy: Never
   backoffLimit: 1
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -88,7 +83,7 @@ spec:
       containers:
       - command:
         - sh
-        args: 
+        args:
         - "-c"
         # long running task so the pod doesn't exit with 0
         - tail -f /dev/null

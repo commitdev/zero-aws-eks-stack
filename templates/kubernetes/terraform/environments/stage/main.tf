@@ -75,5 +75,5 @@ module "kubernetes" {
 
   auth_enabled           = <% if eq (index .Params `userAuth`) "yes" %>true<% else %>false<% end %>
   auth_domain            = "auth.${local.domain_name}"
-  backend_service_domain = "<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}"
+  backend_service_domain = "<% index .Params `stagingBackendSubdomain` %>${local.domain_name}"
 }
