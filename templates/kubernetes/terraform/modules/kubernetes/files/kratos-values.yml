@@ -50,6 +50,9 @@ kratos:
                     "password": {
                       "identifier": true
                     }
+                  },
+                  "recovery": {
+                    "via": "email"
                   }
                 }
               }
@@ -75,10 +78,14 @@ kratos:
         key_length: 16
 
     identity:
+      # This is populated by kratos.identitySchemas above
       default_schema_url: file:///etc/config/identity.default.schema.json
 
     selfservice:
       methods:
+        # TODO: Look in to error when this is enabled
+        # link:
+          # enabled: true
         password:
           enabled: true
         oidc: # TODO: allow methods to be configured with parameters
@@ -96,65 +103,61 @@ kratos:
             #     scope:
             #       - user:email
 
-      default_browser_return_url: /dashboard
+      default_browser_return_url: / # Overridden by user_auth.tf
+      whitelisted_return_urls:
+        - / # Overridden by user_auth.tf
 
       flows:
         settings:
-          ui_url: /settings
+          ui_url: /auth/settings # Overridden by user_auth.tf
           lifespan: 1m
           privileged_session_max_age: 5m
 
           after:
-            default_browser_return_url: /dashboard
+            default_browser_return_url: /dashboard # Overridden by user_auth.tf
 
         verification:
           enabled: true
-          ui_url: /auth/verify
+          ui_url: /auth/verify # Overridden by user_auth.tf
           lifespan: 5m
           after:
-            default_browser_return_url: /dashboard
+            default_browser_return_url: /dashboard # Overridden by user_auth.tf
+
+        recovery:
+          enabled: true
+          ui_url: /auth/recovery # Overridden by user_auth.tf
+          lifespan: 1h
 
         logout:
           after:
-            default_browser_return_url: /
+            default_browser_return_url: / # Overridden by user_auth.tf
 
         login:
-          ui_url: /auth/login
+          ui_url: /auth/login # Overridden by user_auth.tf
           lifespan: 1h
 
           after:
-            default_browser_return_url: /dashboard
-
-            password:
-              default_browser_return_url: /dashboard
-              hooks:
-                - hook: revoke_active_sessions
-
-            oidc:
-              default_browser_return_url: /dashboard
-              hooks:
-                - hook: revoke_active_sessions
+            default_browser_return_url: /dashboard # Overridden by user_auth.tf
 
         registration:
           ui_url: /auth/registration
           lifespan: 5m
 
           after:
-            default_browser_return_url: /dashboard
+            default_browser_return_url: /dashboard # Overridden by user_auth.tf
 
             password:
-              default_browser_return_url: /dashboard
+              default_browser_return_url: /dashboard # Overridden by user_auth.tf
 
               hooks:
                 - hook: session
 
             oidc:
-              default_browser_return_url: /dashboard
+              default_browser_return_url: /dashboard # Overridden by user_auth.tf
 
               hooks:
                 - hook: session
 
         error:
-          ui_url: /self-service/errors
-          # ui_url: https://kratos.commitzero.com/self-service/errors
+          ui_url: /auth/errors # Overridden by user_auth.tf
 

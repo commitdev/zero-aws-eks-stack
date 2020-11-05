@@ -18,11 +18,10 @@ image:
   pullPolicy: IfNotPresent
 
 # Options for the sidecar
-# TODO: change image after merge
 sidecar:
   image:
     repository: oryd/oathkeeper-maester
-    tag: v0.0.10
+    # tag: v0.0.10
   envs: {}
 
 
@@ -69,6 +68,7 @@ ingress:
         kubernetes.io/ingress.class: nginx
         # nginx.ingress.kubernetes.io/rewrite-target: /$1
         cert-manager.io/cluster-issuer: clusterissuer-letsencrypt-production
+        nginx.ingress.kubernetes.io/enable-cors: "true"
     hosts: # Filled by user_auth.tf
       - paths: ["/"]
     tls: # Filled by user_auth.tf
@@ -78,7 +78,6 @@ ingress:
     # En-/Disable the api ingress.
     enabled: false
 
-    # TODO: Remove entirely?
     # annotations:
     #     kubernetes.io/ingress.class: nginx
     #     # nginx.ingress.kubernetes.io/rewrite-target: /$1
@@ -113,12 +112,6 @@ oathkeeper:
         enabled: true
         config:
           subject: guest
-      # TODO: Do we care about this? Probably won't use hydra
-      # oauth2_client_credentials:
-        # Set enabled to true if the authenticator should be enabled and false to disable the authenticator. Defaults to false.
-        # enabled: true
-        # config:
-          # token_url: https://hydra.commitzero.com/oauth2/token
       cookie_session:
         # Set enabled to true if the authenticator should be enabled and false to disable the authenticator. Defaults to false.
         enabled: true

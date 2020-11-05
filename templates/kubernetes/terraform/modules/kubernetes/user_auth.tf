@@ -24,7 +24,7 @@ resource "helm_release" "oathkeeper" {
   namespace  = kubernetes_namespace.user_auth[0].metadata[0].name
 
   values = [
-    file("${path.module}/files/oathkeeper-values.yml")
+    file("${path.module}/files/oathkeeper-values.yml"),
   ]
 
   set {
@@ -55,6 +55,11 @@ resource "helm_release" "oathkeeper" {
   }
 
   set {
+    name  = "ingress.proxy.annotations.nginx\\.ingress\\.kubernetes\\.io/cors-allow-origin"
+    value = "https://${var.backend_service_domain}"
+  }
+
+  set {
     name  = "ingress.proxy.tls[0].hosts[0]"
     value = var.backend_service_domain
   }
@@ -70,10 +75,10 @@ resource "helm_release" "kratos" {
   namespace  = kubernetes_namespace.user_auth[0].metadata[0].name
 
   values = [
-    file("${path.module}/files/kratos-values.yml")
+    file("${path.module}/files/kratos-values.yml"),
   ]
 
-  # This secret contains db credentials created during the initial zero apply stage
+  # This secret contains db credentials created during the initial zero apply command
   set {
     name  = "secret.nameOverride"
     value = var.project
@@ -115,4 +120,97 @@ resource "helm_release" "kratos" {
     name  = "ingress.admin.tls[0].hosts[0]"
     value = "admin.${var.auth_domain}"
   }
+
+  # Return urls
+  set {
+    name  = "kratos.config.selfservice.default_browser_return_url"
+    value = "https://${var.backend_service_domain}/"
+  }
+
+  set {
+    name  = "kratos.config.selfservice.whitelisted_return_urls[0]"
+    value = "https://${var.backend_service_domain}/"
+  }
+
+  set {
+    name  = "kratos.config.selfservice.flows.settings.ui_url"
+    value = "https://${var.backend_service_domain}/auth/settings"
+  }
+
+  set {
+    name  = "kratos.config.selfservice.flows.settings.after.default_browser_return_url"
+    value = "https://${var.backend_service_domain}/dashboard"
+  }
+
+  set {
+    name  = "kratos.config.selfservice.flows.verification.ui_url"
+    value = "https://${var.backend_service_domain}/auth/verify"
+  }
+
+  set {
+    name  = "kratos.config.selfservice.flows.verification.after.default_browser_return_url"
+    value = "https://${var.backend_service_domain}/dashboard"
+  }
+
+  set {
+    name  = "kratos.config.selfservice.flows.recovery.ui_url"
+    value = "https://${var.backend_service_domain}/auth/recovery"
+  }
+
+  set {
+    name  = "kratos.config.selfservice.flows.logout.after.default_browser_return_url"
+    value = "https://${var.backend_service_domain}/"
+  }
+
+  set {
+    name  = "kratos.config.selfservice.flows.login.ui_url"
+    value = "https://${var.backend_service_domain}/auth/login"
+  }
+
+  set {
+    name  = "kratos.config.selfservice.flows.login.after.default_browser_return_url"
+    value = "https://${var.backend_service_domain}/dashboard"
+  }
+
+  set {
+    name  = "kratos.config.selfservice.flows.registration.ui_url"
+    value = "https://${var.backend_service_domain}/auth/registration"
+  }
+
+  set {
+    name  = "kratos.config.selfservice.flows.registration.after.default_browser_return_url"
+    value = "https://${var.backend_service_domain}/dashboard"
+  }
+
+  set {
+    name  = "kratos.config.selfservice.flows.registration.after.password.default_browser_return_url"
+    value = "https://${var.backend_service_domain}/dashboard"
+  }
+
+  set {
+    name  = "kratos.config.selfservice.flows.registration.after.oidc.default_browser_return_url"
+    value = "https://${var.backend_service_domain}/dashboard"
+  }
+
+  set {
+    name  = "kratos.config.selfservice.flows.error.ui_url"
+    value = "https://${var.backend_service_domain}/auth/errors"
+  }
+
+  set {
+    name  = "kratos.config.selfservice.flows."
+    value = "https://${var.backend_service_domain}/"
+  }
+
+  set {
+    name  = "kratos.config.selfservice.flows."
+    value = "https://${var.backend_service_domain}/"
+  }
+
+  set {
+    name  = "kratos.config.selfservice.flows."
+    value = "https://${var.backend_service_domain}/"
+  }
+
+
 }
