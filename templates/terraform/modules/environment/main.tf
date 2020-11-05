@@ -3,7 +3,7 @@
 locals {
   kubernetes_cluster_name = "${var.project}-${var.environment}-${var.region}"
 
-  users = [
+  user_access_users = [
     for u in var.user_role_mapping : {
       name = u.name
       roles = [
@@ -12,12 +12,22 @@ locals {
       ]
     }
   ]
+ 
+  user_access_roles = [
+    for r in var.roles : {
+      name         = r.name
+      aws_policy   = r.aws_policy
+      k8s_policies = r.k8s_policies
+    }
+  ]
 
-  kubernetes_iam_role_mapping = [
+  eks_kubernetes_iam_role_mapping = [
     for r in module.user_access.eks_iam_role_mapping : {
       iam_role_arn  = r.arn
       k8s_role_name = r.name
-      k8s_groups    = [ r.name ]
+      k8s_groups    = flatten(concat([r.name], [
+        for o in var.roles : o.k8s_groups if r.name == "${var.project}-kubernetes-${o.name}-${var.environment}"
+      ]))
     }
   ]
 }
@@ -64,7 +74,7 @@ module "eks" {
   worker_asg_max_size  = var.eks_worker_asg_max_size
   worker_ami           = var.eks_worker_ami # EKS-Optimized AMI for your region: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
 
-  iam_role_mapping = local.kubernetes_iam_role_mapping
+  iam_role_mapping = local.eks_kubernetes_iam_role_mapping
 }
 
 
@@ -163,8 +173,8 @@ module "user_access" {
   project     = var.project
   environment = var.environment
 
-  roles = var.roles
-  users = local.users
+  roles = local.user_access_roles
+  users = local.user_access_users
 }
 
 
