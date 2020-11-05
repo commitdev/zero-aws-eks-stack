@@ -84,12 +84,36 @@ variable "vpn_client_publickeys" {
 }
 
 variable "cf_signing_enabled" {
-  type = bool
+  type        = bool
   description = "Enable CloudFront signed URLs"
 }
 
 variable "internal_domain" {
   description = "Internal domain to create records in"
+  type        = string
+  default     = ""
+}
+
+variable "auth_enabled" {
+  description = "Domain to use for authentication"
+  type        = string
+  default     = ""
+}
+
+variable "auth_domain" {
+  description = "Domain to use for authentication"
+  type        = string
+  default     = ""
+}
+
+variable "backend_service_domain" {
+  description = "Domain of the backend service"
+  type        = string
+  default     = ""
+}
+
+variable "frontend_service_domain" {
+  description = "Domain of the frontend"
   type        = string
   default     = ""
 }

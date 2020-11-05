@@ -1,0 +1,180 @@
+# Mode for oathkeeper controller
+# Two possible modes are: controller or sidecar
+global:
+  ory:
+    oathkeeper:
+      maester:
+        mode: sidecar
+
+# Number of ORY Oathkeeper members
+replicaCount: 1
+
+image:
+  # ORY Oathkeeper image
+  repository: oryd/oathkeeper
+  # ORY Oathkeeper version
+  # tag: v0.38.2-beta.1
+  # Image pull policy
+  pullPolicy: IfNotPresent
+
+# Options for the sidecar
+sidecar:
+  image:
+    repository: oryd/oathkeeper-maester
+    # tag: v0.0.10
+  envs: {}
+
+
+# If enabled, a demo deployment with exemplary access rules
+# and JSON Web Key Secrets will be generated.
+demo: false
+
+# Configures the Kubernetes service
+service:
+  # Configures the Kubernetes service for the proxy port.
+  proxy:
+    # En-/disable the service
+    enabled: true
+    # The service type
+    type: ClusterIP
+    # The service port
+    port: 4455
+    # If you do want to specify annotations, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'annotations:'.
+    annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  # Configures the Kubernetes service for the api port.
+  api:
+    # En-/disable the service
+    enabled: true
+    # The service type
+    type: ClusterIP
+    # The service port
+    port: 4456
+    # If you do want to specify annotations, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'annotations:'.
+    annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+
+# Configure ingress
+ingress:
+  # Configure ingress for the proxy port.
+  proxy:
+    # En-/Disable the proxy ingress.
+    enabled: true
+    annotations:
+        kubernetes.io/ingress.class: nginx
+        # nginx.ingress.kubernetes.io/rewrite-target: /$1
+        cert-manager.io/cluster-issuer: clusterissuer-letsencrypt-production
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+    hosts: # Filled by user_auth.tf
+      - paths: ["/"]
+    tls: # Filled by user_auth.tf
+      - secretName: oathkeeper-proxy-tls-secret
+
+  api:
+    # En-/Disable the api ingress.
+    enabled: false
+
+    # annotations:
+    #     kubernetes.io/ingress.class: nginx
+    #     # nginx.ingress.kubernetes.io/rewrite-target: /$1
+    #     cert-manager.io/cluster-issuer: clusterissuer-letsencrypt-production
+    # hosts:
+    #   - host: oathkeeper-api.commitzero.com
+    #     paths: ["/"]
+    # tls:
+    #   - secretName: oathkeeper-api-tls-secret
+    #     hosts:
+    #       - oathkeeper-api.commitzero.com
+
+# Configure ORY Oathkeeper itself
+oathkeeper:
+  # The ORY Oathkeeper configuration. For a full list of available settings, check:
+  #   https://github.com/ory/oathkeeper/blob/master/docs/config.yaml
+  config:
+    # access_rules:
+    #   repositories:
+    #     - file:///etc/rules/access-rules.json
+    serve:
+      proxy:
+        port: 4455
+      api:
+        port: 4456
+    authenticators:
+      noop:
+        # Set enabled to true if the authenticator should be enabled and false to disable the authenticator. Defaults to false.
+        enabled: true
+      anonymous:
+        # Set enabled to true if the authenticator should be enabled and false to disable the authenticator. Defaults to false.
+        enabled: true
+        config:
+          subject: guest
+      cookie_session:
+        # Set enabled to true if the authenticator should be enabled and false to disable the authenticator. Defaults to false.
+        enabled: true
+
+        config:
+          check_session_url: http://kratos-public/sessions/whoami
+          preserve_path: true
+          extra_from: "@this"
+          subject_from: "identity.traits.email"
+    authorizers:
+      allow:
+        # Set enabled to true if the authenticator should be enabled and false to disable the authenticator. Defaults to false.
+        enabled: true
+    mutators:
+      noop:
+        enabled: true
+      id_token:
+        enabled: true
+        config:
+          # issuer_url: # Set by user_auth.tf
+          # jwks_url: # Set by user_auth.tf
+          ttl: 60s
+          # Can add extra metadata into the JWT
+          # This map will be merged into the payload
+          # claims:
+            # '{"session": {{ .Extra | toJson }}}'
+      header:
+        enabled: true
+        config:
+          headers:
+            # Extract the email and user id into headers to pass to backend services9
+            X-User-Email: '{{ print .Subject }}'
+            X-User-Id: '{{ print .Extra.identity.id }}'
+    errors:
+      fallback:
+        - redirect
+        - json
+
+      handlers:
+        # json:
+          # enabled: true
+        redirect:
+          enabled: true
+          config:
+            # to: # Set by user_auth.tf
+            when:
+              - error:
+                  - forbidden
+                  - unauthorized
+    # errors:
+    #   # `["json"]` is the default!
+    #   fallback:
+    #     - json
+
+    #   handlers:
+    #     json:
+    #       enabled: true # this is true by default
+    #       # config:
+    #       #   when: ...
+    #     redirect:
+    #       enabled: true # this is false by default
+    #       config:
+    #         to: http://mywebsite/login
+# Configures controller setup
+maester:
+  enabled: true

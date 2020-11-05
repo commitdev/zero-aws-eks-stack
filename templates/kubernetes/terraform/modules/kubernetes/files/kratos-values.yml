@@ -1,0 +1,163 @@
+image:
+  repository:  oryd/kratos
+  # tag: v0.4.6-alpha.1-sqlite
+  pullPolicy: IfNotPresent
+
+ingress:
+  public:
+    enabled: true
+    annotations:
+        kubernetes.io/ingress.class: nginx
+        # nginx.ingress.kubernetes.io/rewrite-target: /$1
+        cert-manager.io/cluster-issuer: clusterissuer-letsencrypt-production
+    hosts: # Filled by user_auth.tf
+      - paths: ["/"]
+    tls:
+      - secretName: kratos-public-tls-secret
+
+  admin:
+    enabled: true
+    annotations:
+        kubernetes.io/ingress.class: nginx
+        # nginx.ingress.kubernetes.io/rewrite-target: /$1
+        cert-manager.io/cluster-issuer: clusterissuer-letsencrypt-production
+    hosts: # Filled by user_auth.tf
+      - paths: ["/"]
+    tls:
+      - secretName: kratos-admin-tls-secret
+
+kratos:
+  development: false
+  autoMigrate: true
+
+#  You can add multiple identity schemas here
+  identitySchemas:
+    "identity.default.schema.json": |
+      {
+        "$id": "default",
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "Person",
+        "type": "object",
+        "properties": {
+          "traits": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "format": "email",
+                "ory.sh/kratos": {
+                  "credentials": {
+                    "password": {
+                      "identifier": true
+                    }
+                  },
+                  "recovery": {
+                    "via": "email"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+  config:
+    secrets:
+      default: ["test-insecure-session-id-here"]
+    courier:
+      smtp:
+        connection_uri: "http://mail-server" # TODO: Mail support
+
+
+    hashers:
+      argon2:
+        parallelism: 1
+        memory: 131072
+        iterations: 2
+        salt_length: 16
+        key_length: 16
+
+    identity:
+      # This is populated by kratos.identitySchemas above
+      default_schema_url: file:///etc/config/identity.default.schema.json
+
+    selfservice:
+      methods:
+        # TODO: Look in to error when this is enabled
+        # link:
+          # enabled: true
+        password:
+          enabled: true
+        oidc: # TODO: allow methods to be configured with parameters
+          enabled: true
+          # config:
+          # TODO: use SELFSERVICE_METHODS_OIDC_CONFIG_PROVIDERS to set via secrets
+          # [{"id":"github","provider":"github","client_id":"id","client_secret":"secret","mapper_url":"http://zombism.ca/github.data-mapper.jsonnet","scope":["user:email"]}]
+            # providers:
+            #   - id: github
+            #     provider: github
+            #     client_id: # TODO: load secret
+            #     client_secret: # TODO : load secret
+            #     # TODO: Change to static or deploy somewhere within infra
+            #     mapper_url: http://zombism.ca/github.data-mapper.jsonnet
+            #     scope:
+            #       - user:email
+
+      default_browser_return_url: / # Overridden by user_auth.tf
+      whitelisted_return_urls:
+        - / # Overridden by user_auth.tf
+
+      flows:
+        settings:
+          ui_url: /auth/settings # Overridden by user_auth.tf
+          lifespan: 1m
+          privileged_session_max_age: 5m
+
+          after:
+            default_browser_return_url: /dashboard # Overridden by user_auth.tf
+
+        verification:
+          enabled: true
+          ui_url: /auth/verify # Overridden by user_auth.tf
+          lifespan: 5m
+          after:
+            default_browser_return_url: /dashboard # Overridden by user_auth.tf
+
+        recovery:
+          enabled: true
+          ui_url: /auth/recovery # Overridden by user_auth.tf
+          lifespan: 1h
+
+        logout:
+          after:
+            default_browser_return_url: / # Overridden by user_auth.tf
+
+        login:
+          ui_url: /auth/login # Overridden by user_auth.tf
+          lifespan: 1h
+
+          after:
+            default_browser_return_url: /dashboard # Overridden by user_auth.tf
+
+        registration:
+          ui_url: /auth/registration
+          lifespan: 5m
+
+          after:
+            default_browser_return_url: /dashboard # Overridden by user_auth.tf
+
+            password:
+              default_browser_return_url: /dashboard # Overridden by user_auth.tf
+
+              hooks:
+                - hook: session
+
+            oidc:
+              default_browser_return_url: /dashboard # Overridden by user_auth.tf
+
+              hooks:
+                - hook: session
+
+        error:
+          ui_url: /auth/errors # Overridden by user_auth.tf
+
