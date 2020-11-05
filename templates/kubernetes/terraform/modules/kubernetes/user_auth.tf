@@ -56,7 +56,7 @@ resource "helm_release" "oathkeeper" {
 
   set {
     name  = "ingress.proxy.annotations.nginx\\.ingress\\.kubernetes\\.io/cors-allow-origin"
-    value = "https://${var.backend_service_domain}"
+    value = "https://${var.frontend_service_domain}"
   }
 
   set {

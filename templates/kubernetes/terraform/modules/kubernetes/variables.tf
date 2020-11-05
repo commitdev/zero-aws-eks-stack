@@ -111,3 +111,9 @@ variable "backend_service_domain" {
   type        = string
   default     = ""
 }
+
+variable "frontend_service_domain" {
+  description = "Domain of the frontend"
+  type        = string
+  default     = ""
+}

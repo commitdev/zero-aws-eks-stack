@@ -73,7 +73,8 @@ module "kubernetes" {
     ["Carter L", "10.10.199.202/32", "h2jMuaXNIlx7Z0a3owWFjPsAA8B+ZpQH3FbZK393+08="],
   ]
 
-  auth_enabled           = <% if eq (index .Params `userAuth`) "yes" %>true<% else %>false<% end %>
-  auth_domain            = "auth.${local.domain_name}"
-  backend_service_domain = "<% index .Params `stagingBackendSubdomain` %>${local.domain_name}"
+  auth_enabled            = <% if eq (index .Params `userAuth`) "yes" %>true<% else %>false<% end %>
+  auth_domain             = "auth.${local.domain_name}"
+  backend_service_domain  = "<% index .Params `stagingBackendSubdomain` %>${local.domain_name}"
+  frontend_service_domain = "<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}"
 }
