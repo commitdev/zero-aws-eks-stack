@@ -225,3 +225,33 @@ resource "kubernetes_deployment" "wireguard" {
   }
 }
 
+# Create Kubernetes role and binding to use arbitrary group 'vpn-users'. This group has been added by administor and mapped to user roles(developer & operator).
+resource "kubernetes_role" "wireguard" {
+  metadata {
+    name      = "wireguard"
+    namespace = kubernetes_namespace.vpn_namespace.metadata[0].name
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["pods", "pods/exec"]
+    verbs      = ["exec", "list", "create"]
+  }
+}
+
+resource "kubernetes_role_binding" "wireguard" {
+  metadata {
+    name      = "wireguard"
+    namespace = kubernetes_namespace.vpn_namespace.metadata[0].name
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = "wireguard"
+  }
+  subject {
+    kind      = "Group"
+    name      = "vpn-users"
+    api_group = "rbac.authorization.k8s.io"
+  }
+}
