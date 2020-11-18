@@ -222,7 +222,7 @@ data "template_file" "oathkeeper_kratos_proxy_rules" {
   }
 }
 
-resource "null_resource" "cert_manager_issuer" {
+resource "null_resource" "oathkeeper_kratos_proxy_rules" {
   triggers = {
     manifest_sha1 = sha1(data.template_file.oathkeeper_kratos_proxy_rules.rendered)
   }
