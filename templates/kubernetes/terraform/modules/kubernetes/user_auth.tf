@@ -46,7 +46,7 @@ resource "helm_release" "oathkeeper" {
 
   set {
     name  = "oathkeeper.config.errors.handlers.redirect.config.to"
-    value = "https://${var.backend_service_domain}/auth/login"
+    value = "https://${var.frontend_service_domain}/auth/login"
   }
 
   set {
@@ -124,92 +124,82 @@ resource "helm_release" "kratos" {
   # Return urls
   set {
     name  = "kratos.config.selfservice.default_browser_return_url"
-    value = "https://${var.backend_service_domain}/"
+    value = "https://${var.frontend_service_domain}/"
   }
 
   set {
     name  = "kratos.config.selfservice.whitelisted_return_urls[0]"
-    value = "https://${var.backend_service_domain}/"
+    value = "https://${var.frontend_service_domain}/"
   }
 
   set {
     name  = "kratos.config.selfservice.flows.settings.ui_url"
-    value = "https://${var.backend_service_domain}/auth/settings"
+    value = "https://${var.frontend_service_domain}/auth/settings"
   }
 
   set {
     name  = "kratos.config.selfservice.flows.settings.after.default_browser_return_url"
-    value = "https://${var.backend_service_domain}/dashboard"
+    value = "https://${var.frontend_service_domain}/dashboard"
   }
 
   set {
     name  = "kratos.config.selfservice.flows.verification.ui_url"
-    value = "https://${var.backend_service_domain}/auth/verify"
+    value = "https://${var.frontend_service_domain}/auth/verify"
   }
 
   set {
     name  = "kratos.config.selfservice.flows.verification.after.default_browser_return_url"
-    value = "https://${var.backend_service_domain}/dashboard"
+    value = "https://${var.frontend_service_domain}/dashboard"
   }
 
   set {
     name  = "kratos.config.selfservice.flows.recovery.ui_url"
-    value = "https://${var.backend_service_domain}/auth/recovery"
+    value = "https://${var.frontend_service_domain}/auth/recovery"
   }
 
   set {
     name  = "kratos.config.selfservice.flows.logout.after.default_browser_return_url"
-    value = "https://${var.backend_service_domain}/"
+    value = "https://${var.frontend_service_domain}/"
   }
 
   set {
     name  = "kratos.config.selfservice.flows.login.ui_url"
-    value = "https://${var.backend_service_domain}/auth/login"
+    value = "https://${var.frontend_service_domain}/auth/login"
   }
 
   set {
     name  = "kratos.config.selfservice.flows.login.after.default_browser_return_url"
-    value = "https://${var.backend_service_domain}/dashboard"
+    value = "https://${var.frontend_service_domain}/dashboard"
   }
 
   set {
     name  = "kratos.config.selfservice.flows.registration.ui_url"
-    value = "https://${var.backend_service_domain}/auth/registration"
+    value = "https://${var.frontend_service_domain}/auth/registration"
   }
 
   set {
     name  = "kratos.config.selfservice.flows.registration.after.default_browser_return_url"
-    value = "https://${var.backend_service_domain}/dashboard"
+    value = "https://${var.frontend_service_domain}/dashboard"
   }
 
   set {
     name  = "kratos.config.selfservice.flows.registration.after.password.default_browser_return_url"
-    value = "https://${var.backend_service_domain}/dashboard"
+    value = "https://${var.frontend_service_domain}/dashboard"
   }
 
   set {
     name  = "kratos.config.selfservice.flows.registration.after.oidc.default_browser_return_url"
-    value = "https://${var.backend_service_domain}/dashboard"
+    value = "https://${var.frontend_service_domain}/dashboard"
   }
 
   set {
     name  = "kratos.config.selfservice.flows.error.ui_url"
-    value = "https://${var.backend_service_domain}/auth/errors"
+    value = "https://${var.frontend_service_domain}/auth/errors"
   }
 
   set {
     name  = "kratos.config.selfservice.flows."
-    value = "https://${var.backend_service_domain}/"
-  }
-
-  set {
-    name  = "kratos.config.selfservice.flows."
-    value = "https://${var.backend_service_domain}/"
-  }
-
-  set {
-    name  = "kratos.config.selfservice.flows."
-    value = "https://${var.backend_service_domain}/"
+    value = "https://${var.frontend_service_domain}/"
   }
 }
 
