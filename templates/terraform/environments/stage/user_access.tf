@@ -1,3 +1,13 @@
+locals {
+  # user-auth:enabled will allow deployer to manage oathkeeper rules, otherwise concats with []
+  auth_enabled = <% if eq (index .Params `userAuth`) "yes" %>true<% else %>false<% end %>
+  auth_deploy_rules = local.auth_enabled ? [{
+      verbs      = ["get", "create", "delete", "patch", "update"]
+      api_groups = ["*"]
+      resources  = ["rules"]
+    }] : []
+}
+
 # define AWS policy documents for developer
 data "aws_iam_policy_document" "developer_access" {
   # EKS
@@ -192,7 +202,7 @@ locals {
   ]
 
   # define Kubernetes policy for deployer
-  k8s_deployer_access = [
+  k8s_deployer_access = concat([
     {
       verbs      = ["create", "list", "get", "delete", "patch", "update", "watch"]
       api_groups = ["*"]
@@ -207,5 +217,5 @@ locals {
       api_groups = ["*"]
       resources  = ["secrets"]
     }
-  ]
+  ], local.auth_deploy_rules)
 }
