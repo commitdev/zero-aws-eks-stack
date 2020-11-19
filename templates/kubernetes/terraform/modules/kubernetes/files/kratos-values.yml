@@ -1,6 +1,6 @@
 image:
   repository:  oryd/kratos
-  # tag: v0.4.6-alpha.1-sqlite
+  tag: v0.5.4-alpha.1-sqlite
   pullPolicy: IfNotPresent
 
 ingress:
@@ -25,6 +25,13 @@ ingress:
       - paths: ["/"]
     tls:
       - secretName: kratos-admin-tls-secret
+
+# To set up OIDC you can uncomment this and create a secret which contains the
+# OIDC provider configuration in JSON format in an env var called SELFSERVICE_METHODS_OIDC like so:
+# SELFSERVICE_METHODS_OIDC='[{"id":"github","provider":"github","client_id":"<id>","client_secret":"<secret>","mapper_url":"http://your-url/github.data-mapper.jsonnet","scope":["user:email"]}]'
+# See README.md for more info
+# deployment:
+  # environmentSecretsName: secretName
 
 kratos:
   development: false
@@ -88,20 +95,8 @@ kratos:
           # enabled: true
         password:
           enabled: true
-        oidc: # TODO: allow methods to be configured with parameters
-          enabled: true
-          # config:
-          # TODO: use SELFSERVICE_METHODS_OIDC_CONFIG_PROVIDERS to set via secrets
-          # [{"id":"github","provider":"github","client_id":"id","client_secret":"secret","mapper_url":"http://zombism.ca/github.data-mapper.jsonnet","scope":["user:email"]}]
-            # providers:
-            #   - id: github
-            #     provider: github
-            #     client_id: # TODO: load secret
-            #     client_secret: # TODO : load secret
-            #     # TODO: Change to static or deploy somewhere within infra
-            #     mapper_url: http://zombism.ca/github.data-mapper.jsonnet
-            #     scope:
-            #       - user:email
+        # To set up OIDC (Github, Google login, etc.) this value can be provided via env var, see the deployment section above
+        # oidc:
 
       default_browser_return_url: / # Overridden by user_auth.tf
       whitelisted_return_urls:
