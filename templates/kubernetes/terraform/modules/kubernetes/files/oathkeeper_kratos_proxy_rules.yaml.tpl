@@ -6,6 +6,7 @@ apiVersion: oathkeeper.ory.sh/v1alpha1
 kind: Rule
 metadata:
   name: kratos-public
+  namespace: user-auth
 spec:
   upstream:
     url: http://kratos-public.user-auth
@@ -35,6 +36,7 @@ apiVersion: oathkeeper.ory.sh/v1alpha1
 kind: Rule
 metadata:
   name: kratos-form-data
+  namespace: user-auth
 spec:
   upstream:
     url: http://kratos-admin.user-auth
