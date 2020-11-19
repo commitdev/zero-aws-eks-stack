@@ -211,6 +211,24 @@ resource "helm_release" "kratos" {
     name  = "kratos.config.selfservice.flows."
     value = "https://${var.backend_service_domain}/"
   }
+}
 
+data "template_file" "oathkeeper_kratos_proxy_rules" {
+  template = file("${path.module}/files/oathkeeper_kratos_proxy_rules.yaml.tpl")
+  vars = {
+    backend_service_domain = var.backend_service_domain
+    public_selfserve_endpoint = "/.ory/kratos/public"
+    admin_selfserve_endpoint = "/.ory/kratos"
+  }
+}
 
+resource "null_resource" "oathkeeper_kratos_proxy_rules" {
+  triggers = {
+    manifest_sha1 = sha1(data.template_file.oathkeeper_kratos_proxy_rules.rendered)
+  }
+  # local exec call requires kubeconfig to be updated
+  provisioner "local-exec" {
+    command = "kubectl apply -f - <<EOF\n${data.template_file.oathkeeper_kratos_proxy_rules.rendered}\nEOF"
+  }
+  depends_on = [helm_release.oathkeeper]
 }
