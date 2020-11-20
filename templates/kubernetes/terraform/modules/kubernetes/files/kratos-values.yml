@@ -89,14 +89,13 @@ kratos:
       default_schema_url: file:///etc/config/identity.default.schema.json
 
     selfservice:
+      # To set up OIDC (Github, Google login, etc.) the 'oidc' method section can be provided via env var, see the deployment section above
       methods:
         # TODO: Look in to error when this is enabled
         # link:
           # enabled: true
         password:
           enabled: true
-        # To set up OIDC (Github, Google login, etc.) this value can be provided via env var, see the deployment section above
-        # oidc:
 
       default_browser_return_url: / # Overridden by user_auth.tf
       whitelisted_return_urls:
