@@ -4,7 +4,18 @@ locals {
     "postgres" : "postgres",
     "mysql" : "mysql",
   }
-  db_type = local.type_map[data.aws_db_instance.database.engine]
+  db_type          = local.type_map[data.aws_db_instance.database.engine]
+  jwks_secret_name = "${var.project}-${var.environment}-oathkeeper-jwks-${var.random_seed}" # Created in pre-k8s.sh
+}
+
+## Get generated JWKS content from secret
+data "aws_secretsmanager_secret" "jwks_content" {
+  count = var.auth_enabled ? 1 : 0
+  name  = local.jwks_secret_name
+}
+data "aws_secretsmanager_secret_version" "jwks_content" {
+  count     = var.auth_enabled ? 1 : 0
+  secret_id = data.aws_secretsmanager_secret.jwks_content[0].id
 }
 
 resource "kubernetes_namespace" "user_auth" {
@@ -32,16 +43,10 @@ resource "helm_release" "oathkeeper" {
     value = "https://${var.backend_service_domain}"
   }
 
-  # This will read the local jwks file and
-  # Nope, this won't work. Need to create the secret OOB.
-  # set {
-  #   name  = "oathkeeper.mutatorIdTokenJWKs"
-  #   value = file("${path.module}/files/id_token.jwks.json")
-  # }
-
-  set {
-    name  = "oathkeeper.config.mutators.id_token.config.jwks_url"
-    value = "http://zombism.ca/id_token.jwks.json"
+  # Clean up and set the JWKS content. This will become a secret mounted into the pod
+  set_sensitive {
+    name  = "oathkeeper.mutatorIdTokenJWKs"
+    value = replace(jsonencode(jsondecode(data.aws_secretsmanager_secret_version.jwks_content[0].secret_string)), "/([,\\[\\]{}])/", "\\$1")
   }
 
   set {
@@ -206,9 +211,9 @@ resource "helm_release" "kratos" {
 data "template_file" "oathkeeper_kratos_proxy_rules" {
   template = file("${path.module}/files/oathkeeper_kratos_proxy_rules.yaml.tpl")
   vars = {
-    backend_service_domain = var.backend_service_domain
+    backend_service_domain    = var.backend_service_domain
     public_selfserve_endpoint = "/.ory/kratos/public"
-    admin_selfserve_endpoint = "/.ory/kratos"
+    admin_selfserve_endpoint  = "/.ory/kratos"
   }
 }
 

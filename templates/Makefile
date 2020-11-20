@@ -6,6 +6,8 @@ export AWS_DEFAULT_REGION = <% index .Params `region` %>
 export AWS_PAGER =
 KUBE_CONTEXT := $(PROJECT)-$(ENVIRONMENT)-$(AWS_DEFAULT_REGION)
 
+.EXPORT_ALL_VARIABLES:
+
 apply: apply-remote-state apply-shared-remote-state apply-secrets apply-shared-env apply-env update-k8s-conf pre-k8s apply-k8s-utils post-apply-setup
 
 apply-remote-state:
@@ -40,12 +42,7 @@ apply-env:
 	terraform apply $(AUTO_APPROVE)
 
 pre-k8s:
-	@aws secretsmanager describe-secret --region $(AWS_DEFAULT_REGION) --secret-id $(PROJECT)-$(ENVIRONMENT)-vpn-wg-privatekey-<% index .Params `randomSeed` %> > /dev/null 2>&1 || ( \
-	echo "Creating VPN private key..." && \
-	kubectl run --context $(KUBE_CONTEXT) -i --tty zero-k8s-utilities --image=commitdev/zero-k8s-utilities:0.0.3 --restart=Never -- wg genkey | \
-	xargs aws secretsmanager create-secret --region $(AWS_DEFAULT_REGION) --name $(PROJECT)-$(ENVIRONMENT)-vpn-wg-privatekey-<% index .Params `randomSeed` %> --description "Auto-generated Wireguard VPN private key" --tags '[{"Key":"wg","Value":"$(PROJECT)-$(ENVIRONMENT)"}]' --secret-string && \
-	kubectl delete --context $(KUBE_CONTEXT) pod/zero-k8s-utilities && \
-	echo "Done VPN private key creation" )
+	cd scripts && sh pre-k8s.sh
 
 apply-k8s-utils:
 	cd kubernetes/terraform/environments/$(ENVIRONMENT) && \
@@ -56,7 +53,7 @@ update-k8s-conf:
 	aws eks --region $(AWS_DEFAULT_REGION) update-kubeconfig --role "arn:aws:iam::<% index .Params `accountId` %>:role/$(PROJECT)-kubernetes-$(ROLE)-$(ENVIRONMENT)" --name $(KUBE_CONTEXT) --alias $(KUBE_CONTEXT)
 
 post-apply-setup:
-	cd scripts && ENVIRONMENT=$(ENVIRONMENT) PROJECT=$(PROJECT) sh post-apply.sh
+	cd scripts && sh post-apply.sh
 
 teardown: teardown-k8s-utils teardown-env teardown-shared-env teardown-secrets teardown-remote-state teardown-shared-remote-state
 
