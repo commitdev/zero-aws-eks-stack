@@ -109,7 +109,7 @@ To specify your provider config you need to create a secret containing your prov
 kubectl create secret generic oidc-providers -n user-auth  --from-literal=SELFSERVICE_METHODS_OIDC='[{"id":"github","provider":"github","client_id":"<id>","client_secret":"<secret>","mapper_url":"http://your-url/github.data-mapper.jsonnet","scope":["user:email"]}]'
 ```
 
-This also requires specifying a mapper file which maps claims from the provider to fields which will be exposed to your app.
+This also requires specifying a mapper file which maps claims from the provider to fields which will be exposed to your app. This must be provided in the `mapper_url` field in the config above. It can be provided as a HTTP URL, a file, or a base64 encoded string.
 Here is a simple example for GitHub:
 ```js
 local claims = std.extVar('claims');
@@ -127,6 +127,7 @@ local claims = std.extVar('claims');
 Next, edit `kubernetes/terraform/modules/kubernetes/files/kratos-values.yml` and set `deployment.environmentSecretsName` to the name of the secret you created above.
 After restarting kratos, you should see a button appear on the login / signup pages to use the providers you set up.
 
+_Note: Oathkeeper requires a `JWKS` file which should have been created automatically during project setup and saved into a secret in AWS secret manager._
 
 # Resources
 ###  Infrastructure

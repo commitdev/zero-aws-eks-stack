@@ -10,10 +10,12 @@ locals {
 
 ## Get generated JWKS content from secret
 data "aws_secretsmanager_secret" "jwks_content" {
-  name = local.jwks_secret_name
+  count = var.auth_enabled ? 1 : 0
+  name  = local.jwks_secret_name
 }
 data "aws_secretsmanager_secret_version" "jwks_content" {
-  secret_id = data.aws_secretsmanager_secret.jwks_content.id
+  count     = var.auth_enabled ? 1 : 0
+  secret_id = data.aws_secretsmanager_secret.jwks_content[0].id
 }
 
 resource "kubernetes_namespace" "user_auth" {
@@ -44,7 +46,7 @@ resource "helm_release" "oathkeeper" {
   # Clean up and set the JWKS content. This will become a secret mounted into the pod
   set_sensitive {
     name  = "oathkeeper.mutatorIdTokenJWKs"
-    value = replace(jsonencode(jsondecode(data.aws_secretsmanager_secret_version.jwks_content.secret_string)), "/([,\\[\\]{}])/", "\\$1")
+    value = replace(jsonencode(jsondecode(data.aws_secretsmanager_secret_version.jwks_content[0].secret_string)), "/([,\\[\\]{}])/", "\\$1")
   }
 
   set {
