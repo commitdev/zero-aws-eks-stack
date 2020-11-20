@@ -27,8 +27,7 @@ ingress:
       - secretName: kratos-admin-tls-secret
 
 # To set up OIDC you can uncomment this and create a secret which contains the
-# OIDC provider configuration in JSON format in an env var called SELFSERVICE_METHODS_OIDC like so:
-# SELFSERVICE_METHODS_OIDC='[{"id":"github","provider":"github","client_id":"<id>","client_secret":"<secret>","mapper_url":"http://your-url/github.data-mapper.jsonnet","scope":["user:email"]}]'
+# OIDC provider configuration in JSON format in an env var called SELFSERVICE_METHODS_OIDC
 # See README.md for more info
 # deployment:
   # environmentSecretsName: secretName
