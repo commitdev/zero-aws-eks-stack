@@ -21,7 +21,7 @@ locals {
 }
 EOF
   controller_image = "k8s.gcr.io/ingress-nginx/controller"
-  controller_tag   = "0.41.2"
+  controller_tag   = "v0.41.2"
 }
 
 resource "kubernetes_namespace" "ingress_nginx" {

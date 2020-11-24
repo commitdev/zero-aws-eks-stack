@@ -23,18 +23,16 @@ resource "helm_release" "cert_manager" {
   namespace  = kubernetes_namespace.cert_manager.metadata[0].name
 
   set {
-    type  = "string"
     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = module.iam_assumable_role_cert_manager.this_iam_role_arn
-  }
-  set {
-    type  = "string"
-    name  = "podAnnotations.eks\\.amazonaws\\.com/role-arn"
     value = module.iam_assumable_role_cert_manager.this_iam_role_arn
   }
   set {
     name  = "securityContext.fsGroup"
     value = "1001"
+  }
+  set {
+    name  = "installCRDs"
+    value = true
   }
 }
 

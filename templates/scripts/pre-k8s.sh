@@ -31,7 +31,7 @@ if [[ $? -ne 0 ]]; then
     fi
 fi
 
-kubectl -n user-auth get secrets ${PROJECT} > /dev/null 2>&1
+kubectl --context ${KUBE_CONTEXT} -n user-auth get secrets ${PROJECT} > /dev/null 2>&1
 if [[ $? -ne 0 ]]; then
 	REGION=${AWS_DEFAULT_REGION} \
 	SEED=${RANDOM_SEED} \

@@ -1,11 +1,11 @@
 #!/bin/sh
-set -e
 
+KUBE_CONTEXT=${PROJECT}-${ENVIRONMENT}-${AWS_DEFAULT_REGION}
 RANDOM_SEED="<% index .Params `randomSeed` %>"
 
 <% if ne (index .Params `loggingType`) "kibana" %># <% end %>source elasticsearch-logging.sh
 
-shell kubectl -n ${PROJECT} get secrets ${PROJECT} > /dev/null 2>&1
+kubectl --context ${KUBE_CONTEXT} -n ${PROJECT} get secrets ${PROJECT} > /dev/null 2>&1
 if [[ $? -ne 0 ]]; then
     REGION=${AWS_DEFAULT_REGION} \
     SEED=${RANDOM_SEED} \
@@ -16,5 +16,5 @@ if [[ $? -ne 0 ]]; then
     DATABASE_NAME=${PROJECT} \
     USER_NAME=${PROJECT} \
     CREATE_SECRET=secret-application.yml.tpl \
-    sh ./create-db-user.sh || echo "Skipping database credential creation - credentials already exist"
+    sh ./create-db-user.sh
 fi

@@ -20,7 +20,7 @@ resource "helm_release" "cluster_autoscaler" {
   }
   set {
     type  = "string"
-    name  = "rbac.serviceAccountAnnotations.eks\\.amazonaws\\.com/role-arn"
+    name  = "rbac.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
     value = module.iam_assumable_role_cluster_autoscaler.this_iam_role_arn
   }
   set {
@@ -42,7 +42,7 @@ module "iam_assumable_role_cluster_autoscaler" {
   role_name                     = "${var.project}-k8s-${var.environment}-cluster-autoscaler"
   provider_url                  = replace(data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer, "https://", "")
   role_policy_arns              = [aws_iam_policy.cluster_autoscaler.arn]
-  oidc_fully_qualified_subjects = ["system:serviceaccount:${local.cluster_autoscaler_namespace}:cluster-autoscaler-aws-cluster-autoscaler"]
+  oidc_fully_qualified_subjects = ["system:serviceaccount:${local.cluster_autoscaler_namespace}:cluster-autoscaler-aws-cluster-autoscaler-chart"]
 }
 
 resource "aws_iam_policy" "cluster_autoscaler" {
