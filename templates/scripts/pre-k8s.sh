@@ -1,6 +1,7 @@
 #!/bin/sh
 ZERO_K8S_UTILS_VERSION=0.0.3
 OATHKEEPER_VERSION=v0.38.4-beta.1-alpine
+KUBE_CONTEXT=${PROJECT}-${ENVIRONMENT}-${AWS_DEFAULT_REGION}
 
 VPN_SECRET_NAME=${PROJECT}-${ENVIRONMENT}-vpn-wg-privatekey-<% index .Params `randomSeed` %>
 OATHKEEPER_SECRET_NAME=${PROJECT}-${ENVIRONMENT}-oathkeeper-jwks-<% index .Params `randomSeed` %>

@@ -1,5 +1,5 @@
 locals {
-  cert_manager_version     = "0.14.2"
+  cert_manager_version     = "1.0.4"
   cluster_issuer_name      = var.cert_manager_use_production_acme_environment ? "clusterissuer-letsencrypt-production" : "clusterissuer-letsencrypt-staging"
   cert_manager_acme_server = var.cert_manager_use_production_acme_environment ? "https://acme-v02.api.letsencrypt.org/directory" : "https://acme-staging-v02.api.letsencrypt.org/directory"
 }
@@ -15,24 +15,28 @@ data "aws_route53_zone" "public" {
   name = var.external_dns_zone
 }
 
-# Cert-manager CRD manifest
-# https://github.com/jetstack/cert-manager/releases/download/v0.14.2/cert-manager.crds.yaml
-data "local_file" "cert_manager" {
-  filename = "${path.module}/files/cert-manager.crds.yaml"
-}
+resource "helm_release" "cert_manager" {
+  name       = "cert-manager"
+  repository = "https://charts.jetstack.io"
+  chart      = "cert-manager"
+  version    = local.cert_manager_version
+  namespace  = kubernetes_namespace.cert_manager.metadata[0].name
 
-# Install the cert manager Custom Resource Definitions (this can't be done via helm/terraform)
-resource "null_resource" "cert_manager" {
-  triggers = {
-    manifest_sha1 = sha1(data.local_file.cert_manager.content)
+  set {
+    type  = "string"
+    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = module.iam_assumable_role_cert_manager.this_iam_role_arn
   }
-  # local exec call requires kubeconfig to be updated
-  provisioner "local-exec" {
-    command = "kubectl apply --validate=false -f ${path.module}/files/cert-manager.crds.yaml"
+  set {
+    type  = "string"
+    name  = "podAnnotations.eks\\.amazonaws\\.com/role-arn"
+    value = module.iam_assumable_role_cert_manager.this_iam_role_arn
   }
-  depends_on = [kubernetes_namespace.cert_manager]
+  set {
+    name  = "securityContext.fsGroup"
+    value = "1001"
+  }
 }
-
 
 # Cert-manager issuer manifest
 data "template_file" "cert_manager_issuer" {
@@ -59,30 +63,6 @@ resource "null_resource" "cert_manager_issuer" {
   }
   depends_on = [null_resource.cert_manager]
 }
-
-resource "helm_release" "cert_manager" {
-  name       = "cert-manager"
-  repository = "https://charts.jetstack.io"
-  chart      = "cert-manager"
-  version    = local.cert_manager_version
-  namespace  = kubernetes_namespace.cert_manager.metadata[0].name
-
-  set {
-    type  = "string"
-    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = module.iam_assumable_role_cert_manager.this_iam_role_arn
-  }
-  set {
-    type  = "string"
-    name  = "podAnnotations.eks\\.amazonaws\\.com/role-arn"
-    value = module.iam_assumable_role_cert_manager.this_iam_role_arn
-  }
-  set {
-    name  = "securityContext.fsGroup"
-    value = "1001"
-  }
-}
-
 
 # Create a role using oidc to map service accounts
 module "iam_assumable_role_cert_manager" {

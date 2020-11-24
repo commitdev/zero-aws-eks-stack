@@ -5,8 +5,9 @@ locals {
 
 resource "helm_release" "cluster_autoscaler" {
   name       = "cluster-autoscaler"
-  repository = "https://kubernetes-charts.storage.googleapis.com"
-  chart      = "cluster-autoscaler"
+  repository = "https://kubernetes.github.io/autoscaler"
+  chart      = "cluster-autoscaler-chart"
+  version    = "1.1.1"
   namespace  = local.cluster_autoscaler_namespace
 
   set {
