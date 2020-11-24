@@ -61,7 +61,7 @@ resource "null_resource" "cert_manager_issuer" {
   provisioner "local-exec" {
     command = "kubectl apply -f - <<EOF\n${data.template_file.cert_manager_issuer.rendered}\nEOF"
   }
-  depends_on = [null_resource.cert_manager]
+  depends_on = [helm_release.cert_manager]
 }
 
 # Create a role using oidc to map service accounts
