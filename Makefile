@@ -1,13 +1,16 @@
 SHELL := /bin/bash
-CREATE_DB_USERS := $(shell kubectl -n ${PROJECT_NAME} get secrets ${PROJECT_NAME} > /dev/null 2>&1; echo $$?)
+CREATE_DB_DEFAULT_USER := $(shell kubectl -n ${PROJECT_NAME} get secrets ${PROJECT_NAME} > /dev/null 2>&1; echo $$?)
+IAM_DEV_ENV_USERS := $(shell aws iam get-group --group-name ${PROJECT_NAME}-developer-${ENVIRONMENT} | jq -r .Users[].UserName)
+CREATE_DB_DEV_USERS := $(shell for u in ${IAM_DEV_ENV_USERS}; do kubectl -n ${PROJECT_NAME} get secrets dev-$${u} > /dev/null 2>&1; [[ "$$?" != "0" ]] && echo $${u}; done)
+#CREATE_DB_DEV_USERS := $(shell echo ${IAM_DEV_ENV_USERS})
 
-run: make-apply create-application-user create-auth-user
+run: make-apply create-application-user create-application-dev-user create-auth-user
 
 make-apply:
 	cd $(PROJECT_DIR) && AUTO_APPROVE="-auto-approve" make
 
-create-application-user:
-	[[ "${CREATE_DB_USERS}" != "0" ]] && \
+create-application-default-user:
+	[[ "${CREATE_DB_DEFAULT_USER}" != "0" ]] && \
 	REGION=${region} \
 	SEED=${randomSeed} \
 	PROJECT_NAME=${PROJECT_NAME} \
@@ -19,8 +22,22 @@ create-application-user:
 	CREATE_SECRET=secret-application.yml.tpl \
 	sh ./db-ops/create-db-user.sh || echo
 
+create-application-dev-user:
+	for u in ${CREATE_DB_DEV_USERS}; do \
+	REGION=${region} \
+	SEED=${randomSeed} \
+	PROJECT_NAME=${PROJECT_NAME} \
+	ENVIRONMENT=${ENVIRONMENT} \
+	NAMESPACE=${PROJECT_NAME} \
+	DATABASE_TYPE=${database} \
+	CREATE_SECRET=secret-application-dev.yml.tpl \
+	DATABASE_NAME=dev-$${u} \
+	USER_NAME=dev-$${u} \
+	sh ./db-ops/create-db-user.sh || echo; \
+	done
+
 create-auth-user:
-	[[ "${CREATE_DB_USERS}" != "0" && "${userAuth}" == "yes" ]] && \
+	[[ "${CREATE_DB_DEFAULT_USER}" != "0" && "${userAuth}" == "yes" ]] && \
 	REGION=${region} \
 	SEED=${randomSeed} \
 	PROJECT_NAME=${PROJECT_NAME} \

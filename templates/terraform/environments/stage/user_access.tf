@@ -173,6 +173,32 @@ data "aws_iam_policy_document" "deployer_access" {
 
 
 locals {
+  # define Kubernetes policy for developer env deployment
+  k8s_developer_env_access = [
+    # to support developer environment
+    {
+      verbs      = ["create", "exec", "list", "get", "delete", "patch", "update", "watch"]
+      api_groups = ["*"]
+      resources = ["namespaces", "deployments", "deployments/scale", "configmaps", "pods", "pods/log", "pods/status", "pods/portforward", "pods/exec",
+        "jobs", "cronjobs",
+        "ingresses", "services", "serviceaccounts",
+        "replicasets", "horizontalpodautoscalers", "horizontalpodautoscalers/status"
+      ]
+    },
+    {
+      verbs      = ["get", "list", "watch"]
+      api_groups = ["*"]
+      resources = [ "daemonsets", "endpoints", "events",
+        "poddisruptionbudgets"
+      ]
+    },
+    {
+      verbs      = ["create", "get", "list"]
+      api_groups = ["*"]
+      resources = [ "secrets" ]
+    }
+  ]
+
   # define Kubernetes policy for developer
   k8s_developer_access = [
     {
