@@ -1,10 +1,12 @@
 SHELL := /bin/bash
 CREATE_DB_DEFAULT_USER := $(shell kubectl -n ${PROJECT_NAME} get secrets ${PROJECT_NAME} > /dev/null 2>&1; echo $$?)
-IAM_DEV_ENV_USERS := $(shell aws iam get-group --group-name ${PROJECT_NAME}-developer-${ENVIRONMENT} | jq -r .Users[].UserName)
-CREATE_DB_DEV_USERS := $(shell for u in ${IAM_DEV_ENV_USERS}; do kubectl -n ${PROJECT_NAME} get secrets dev-$${u} > /dev/null 2>&1; [[ "$$?" != "0" ]] && echo $${u}; done)
-#CREATE_DB_DEV_USERS := $(shell echo ${IAM_DEV_ENV_USERS})
 
-run: make-apply create-application-user create-application-dev-user create-auth-user
+IAM_DEV_ENV_USERS := $(shell aws iam get-group --group-name ${PROJECT_NAME}-developer-${ENVIRONMENT} | jq -r .Users[].UserName)
+DEV_DB_LIST := $(shell for u in ${IAM_DEV_ENV_USERS}; do echo -n "dev$${u} "; done)
+SECRET_ID := $(shell aws secretsmanager list-secrets --region ${region} --query "SecretList[?Name=='${PROJECT_NAME}-stage-rds-${randomSeed}-devenv'].Name" | jq -r ".[0]")
+DEV_DB_SECRET := $(shell aws secretsmanager get-secret-value --region=${region} --secret-id=${SECRET_ID} | jq -r ".SecretString")
+
+run: make-apply create-application-default-user create-application-dev-user create-auth-user
 
 make-apply:
 	cd $(PROJECT_DIR) && AUTO_APPROVE="-auto-approve" make
@@ -17,24 +19,27 @@ create-application-default-user:
 	ENVIRONMENT=${ENVIRONMENT} \
 	NAMESPACE=${PROJECT_NAME} \
 	DATABASE_TYPE=${database} \
-	DATABASE_NAME=${PROJECT_NAME} \
+	DATABASE_LIST=${PROJECT_NAME} \
 	USER_NAME=${PROJECT_NAME} \
+	USER_PASSWORD= \
 	CREATE_SECRET=secret-application.yml.tpl \
+	CREATE_DB_POD=deployment-db-test.yml.tpl \
 	sh ./db-ops/create-db-user.sh || echo
 
 create-application-dev-user:
-	for u in ${CREATE_DB_DEV_USERS}; do \
+	[[ "${ENVIRONMENT}" == "stage" && -n "${IAM_DEV_ENV_USERS}" && -n "${DEV_DB_SECRET}" ]] && \
 	REGION=${region} \
 	SEED=${randomSeed} \
 	PROJECT_NAME=${PROJECT_NAME} \
 	ENVIRONMENT=${ENVIRONMENT} \
 	NAMESPACE=${PROJECT_NAME} \
-	DATABASE_TYPE=${database} \
-	CREATE_SECRET=secret-application-dev.yml.tpl \
-	DATABASE_NAME=dev-$${u} \
-	USER_NAME=dev-$${u} \
-	sh ./db-ops/create-db-user.sh || echo; \
-	done
+	DATABASE_TYPE=postgres \
+	DATABASE_LIST="${DEV_DB_LIST}" \
+	USER_NAME=dev${PROJECT_NAME} \
+	USER_PASSWORD=${DEV_DB_SECRET} \
+	CREATE_SECRET= \
+	CREATE_DB_POD= \
+	sh ./db-ops/create-db-user.sh || echo
 
 create-auth-user:
 	[[ "${CREATE_DB_DEFAULT_USER}" != "0" && "${userAuth}" == "yes" ]] && \
@@ -44,9 +49,11 @@ create-auth-user:
 	ENVIRONMENT=${ENVIRONMENT} \
 	NAMESPACE=user-auth \
 	DATABASE_TYPE=${database} \
-	DATABASE_NAME=user_auth \
+	DATABASE_LIST=user_auth \
 	USER_NAME=kratos \
+	USER_PASSWORD= \
 	CREATE_SECRET=secret-user-auth.yml.tpl \
+	CREATE_DB_POD=deployment-db-test.yml.tpl \
 	sh ./db-ops/create-db-user.sh || echo
 
 summary:

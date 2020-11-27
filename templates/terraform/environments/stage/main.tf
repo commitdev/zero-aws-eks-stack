@@ -41,6 +41,17 @@ data "terraform_remote_state" "shared" {
   }
 }
 
+# rds shared db password for dev envrionment
+module "rds_dev_secret" {
+  source  = "commitdev/zero/aws//modules/secret"
+  version = "0.0.2"
+  
+  name          = "${local.project}-stage-rds-${local.random_seed}-devenv"
+  type          = "random"
+  random_length = 32
+  tags          = map("rds", "${local.project}-stage-devenv")
+}
+
 # Instantiate the staging environment
 module "stage" {
   source      = "../../modules/environment"
