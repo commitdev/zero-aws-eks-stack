@@ -74,6 +74,7 @@ module "kubernetes" {
     ["Carter L", "10.10.99.202/32", "h2jMuaXNIlx7Z0a3owWFjPsAA8B+ZpQH3FbZK393+08="],
   ]
 
+  domain_name             = local.domain_name
   auth_enabled            = <% if eq (index .Params `userAuth`) "yes" %>true<% else %>false<% end %>
   auth_domain             = "auth.${local.domain_name}"
   backend_service_domain  = "<% index .Params `productionBackendSubdomain` %>${local.domain_name}"

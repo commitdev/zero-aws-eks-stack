@@ -33,16 +33,21 @@ fi
 
 kubectl --context ${KUBE_CONTEXT} -n user-auth get secrets ${PROJECT} > /dev/null 2>&1
 if [[ $? -ne 0 ]]; then
-	REGION=${AWS_DEFAULT_REGION} \
-	SEED=${RANDOM_SEED} \
-	PROJECT_NAME=${PROJECT} \
-	ENVIRONMENT=${ENVIRONMENT} \
-	NAMESPACE=user-auth \
-	DATABASE_TYPE=<% index .Params `database` %> \
-	DATABASE_NAME=user_auth \
-	USER_NAME=kratos \
-	CREATE_SECRET=secret-user-auth.yml.tpl \
-	sh ./create-db-user.sh
+    REGION=${AWS_DEFAULT_REGION} \
+    SEED=${RANDOM_SEED} \
+    PROJECT_NAME=${PROJECT} \
+    ENVIRONMENT=${ENVIRONMENT} \
+    NAMESPACE=user-auth \
+    DATABASE_TYPE=<% index .Params `database` %> \
+    DATABASE_NAME=user_auth \
+    USER_NAME=kratos \
+    CREATE_SECRET=secret-user-auth.yml.tpl \
+    <%- if ne (index .Params `sendgridApiKey`) "" %>
+    SMTP_URI=smtps://apikey:${sendgridApiKey}@smtp.sendgrid.net:465 \
+    <%- else %>
+    SMTP_URI=smtps://no-value-specified:25 \
+    <%- end %>
+    sh ./create-db-user.sh
 fi
 
 <% end %>

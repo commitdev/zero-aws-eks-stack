@@ -96,6 +96,12 @@ resource "helm_release" "kratos" {
   #   # value = "${local.db_type}://${kubernetes_service.app_db.metadata[0].name}.${kubernetes_service.app_db.metadata[0].namespace}"
   # }
 
+  # This domain or address must be verified by the mail provider (Sendgrid, SES, etc.)
+  set {
+    name  = "kratos.config.courier.smtp.from_address"
+    value = "noreply@${var.domain_name}"
+  }
+
   set {
     name  = "kratos.config.serve.public.base_url"
     value = "https://${var.backend_service_domain}/.ory/kratos/public"

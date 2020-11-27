@@ -88,6 +88,12 @@ variable "cf_signing_enabled" {
   description = "Enable CloudFront signed URLs"
 }
 
+variable "domain_name" {
+  description = "Root domain name"
+  type        = string
+  default     = ""
+}
+
 variable "internal_domain" {
   description = "Internal domain to create records in"
   type        = string
