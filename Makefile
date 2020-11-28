@@ -1,10 +1,8 @@
 SHELL := /bin/bash
 CREATE_DB_DEFAULT_USER := $(shell kubectl -n ${PROJECT_NAME} get secrets ${PROJECT_NAME} > /dev/null 2>&1; echo $$?)
 
-IAM_DEV_ENV_USERS := $(shell aws iam get-group --group-name ${PROJECT_NAME}-developer-${ENVIRONMENT} | jq -r .Users[].UserName)
-DEV_DB_LIST := $(shell for u in ${IAM_DEV_ENV_USERS}; do echo -n "dev$${u} "; done)
-SECRET_ID := $(shell aws secretsmanager list-secrets --region ${region} --query "SecretList[?Name=='${PROJECT_NAME}-stage-rds-${randomSeed}-devenv'].Name" | jq -r ".[0]")
-DEV_DB_SECRET := $(shell aws secretsmanager get-secret-value --region=${region} --secret-id=${SECRET_ID} | jq -r ".SecretString")
+DEV_DB_LIST := $(shell aws iam get-group --group-name ${PROJECT_NAME}-developer-${ENVIRONMENT} | jq -r .Users[].UserName | sed 's/^/dev/' | tr '\n' ' ')
+DEV_DB_SECRET := $(shell aws secretsmanager list-secrets --region ${region} --query "SecretList[?Tags[?Key=='rds' && Value=='$(PROJECT_NAME)-$(ENVIRONMENT)-devenv']].[Name] | [0][0]" | xargs aws secretsmanager get-secret-value --region=${region} --secret-id | jq -r ".SecretString" || echo)
 
 run: make-apply create-application-default-user create-application-dev-user create-auth-user
 

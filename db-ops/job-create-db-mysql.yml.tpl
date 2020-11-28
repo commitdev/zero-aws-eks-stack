@@ -13,8 +13,8 @@ type: Opaque
 stringData:
   RDS_MASTER_PASSWORD: $MASTER_RDS_PASSWORD
   create-user.sql: |
-    CREATE DATABASE IF NOT EXISTS __DB_NAME;
-    GRANT ALL PRIVILEGES ON __DB_NAME.* TO '$DB_APP_USERNAME' IDENTIFIED BY '$DB_APP_PASSWORD';
+    CREATE DATABASE IF NOT EXISTS {{ DB_NAME }};
+    GRANT ALL PRIVILEGES ON {{ DB_NAME }}.* TO '$DB_APP_USERNAME' IDENTIFIED BY '$DB_APP_PASSWORD';
 
 ---
 apiVersion: batch/v1
@@ -35,7 +35,7 @@ spec:
           for db in $DB_LIST; do
             [[ echo \"show databases;\" | mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT | grep \$db ]] || \
             cat /db-ops/create-user.sql | \
-            sed \"s/__DB_NAME/\$db/g\" | \
+            sed \"s/{{ DB_NAME }}/\$db/g\" | \
             mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT
           done
         env:
