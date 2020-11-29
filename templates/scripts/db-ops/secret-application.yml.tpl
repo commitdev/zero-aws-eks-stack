@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: $PROJECT_NAME
+  name: $SECRET_NAME
   namespace: $NAMESPACE
 type: Opaque
 stringData:

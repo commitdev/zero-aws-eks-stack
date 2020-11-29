@@ -1,5 +1,5 @@
 locals {
-  log_format = <<EOF
+  log_format       = <<EOF
 {
  "timestamp": "$time_iso8601",
  "remote_addr": "$remote_addr",
@@ -20,7 +20,8 @@ locals {
  "http_x_forwarded_for": "$proxy_add_x_forwarded_for"
 }
 EOF
-
+  controller_image = "k8s.gcr.io/ingress-nginx/controller"
+  controller_tag   = "v0.41.2"
 }
 
 resource "kubernetes_namespace" "ingress_nginx" {
@@ -232,7 +233,7 @@ resource "kubernetes_deployment" "nginx_ingress_controller" {
       spec {
         container {
           name  = "nginx-ingress-controller"
-          image = "quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.30.0"
+          image = "${local.controller_image}:${local.controller_tag}"
           args = [
             "/nginx-ingress-controller",
             "--configmap=$(POD_NAMESPACE)/nginx-configuration",

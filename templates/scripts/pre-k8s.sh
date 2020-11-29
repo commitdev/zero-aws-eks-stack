@@ -1,9 +1,11 @@
 #!/bin/sh
 ZERO_K8S_UTILS_VERSION=0.0.3
 OATHKEEPER_VERSION=v0.38.4-beta.1-alpine
+KUBE_CONTEXT=${PROJECT}-${ENVIRONMENT}-${AWS_DEFAULT_REGION}
+RANDOM_SEED="<% index .Params `randomSeed` %>"
 
-VPN_SECRET_NAME=${PROJECT}-${ENVIRONMENT}-vpn-wg-privatekey-<% index .Params `randomSeed` %>
-OATHKEEPER_SECRET_NAME=${PROJECT}-${ENVIRONMENT}-oathkeeper-jwks-<% index .Params `randomSeed` %>
+VPN_SECRET_NAME=${PROJECT}-${ENVIRONMENT}-vpn-wg-privatekey-${RANDOM_SEED}
+OATHKEEPER_SECRET_NAME=${PROJECT}-${ENVIRONMENT}-oathkeeper-jwks-${RANDOM_SEED}
 
 # Create VPN private key if the secret doesn't already exist
 aws secretsmanager describe-secret --region ${AWS_DEFAULT_REGION} --secret-id ${VPN_SECRET_NAME} > /dev/null 2>&1
@@ -28,4 +30,19 @@ if [[ $? -ne 0 ]]; then
         echo "Done Oathkeeper JWKS file creation..."
     fi
 fi
+
+kubectl --context ${KUBE_CONTEXT} -n user-auth get secrets ${PROJECT} > /dev/null 2>&1
+if [[ $? -ne 0 ]]; then
+	REGION=${AWS_DEFAULT_REGION} \
+	SEED=${RANDOM_SEED} \
+	PROJECT_NAME=${PROJECT} \
+	ENVIRONMENT=${ENVIRONMENT} \
+	NAMESPACE=user-auth \
+	DATABASE_TYPE=<% index .Params `database` %> \
+	DATABASE_NAME=user_auth \
+	USER_NAME=kratos \
+	CREATE_SECRET=secret-user-auth.yml.tpl \
+	sh ./create-db-user.sh
+fi
+
 <% end %>

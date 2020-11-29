@@ -6,6 +6,8 @@ usage () {
   exit 1
 }
 
+[[ "$1" == "devenv" ]] && DEVENV=$1
+
 # check parameters
 # REGION        - AWS region to use
 # SEED          - Random seed that is part of the name of the AWS secret containing the db master password
@@ -13,26 +15,29 @@ usage () {
 # ENVIRONMENT   - stage or prod
 # NAMESPACE     - The target k8s namespace to create and create a secret in
 # DATABASE_TYPE - The type of database - mysql, postgres
-# DATABASE_LIST - The name of the database to create in the database server
+# DATABASE_NAME - The name of the database(s) to create in the database server
 # USER_NAME     - The name of the user to create and grant access to the database specified above
-# USER_PASSWORD - The password of the user to create and grant access to the database specified above
-# CREATE_SECRET - A template file to render to create a secret
+# USER_PASSWORD - The password of the user to create and grant access to the database specified above (optional)
+# SECRET_NAME   - The secret of the database user to get password
+# CREATE_SECRET - A template file to render to create a secret (optional)
+# CREATE_DB_POD - A template file to render to create a db pod for troubleshooting (optional)
 ([[ -z "${REGION}" ]]        || \
  [[ -z "${SEED}" ]]          || \
  [[ -z "${PROJECT_NAME}" ]]  || \
  [[ -z "${ENVIRONMENT}" ]]   || \
  [[ -z "${NAMESPACE}" ]]     || \
  [[ -z "${DATABASE_TYPE}" ]] || \
- [[ -z "${DATABASE_LIST}" ]] || \
+ [[ -z "${DATABASE_NAME}" ]] || \
  [[ -z "${USER_NAME}" ]] )  && \
-echo "Some environment variables (REGION, SEED, PROJECT_NAME, ENVIRONMENT, NAMESPACE, DATABASE_TYPE, DATABASE_LIST, USER_NAME) are not set properly." && usage
+echo "Some environment variables (REGION, SEED, PROJECT_NAME, ENVIRONMENT, NAMESPACE, DATABASE_TYPE, DATABASE_NAME, USER_NAME) are not set properly." && usage
 
 # docker image with postgres + mysql clients
 DOCKER_IMAGE_TAG=commitdev/zero-k8s-utilities:0.0.3
 
 # database info preparation
 DB_ENDPOINT=database.${PROJECT_NAME}
-DB_LIST=$(echo ${DATABASE_LIST} | tr -dc 'A-Za-z0-9 ')
+DB_NAME_LIST=$(echo ${DATABASE_NAME} | tr -dc 'A-Za-z0-9 ') # used by job
+DB_NAME=$(echo ${DB_NAME_LIST} | cut -d" " -f1) # used by db-pod
 DB_TYPE=${DATABASE_TYPE}
 ## get rds master
 SECRET_ID=$(aws secretsmanager list-secrets --region ${REGION}  --query "SecretList[?Name=='${PROJECT_NAME}-${ENVIRONMENT}-rds-${SEED}'].Name" | jq -r ".[0]")
@@ -50,10 +55,10 @@ elif [[ "${DB_TYPE}" == "mysql" ]]; then
 fi
 
 # fill in env-vars to db user creation manifest
+SECRET_NAME=${DEVENV}${PROJECT_NAME}
 JOB_ID=$(LC_ALL=C tr -dc 'a-z0-9' < /dev/urandom | head -c 8)
 eval "echo \"$(cat ./db-ops/job-create-db-${DATABASE_TYPE}.yml.tpl)\"" > ./k8s-job-create-db.yml
 [[ -z "${CREATE_SECRET}" ]] || eval "echo \"$(cat ./db-ops/${CREATE_SECRET})\"" >> ./k8s-job-create-db.yml
-[[ -z "${CREATE_DB_POD}" ]] || eval "echo \"$(cat ./db-ops/deployment-db-test.yml.tpl)\"" >> ./k8s-job-create-db.yml
 # the manifest creates these things
 # 1. Namespaces: db-ops, $NAMESPACE
 # 2. Secret in db-ops: db-create-users (with master password, and a .sql file
