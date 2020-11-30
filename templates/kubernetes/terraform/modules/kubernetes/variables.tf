@@ -88,6 +88,12 @@ variable "cf_signing_enabled" {
   description = "Enable CloudFront signed URLs"
 }
 
+variable "domain_name" {
+  description = "Root domain name"
+  type        = string
+  default     = ""
+}
+
 variable "internal_domain" {
   description = "Internal domain to create records in"
   type        = string
@@ -114,6 +120,12 @@ variable "backend_service_domain" {
 
 variable "frontend_service_domain" {
   description = "Domain of the frontend"
+  type        = string
+  default     = ""
+}
+
+variable "user_auth_mail_from_address" {
+  description = "Mail from the user management system will come from this address"
   type        = string
   default     = ""
 }

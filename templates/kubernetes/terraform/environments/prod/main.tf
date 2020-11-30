@@ -74,9 +74,11 @@ module "kubernetes" {
     ["Carter L", "10.10.99.202/32", "h2jMuaXNIlx7Z0a3owWFjPsAA8B+ZpQH3FbZK393+08="],
   ]
 
-  auth_enabled            = <% if eq (index .Params `userAuth`) "yes" %>true<% else %>false<% end %>
-  auth_domain             = "auth.${local.domain_name}"
-  backend_service_domain  = "<% index .Params `productionBackendSubdomain` %>${local.domain_name}"
-  frontend_service_domain = "<% index .Params `productionFrontendSubdomain` %>${local.domain_name}"
-
+  domain_name                 = local.domain_name
+  auth_enabled                = <% if eq (index .Params `userAuth`) "yes" %>true<% else %>false<% end %>
+  auth_domain                 = "auth.${local.domain_name}"
+  backend_service_domain      = "<% index .Params `productionBackendSubdomain` %>${local.domain_name}"
+  frontend_service_domain     = "<% index .Params `productionFrontendSubdomain` %>${local.domain_name}"
+  # This domain or address must be verified by the mail provider (Sendgrid, SES, etc.)
+  user_auth_mail_from_address = "noreply@${local.domain_name}"
 }

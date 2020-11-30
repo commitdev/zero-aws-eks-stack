@@ -97,6 +97,11 @@ resource "helm_release" "kratos" {
   # }
 
   set {
+    name  = "kratos.config.courier.smtp.from_address"
+    value = var.user_auth_mail_from_address
+  }
+
+  set {
     name  = "kratos.config.serve.public.base_url"
     value = "https://${var.backend_service_domain}/.ory/kratos/public"
   }
