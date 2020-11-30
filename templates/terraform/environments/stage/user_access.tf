@@ -10,6 +10,12 @@ locals {
 
 # define AWS policy documents for developer
 data "aws_iam_policy_document" "developer_access" {
+  # IAM
+  statement {
+    effect    = "Allow"
+    actions   = ["iam:GetGroup"]
+    resources = ["arn:aws:iam::${local.account_id}:group/users/${local.project}-developer-stage"]
+  }
   # EKS
   statement {
     effect    = "Allow"
