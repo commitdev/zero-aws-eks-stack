@@ -123,3 +123,9 @@ variable "frontend_service_domain" {
   type        = string
   default     = ""
 }
+
+variable "user_auth_mail_from_address" {
+  description = "Mail from the user management system will come from this address"
+  type        = string
+  default     = ""
+}
