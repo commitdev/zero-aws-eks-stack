@@ -40,6 +40,6 @@ module "sendgrid_api_key" {
 
   name  = "${local.project}-sendgrid-<% index .Params `randomSeed` %>"
   type  = "string"
-  value = "<% index .Params `sendgridApiKey` %>"
+  value = var.sendgrid_api_key
   tags  = map("sendgrid", local.project)
 }

@@ -28,7 +28,7 @@ apply-secrets:
 	aws secretsmanager describe-secret --secret-id "$(PROJECT)-$(ENVIRONMENT)-rds-<% index .Params `randomSeed` %>" > /dev/null 2>&1 || ( \
 	cd terraform/bootstrap/secrets && \
 	terraform init && \
-	terraform apply $(AUTO_APPROVE) && \
+	terraform apply $(AUTO_APPROVE) --var "sendgrid_api_key=${sendgridApiKey}" && \
 	rm ./terraform.tfstate )
 
 apply-shared-env:
