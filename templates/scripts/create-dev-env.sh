@@ -5,7 +5,7 @@ AWS_DEFAULT_REGION=<% index .Params `region` %>
 RANDOM_SEED="<% index .Params `randomSeed` %>"
 ENVIRONMENT=stage  # only apply to Staging environment
 
-DEV_DB_LIST=$(aws iam get-group --group-name ${PROJECT}-developer-${ENVIRONMENT} | jq -r .Users[].UserName | sed 's/^/dev/' | tr '\n' ' ')
+DEV_DB_LIST=$(aws iam get-group --group-name ${PROJECT}-developer-${ENVIRONMENT} | jq -r '"dev" + .Users[].UserName' | tr '\n' ' ')
 if [[ -z "${DEV_DB_LIST}" ]]; then
     echo "$0: No developers available"
     exit 2
