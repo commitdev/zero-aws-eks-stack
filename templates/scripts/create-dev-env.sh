@@ -22,8 +22,9 @@ if [[ $? -eq 0 ]]; then
     NAMESPACE=${PROJECT} \
     DATABASE_TYPE=<% index .Params `database` %> \
 	DATABASE_NAME="${DEV_DB_LIST}" \
+    SECRET_NAME=devenv${PROJECT} \
 	USER_NAME=dev${PROJECT} \
 	USER_PASSWORD=${DEV_DB_SECRET} \
     CREATE_SECRET=secret-application.yml.tpl \
-	sh ./create-db-user.sh devenv
+	sh ./create-db-user.sh
 fi

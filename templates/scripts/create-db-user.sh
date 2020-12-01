@@ -6,8 +6,6 @@ usage () {
   exit 1
 }
 
-[[ "$1" == "devenv" ]] && DEVENV=$1
-
 # check parameters
 # REGION        - AWS region to use
 # SEED          - Random seed that is part of the name of the AWS secret containing the db master password
@@ -28,6 +26,7 @@ usage () {
  [[ -z "${NAMESPACE}" ]]     || \
  [[ -z "${DATABASE_TYPE}" ]] || \
  [[ -z "${DATABASE_NAME}" ]] || \
+ [[ -z "${SECRET_NAME}" ]]  || \
  [[ -z "${USER_NAME}" ]] )  && \
 echo "Some environment variables (REGION, SEED, PROJECT_NAME, ENVIRONMENT, NAMESPACE, DATABASE_TYPE, DATABASE_NAME, USER_NAME) are not set properly." && usage
 
@@ -55,7 +54,6 @@ elif [[ "${DB_TYPE}" == "mysql" ]]; then
 fi
 
 # fill in env-vars to db user creation manifest
-SECRET_NAME=${DEVENV}${PROJECT_NAME}
 JOB_ID=$(LC_ALL=C tr -dc 'a-z0-9' < /dev/urandom | head -c 8)
 eval "echo \"$(cat ./db-ops/job-create-db-${DATABASE_TYPE}.yml.tpl)\"" > ./k8s-job-create-db.yml
 [[ -z "${CREATE_SECRET}" ]] || eval "echo \"$(cat ./db-ops/${CREATE_SECRET})\"" >> ./k8s-job-create-db.yml
