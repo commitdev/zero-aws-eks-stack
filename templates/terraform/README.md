@@ -123,13 +123,24 @@ ENVIRONENT=<env> make apply-env
 ```
 This should detect that there was a new user created, and put them into the necessary group.
 
- 3. To create initial temporary password for users, you may run:
+ 3. To create dev environment for developers, run:
+```
+scripts/create-dev-env.sh
+```
+This should detect new users under developer group, and create dev database for each.
+
+ 4. To create initial temporary password for users, you may run:
 ```
 script/create-temporary-passwords.sh
 ```
 You will get a list with username, termporary password and roles that the user is assigned to. Then, you can pass to the corresponding users.
 
-  4. New users can check and setup local configurations for resoruce access by running:
+ 5. New users can check and setup local configurations for resoruce access by running:
+```
+script/setup-local-config.sh <user name> <role> <environment (stage/prod)>
+```
+
+ 6. New users can check and setup local configurations for resoruce access by running:
 ```
 script/setup-local-config.sh <user name> <role> <environment (stage/prod)>
 ```
