@@ -76,3 +76,4 @@ then
 else
   echo "Failed to create application database user, please see 'kubectl logs -n db-ops -l job-name=db-create-users-$NAMESPACE-${JOB_ID}'"
 fi
+
