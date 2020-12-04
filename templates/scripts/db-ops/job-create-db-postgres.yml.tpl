@@ -13,11 +13,10 @@ type: Opaque
 stringData:
   RDS_MASTER_PASSWORD: $MASTER_RDS_PASSWORD
   create-user.sql: |
-    SELECT 'CREATE DATABASE $DB_NAME' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$DB_NAME');\gexec
-    SELECT 'REVOKE ALL PRIVILEGES ON DATABASE $DB_NAME FROM $DB_APP_USERNAME;' WHERE EXISTS (SELECT FROM pg_roles WHERE rolname = '$DB_APP_USERNAME');\gexec
-    SELECT 'DROP USER $DB_APP_USERNAME;' WHERE EXISTS (SELECT FROM pg_user WHERE usename = '$DB_APP_USERNAME');\gexec
-    CREATE USER $DB_APP_USERNAME WITH ENCRYPTED PASSWORD '$DB_APP_PASSWORD';
-    GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_APP_USERNAME;
+    SELECT 'CREATE DATABASE {{ VAR_DB }}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '{{ VAR_DB }}');\gexec
+    SELECT 'CREATE USER $DB_APP_USERNAME' WHERE NOT EXISTS (SELECT FROM pg_user WHERE usename = '$DB_APP_USERNAME');\gexec
+    ALTER USER $DB_APP_USERNAME WITH ENCRYPTED PASSWORD '$DB_APP_PASSWORD';
+    GRANT ALL PRIVILEGES ON DATABASE {{ VAR_DB }} TO $DB_APP_USERNAME;
 
 ---
 apiVersion: v1
@@ -39,9 +38,14 @@ spec:
         image: $DOCKER_IMAGE_TAG
         command:
         - sh
-        args:
-        - '-c'
-        - psql -U$MASTER_RDS_USERNAME -h $DB_ENDPOINT postgres -v ON_ERROR_STOP=1 -a -f/db-ops/create-user.sql > /dev/null
+        - -c
+        - |
+          for db in $DB_NAME_LIST; do
+            [[ echo '\l' | psql -U$MASTER_RDS_USERNAME -h $DB_ENDPOINT postgres | grep \$db ]] || \
+            cat /db-ops/create-user.sql | \
+            sed \"s/{{ VAR_DB }}/\$db/g\" | \
+            psql -U$MASTER_RDS_USERNAME -h $DB_ENDPOINT postgres -v ON_ERROR_STOP=1 > /dev/null
+          done
         env:
         - name: PGPASSWORD
           valueFrom:
@@ -95,10 +99,10 @@ spec:
         - name: DB_USERNAME
           valueFrom:
             secretKeyRef:
-              name: $PROJECT_NAME
+              name: $SECRET_NAME
               key: DATABASE_USERNAME
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: $PROJECT_NAME
+              name: $SECRET_NAME
               key: DATABASE_PASSWORD

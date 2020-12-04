@@ -41,6 +41,17 @@ data "terraform_remote_state" "shared" {
   }
 }
 
+# rds shared db password for dev envrionment
+module "rds_dev_secret" {
+  source  = "commitdev/zero/aws//modules/secret"
+  version = "0.0.2"
+  
+  name          = "${local.project}-stage-rds-${local.random_seed}-devenv"
+  type          = "random"
+  random_length = 32
+  tags          = map("rds", "${local.project}-stage-devenv")
+}
+
 # Instantiate the staging environment
 module "stage" {
   source      = "../../modules/environment"
@@ -118,7 +129,7 @@ module "stage" {
     {
       name         = "developer"
       aws_policy   = data.aws_iam_policy_document.developer_access.json
-      k8s_policies = local.k8s_developer_access
+      k8s_policies = local.k8s_developer_env_access
       k8s_groups   = ["vpn-users"]
     },
     {

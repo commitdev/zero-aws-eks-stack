@@ -13,10 +13,8 @@ type: Opaque
 stringData:
   RDS_MASTER_PASSWORD: $MASTER_RDS_PASSWORD
   create-user.sql: |
-    CREATE DATABASE IF NOT EXISTS $DB_NAME;
-    DROP USER IF EXISTS '$DB_APP_USERNAME';
-    CREATE USER '$DB_APP_USERNAME' IDENTIFIED BY '$DB_APP_PASSWORD';
-    GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_APP_USERNAME';
+    CREATE DATABASE IF NOT EXISTS {{ VAR_DB }};
+    GRANT ALL PRIVILEGES ON {{ VAR_DB }}.* TO '$DB_APP_USERNAME' IDENTIFIED BY '$DB_APP_PASSWORD';
 
 ---
 apiVersion: v1
@@ -38,14 +36,15 @@ spec:
         image: $DOCKER_IMAGE_TAG
         command:
         - sh
-        args:
-        - '-c'
-        - mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT mysql < /db-ops/create-user.sql
+        - -c
+        - |
+          for db in $DB_NAME_LIST; do
+            [[ echo \"show databases;\" | mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT | grep \$db ]] || \
+            cat /db-ops/create-user.sql | \
+            sed \"s/{{ VAR_DB }}/\$db/g\" | \
+            mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT
+          done
         env:
-        - name: DB_ENDPOINT
-          value: $DB_ENDPOINT
-        - name: DB_NAME
-          value: $DB_NAME
         - name: MYSQL_PWD
           valueFrom:
             secretKeyRef:
@@ -98,10 +97,10 @@ spec:
         - name: DB_USERNAME
           valueFrom:
             secretKeyRef:
-              name: $PROJECT_NAME
+              name: $SECRET_NAME
               key: DATABASE_USERNAME
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: $PROJECT_NAME
+              name: $SECRET_NAME
               key: DATABASE_PASSWORD

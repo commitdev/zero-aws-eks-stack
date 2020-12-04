@@ -14,7 +14,13 @@ if [[ $? -ne 0 ]]; then
     NAMESPACE=${PROJECT} \
     DATABASE_TYPE=<% index .Params `database` %> \
     DATABASE_NAME=${PROJECT} \
+    SECRET_NAME=${PROJECT} \
     USER_NAME=${PROJECT} \
     CREATE_SECRET=secret-application.yml.tpl \
     sh ./create-db-user.sh
+fi
+
+# Create dev environment on Staging for developers
+if [[ ${ENVIRONMENT} == "stage" ]]; then
+    sh ./create-dev-env.sh
 fi

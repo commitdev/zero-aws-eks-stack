@@ -40,6 +40,7 @@ if [[ $? -ne 0 ]]; then
     NAMESPACE=user-auth \
     DATABASE_TYPE=<% index .Params `database` %> \
     DATABASE_NAME=user_auth \
+    SECRET_NAME=${PROJECT} \
     USER_NAME=kratos \
     CREATE_SECRET=secret-user-auth.yml.tpl \
     <%- if ne (index .Params `sendgridApiKey`) "" %>

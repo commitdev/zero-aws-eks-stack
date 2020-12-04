@@ -10,6 +10,12 @@ locals {
 
 # define AWS policy documents for developer
 data "aws_iam_policy_document" "developer_access" {
+  # IAM
+  statement {
+    effect    = "Allow"
+    actions   = ["iam:GetGroup"]
+    resources = ["arn:aws:iam::${local.account_id}:group/users/${local.project}-developer-stage"]
+  }
   # EKS
   statement {
     effect    = "Allow"
@@ -173,6 +179,23 @@ data "aws_iam_policy_document" "deployer_access" {
 
 
 locals {
+  # define Kubernetes policy for developer env deployment
+  # TODO: given that in a small team, developers are given almost full permissions on Staging here. In the future, may limit the permissions to sub-namepsace per user.
+  k8s_developer_env_access = [
+    # to support developer environment
+    {
+      verbs      = ["create", "exec", "list", "get", "delete", "patch", "update", "watch"]
+      api_groups = ["*"]
+      resources = ["namespaces", "deployments", "deployments/scale", "configmaps", "pods", "pods/log", "pods/status", "pods/portforward", "pods/exec",
+        "jobs", "cronjobs", "daemonsets", "endpoints", "events",
+        "replicasets", "horizontalpodautoscalers", "horizontalpodautoscalers/status",
+        "ingresses", "services", "serviceaccounts",
+        "poddisruptionbudgets",
+        "secrets"
+      ]
+    }
+  ]
+
   # define Kubernetes policy for developer
   k8s_developer_access = [
     {
