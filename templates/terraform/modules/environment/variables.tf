@@ -68,6 +68,12 @@ variable "db_storage_gb" {
   description = "The amount of storage to allocate for the db, in GB"
 }
 
+variable "vpc_enable_nat_gateway" {
+  description = "Enable nat-gateway"
+  type        = bool
+  default     = true
+}
+
 variable "vpc_use_single_nat_gateway" {
   description = "Use single nat-gateway instead of nat-gateway per subnet"
   type        = bool

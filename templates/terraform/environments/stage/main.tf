@@ -102,7 +102,10 @@ module "stage" {
 
   domain_name = local.domain_name
 
-  # This will save some money as there a cost associated to each NAT gateway, but if the AZ with the gateway
+  # Instead of NAT gateway, enable NAT instance at cost of $1 per month
+  vpc_enable_nat_gateway = false
+
+  # When use NAT gateway, this setting will save some money as there a cost associated to each NAT gateway, but if the AZ with the gateway
   # goes down, nothing in the private subnets will be able to reach the internet. Not recommended for production.
   vpc_use_single_nat_gateway = true
 
