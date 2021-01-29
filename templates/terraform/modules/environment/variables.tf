@@ -80,6 +80,12 @@ variable "vpc_use_single_nat_gateway" {
   default     = true
 }
 
+variable "vpc_nat_instance_types" {
+   description = "Candidates of instance type for the NAT instance"
+   type        = list
+   default     = ["t3.nano", "t3a.nano"]
+}
+
 variable "database" {
   default     = "postgres"
   description = "Which database engine to use, currently supports postgres or mysql"

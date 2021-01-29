@@ -46,6 +46,7 @@ module "vpc" {
   kubernetes_cluster_name = local.kubernetes_cluster_name
   enable_nat_gateway      = var.vpc_enable_nat_gateway
   single_nat_gateway      = var.vpc_use_single_nat_gateway
+  nat_instance_types      = var.vpc_nat_instance_types
 }
 
 # To get the current account id
