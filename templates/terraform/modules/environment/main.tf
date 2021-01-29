@@ -38,13 +38,15 @@ data "aws_iam_user" "ci_user" {
 
 module "vpc" {
   source  = "commitdev/zero/aws//modules/vpc"
-  version = "0.1.11"
+  version = "0.1.14"
 
   project                 = var.project
   environment             = var.environment
   region                  = var.region
   kubernetes_cluster_name = local.kubernetes_cluster_name
+  enable_nat_gateway      = var.vpc_enable_nat_gateway
   single_nat_gateway      = var.vpc_use_single_nat_gateway
+  nat_instance_types      = var.vpc_nat_instance_types
 }
 
 # To get the current account id
