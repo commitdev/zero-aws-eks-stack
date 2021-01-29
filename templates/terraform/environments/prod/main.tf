@@ -66,6 +66,7 @@ module "prod" {
   eks_worker_ami = "<% index .Params `eksWorkerAMI` %>"
 
   # Hosting configuration. Each domain will have a bucket created for it, but may have mulitple aliases pointing to the same bucket.
+  # Note that because of the way terraform handles lists, new records should be added to the end of the list.
   hosted_domains = [
     {
       domain : local.domain_name,

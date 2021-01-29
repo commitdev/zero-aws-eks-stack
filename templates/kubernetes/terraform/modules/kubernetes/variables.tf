@@ -129,3 +129,9 @@ variable "user_auth_mail_from_address" {
   type        = string
   default     = ""
 }
+
+variable "use_notification_service" {
+  description = "If enabled, will install the Zero notification service in the cluster to enable easy implementation of notification via email, sms, push, etc."
+  type        = string
+  default     = "false"
+}

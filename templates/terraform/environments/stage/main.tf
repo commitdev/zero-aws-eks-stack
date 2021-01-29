@@ -45,7 +45,7 @@ data "terraform_remote_state" "shared" {
 module "rds_dev_secret" {
   source  = "commitdev/zero/aws//modules/secret"
   version = "0.0.2"
-  
+
   name          = "${local.project}-stage-rds-${local.random_seed}-devenv"
   type          = "random"
   random_length = 32
@@ -76,6 +76,8 @@ module "stage" {
   # https://<% index .Params `region` %>.console.aws.amazon.com/systems-manager/parameters/%252Faws%252Fservice%252Feks%252Foptimized-ami%252F1.18%252Famazon-linux-2%252Frecommended%252Fimage_id/description?region=<% index .Params `region` %>
   eks_worker_ami = "<% index .Params `eksWorkerAMI` %>"
 
+  # Hosting configuration. Each domain will have a bucket created for it, but may have mulitple aliases pointing to the same bucket.
+  # Note that because of the way terraform handles lists, new records should be added to the end of the list.
   hosted_domains = [
     {
       domain : local.domain_name,
