@@ -102,8 +102,9 @@ module "stage" {
 
   domain_name = local.domain_name
 
-  # NAT configuration
-  ## Instead of NAT gateway, enable NAT instance at cost of $1 per month
+  # NAT configuration - NAT allows traffic from private subnets to access the public internet
+  
+  ## Instead of using AWS NAT gateway, use a NAT instance which is cheaper by about $30/month, though NAT gateways are more reliable. Only recommended for non-production environments.
   vpc_enable_nat_gateway = false
 
   ## Use this setting to override default NAT instance types
