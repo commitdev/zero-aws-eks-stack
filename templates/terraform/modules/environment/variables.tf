@@ -83,7 +83,7 @@ variable "vpc_use_single_nat_gateway" {
 variable "vpc_nat_instance_types" {
    description = "Candidates of instance type for the NAT instance"
    type        = list
-   default     = ["t3.nano", "t3a.nano"]
+   default     = ["t3.nano"]
 }
 
 variable "database" {

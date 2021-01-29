@@ -107,9 +107,6 @@ module "stage" {
   ## Instead of using AWS NAT gateway, use a NAT instance which is cheaper by about $30/month, though NAT gateways are more reliable. Only recommended for non-production environments.
   vpc_enable_nat_gateway = false
 
-  ## Use this setting to override default NAT instance types
-  vpc_nat_instance_types = ["t3.nano", "t3a.nano"]
-
   ## When using NAT gateway, setting this to true will save some money as there a cost per-gateway of about $35/month. However, if the AZ with the gateway goes down nothing in the private subnets will be able to reach the internet. Not recommended for production. Not used if `vpc_enable_nat_gateway` is `false`.
   vpc_use_single_nat_gateway = true
 
