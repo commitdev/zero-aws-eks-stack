@@ -110,7 +110,7 @@ module "stage" {
   ## Use this setting to override default NAT instance types
   vpc_nat_instance_types = ["t3.nano", "t3a.nano"]
 
-  ## When use NAT gateway, this setting will save some money as there a cost associated to each NAT gateway, but if the AZ with the gateway goes down, nothing in the private subnets will be able to reach the internet. Not recommended for production.
+  ## When using NAT gateway, setting this to true will save some money as there a cost per-gateway of about $35/month. However, if the AZ with the gateway goes down nothing in the private subnets will be able to reach the internet. Not recommended for production. Not used if `vpc_enable_nat_gateway` is `false`.
   vpc_use_single_nat_gateway = true
 
   # DB configuration
