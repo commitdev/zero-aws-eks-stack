@@ -5,7 +5,6 @@ KUBE_CONTEXT=${PROJECT}-${ENVIRONMENT}-${AWS_DEFAULT_REGION}
 RANDOM_SEED="<% index .Params `randomSeed` %>"
 
 VPN_SECRET_NAME=${PROJECT}-${ENVIRONMENT}-vpn-wg-privatekey-${RANDOM_SEED}
-SENDGRID_SECRET_NAME=${PROJECT}-${ENVIRONMENT}-sendgrid-api-key-${RANDOM_SEED}
 OATHKEEPER_SECRET_NAME=${PROJECT}-${ENVIRONMENT}-oathkeeper-jwks-${RANDOM_SEED}
 
 # Create VPN private key if the secret doesn't already exist
@@ -19,18 +18,6 @@ if [[ $? -ne 0 ]]; then
         echo "Done VPN private key creation"
     fi
 fi
-
-<% if ne (index .Params `sendgridApiKey`) "" %>
-# Create sendgrid api key secret if the secret doesn't already exist
-aws secretsmanager describe-secret --region ${AWS_DEFAULT_REGION} --secret-id ${SENDGRID_SECRET_NAME} > /dev/null 2>&1
-if [[ $? -ne 0 ]]; then
-    echo "Creating Sendgrid API key secret..."
-    aws secretsmanager create-secret --region ${AWS_DEFAULT_REGION} --name ${SENDGRID_SECRET_NAME} --description "Sendgrid API Key" --tags "[{\"Key\":\"sendgrid-api-key\",\"Value\":\"${PROJECT}-${ENVIRONMENT}\"}]" --secret-string "${sendgridApiKey}"
-    if [[ $? -eq 0 ]]; then
-        echo "Done Sendgrid API key secret creation..."
-    fi
-fi
-<% end %>
 
 <% if eq (index .Params `userAuth`) "yes" %>
 # Create oathkeeper JWKS file if the secret doesn't already exist
