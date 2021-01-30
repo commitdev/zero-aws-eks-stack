@@ -70,8 +70,8 @@ module "kubernetes" {
   # Wireguard configuration
   vpn_server_address = "10.10.99.0/24"
   vpn_client_publickeys = [
-    ["Max C", "10.10.99.201/32", "/B3Q/Hlf+ILInjpehTLk9DZGgybdGdbm0SsG87OnWV0="],
-    ["Carter L", "10.10.99.202/32", "h2jMuaXNIlx7Z0a3owWFjPsAA8B+ZpQH3FbZK393+08="],
+    # ["Test User 1", "10.10.99.201/32", "/B3Q/Hlf+ILInjpehTLk9DZGgybdGdbm0SsG87OnWV0="],
+    # ["Test User 2", "10.10.99.202/32", "h2jMuaXNIlx7Z0a3owWFjPsAA8B+ZpQH3FbZK393+08="],
   ]
 
   domain_name                 = local.domain_name
@@ -81,4 +81,6 @@ module "kubernetes" {
   frontend_service_domain     = "<% index .Params `productionFrontendSubdomain` %>${local.domain_name}"
   # This domain or address must be verified by the mail provider (Sendgrid, SES, etc.)
   user_auth_mail_from_address = "noreply@${local.domain_name}"
+
+  notification_service_enabled    = <%if eq (index .Params `sendgridApiKey`) "" %>false<% else %>true<% end %>
 }

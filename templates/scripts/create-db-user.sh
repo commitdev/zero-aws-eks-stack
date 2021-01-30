@@ -72,8 +72,9 @@ rm -f ./k8s-job-create-db.yml
 kubectl -n db-ops wait --for=condition=complete --timeout=10s job db-create-users-$NAMESPACE-${JOB_ID}
 if [ $? -eq 0 ]
 then
-  kubectl delete namespace db-ops
+    kubectl delete namespace db-ops
 else
-  echo "Failed to create application database user, please see 'kubectl logs -n db-ops -l job-name=db-create-users-$NAMESPACE-${JOB_ID}'"
+    echo "Failed to create application database user, please see 'kubectl logs -n db-ops -l job-name=db-create-users-$NAMESPACE-${JOB_ID}'"
+    kubectl delete secret -n db-ops ${SECRET_NAME}
 fi
 
