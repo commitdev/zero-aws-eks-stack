@@ -32,6 +32,19 @@ resource "helm_release" "notification_service" {
     value = "true"
   }
 
+  set {
+    name  = "autoscaling.enabled"
+    value = var.notification_service_highly_available ? "true" : "false" # If false, deployment replicas will be set to 1 and the replica options below will be ignored
+  }
+  set {
+    name  = "autoscaling.minReplicas"
+    value = var.notification_service_highly_available ? "2" : "1"
+  }
+  set {
+    name  = "autoscaling.maxReplicas"
+    value = var.notification_service_highly_available ? "4" : "2"
+  }
+
   # This will become a secret provided as an env var
   set_sensitive {
     name  = "application.sendgridApiKey"
