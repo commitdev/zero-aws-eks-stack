@@ -82,5 +82,6 @@ module "kubernetes" {
   # This domain or address must be verified by the mail provider (Sendgrid, SES, etc.)
   user_auth_mail_from_address = "noreply@${local.domain_name}"
 
-  notification_service_enabled    = <%if eq (index .Params `sendgridApiKey`) "" %>false<% else %>true<% end %>
+  notification_service_enabled          = <%if eq (index .Params `sendgridApiKey`) "" %>false<% else %>true<% end %>
+  notification_service_highly_available = true
 }

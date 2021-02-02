@@ -132,6 +132,12 @@ variable "user_auth_mail_from_address" {
 
 variable "notification_service_enabled" {
   description = "If enabled, will install the Zero notification service in the cluster to enable easy implementation of notification via email, sms, push, etc."
-  type        = string
-  default     = "false"
+  type        = bool
+  default     = false
+}
+
+variable "notification_service_highly_available" {
+  description = "If enabled, will make sure a minimum of 2 pods are running and use a horizontal pod autoscaler to make scale the number of pods based on CPU. Recommended for Production."
+  type        = bool
+  default     = true
 }
