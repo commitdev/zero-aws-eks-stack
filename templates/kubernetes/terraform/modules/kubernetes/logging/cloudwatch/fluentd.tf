@@ -28,8 +28,8 @@ resource "kubernetes_config_map" "cluster_info" {
 
 resource "kubernetes_service_account" "fluentd" {
   metadata {
-    name        = "fluentd"
-    namespace   = "amazon-cloudwatch"
+    name      = "fluentd"
+    namespace = "amazon-cloudwatch"
     annotations = {
       "eks.amazonaws.com/role-arn" = module.iam_assumable_role_fluentd.this_iam_role_arn
     }
@@ -178,6 +178,10 @@ resource "kubernetes_daemonset" "fluentd_cloudwatch" {
               }
             }
           }
+          env {
+            name  = "FLUENTD_OPT"
+            value = "-q"
+          }
           resources {
             limits {
               memory = "200Mi"
@@ -217,7 +221,7 @@ resource "kubernetes_daemonset" "fluentd_cloudwatch" {
         }
 
         security_context {
-          fs_group =  65534
+          fs_group = 65534
         }
 
         termination_grace_period_seconds = 30
