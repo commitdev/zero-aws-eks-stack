@@ -38,7 +38,7 @@ data "aws_iam_user" "ci_user" {
 
 module "vpc" {
   source  = "commitdev/zero/aws//modules/vpc"
-  version = "0.1.14"
+  version = "0.1.15"
 
   project                 = var.project
   environment             = var.environment
