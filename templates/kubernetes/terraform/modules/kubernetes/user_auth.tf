@@ -214,6 +214,7 @@ resource "helm_release" "kratos" {
 }
 
 data "template_file" "oathkeeper_kratos_proxy_rules" {
+  count = var.auth_enabled ? 1 : 0
   template = file("${path.module}/files/oathkeeper_kratos_proxy_rules.yaml.tpl")
   vars = {
     backend_service_domain    = var.backend_service_domain
@@ -223,12 +224,13 @@ data "template_file" "oathkeeper_kratos_proxy_rules" {
 }
 
 resource "null_resource" "oathkeeper_kratos_proxy_rules" {
+  count = var.auth_enabled ? 1 : 0
   triggers = {
-    manifest_sha1 = sha1(data.template_file.oathkeeper_kratos_proxy_rules.rendered)
+    manifest_sha1 = sha1(data.template_file.oathkeeper_kratos_proxy_rules[0].rendered)
   }
   # local exec call requires kubeconfig to be updated
   provisioner "local-exec" {
-    command = "kubectl apply -f - <<EOF\n${data.template_file.oathkeeper_kratos_proxy_rules.rendered}\nEOF"
+    command = "kubectl apply -f - <<EOF\n${data.template_file.oathkeeper_kratos_proxy_rules[0].rendered}\nEOF"
   }
   depends_on = [helm_release.oathkeeper]
 }
