@@ -181,3 +181,21 @@ variable "ci_user_name" {
   type        = string
   description = "CI user name" 
 }
+
+variable "cache_instance_type" {
+  type        = string
+  default     = "cache.t2.micro"
+  description = "Elastic cache instance type"
+}
+
+variable "cache_cluster_size" {
+  type        = number
+  default     = 1
+  description = "Number of nodes in cluster"
+}
+
+variable "cache_store" {
+  type        = string
+  default     = "none"
+  description = "Cache store - redis or memcached"
+}

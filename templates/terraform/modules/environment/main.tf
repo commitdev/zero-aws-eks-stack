@@ -38,7 +38,7 @@ data "aws_iam_user" "ci_user" {
 
 module "vpc" {
   source  = "commitdev/zero/aws//modules/vpc"
-  version = "0.1.15"
+  version = "0.1.16"
 
   project                 = var.project
   environment             = var.environment
@@ -179,12 +179,30 @@ module "user_access" {
   users = local.user_access_users
 }
 
+module "cache" {
+  source  = "commitdev/zero/aws//modules/cache"
+  version = "0.1.16"
+
+  project     = var.project
+  environment = var.environment
+
+  cache_store = var.cache_store
+
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnets
+  zone_name  = var.domain_name
+
+  cluster_size       = var.cache_cluster_size
+  instance_type      = var.cache_instance_type
+  availability_zones = module.vpc.azs
+  security_groups    = [module.vpc.default_security_group_id]
+}
 
 output "s3_hosting" {
   description = "used by access policy for s3 hosting bucket"
   value = [
     for p in module.s3_hosting : {
-      cloudfront_distribution_id = p.cloudfront_distribution_id
+      cloudfront_dis:tribution_id = p.cloudfront_distribution_id
       bucket_arn                 = p.bucket_arn
       cf_signing_enabled         = p.cf_signing_enabled
     }
