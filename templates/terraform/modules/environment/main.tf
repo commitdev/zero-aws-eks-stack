@@ -195,14 +195,14 @@ module "cache" {
   cluster_size       = var.cache_cluster_size
   instance_type      = var.cache_instance_type
   availability_zones = module.vpc.azs
-  security_groups    = [module.vpc.default_security_group_id]
+  security_groups    = [module.eks.worker_security_group_id]
 }
 
 output "s3_hosting" {
   description = "used by access policy for s3 hosting bucket"
   value = [
     for p in module.s3_hosting : {
-      cloudfront_dis:tribution_id = p.cloudfront_distribution_id
+      cloudfront_distribution_id = p.cloudfront_distribution_id
       bucket_arn                 = p.bucket_arn
       cf_signing_enabled         = p.cf_signing_enabled
     }
