@@ -67,8 +67,9 @@ parameters:
       - "postgres"
       - "mysql"
   - field: cacheStore
-    label: Cache store to use (redis)
+    label: Cache store to use (default: no cache)
     options:
+      - ""
       - "redis"
       - "memcached"
   - field: loggingType

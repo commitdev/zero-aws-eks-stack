@@ -199,3 +199,9 @@ variable "cache_store" {
   default     = "none"
   description = "Cache store - redis or memcached"
 }
+
+variable "cache_transit_encryption_enabled" {
+  description = "Enable TLS"
+  type        = bool
+  default     = true
+}

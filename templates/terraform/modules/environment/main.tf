@@ -190,12 +190,13 @@ module "cache" {
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
-  zone_name  = var.domain_name
 
   cluster_size       = var.cache_cluster_size
   instance_type      = var.cache_instance_type
   availability_zones = module.vpc.azs
   security_groups    = [module.eks.worker_security_group_id]
+
+  transit_encryption_enabled = var.cache_transit_encryption_enabled
 }
 
 output "s3_hosting" {

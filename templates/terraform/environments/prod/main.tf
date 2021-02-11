@@ -113,11 +113,15 @@ module "prod" {
   # Cache configuration
   ## you may define "redis" or "memcached" as your cache store. If you define "none", there will be no cache service launched.
   ## Check https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/SelectEngine.html to compare redis or memcached.
-  cache_store = "memcached"
+  cache_store = "<% index .Params `cacheStore` %>"
 
   ## See how to define node and instance type: https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/nodes-select-size.html
-  cache_cluster_size  = 3
+  cache_cluster_size  = 1
   cache_instance_type = "cache.r6g.large"
+
+  ## for Redis only
+  ### when this is enabled, your application needs to handle TLS connection. Note: redis-cli can not handle TLS.
+  cache_transit_encryption_enabled = true
 
   # Roles configuration
   roles = [
