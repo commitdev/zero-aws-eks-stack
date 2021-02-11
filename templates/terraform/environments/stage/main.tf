@@ -133,7 +133,7 @@ module "stage" {
   # Cache configuration
   ## you may define "redis" or "memcached" as your cache store. If you define "none", there will be no cache service launched.
   ## Check https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/SelectEngine.html to compare redis or memcached.
-  cache_store         = "memcached"
+  cache_store = "<% index .Params `cacheStore` %>"
 
   # Roles configuration
   roles = [
