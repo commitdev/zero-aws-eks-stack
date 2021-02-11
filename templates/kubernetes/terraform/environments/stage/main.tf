@@ -84,5 +84,5 @@ module "kubernetes" {
   notification_service_enabled          = <%if eq (index .Params `sendgridApiKey`) "" %>false<% else %>true<% end %>
   notification_service_highly_available = false
 
-  cache_store =  "<% index .Params `cacheStore` %>"
+  cache_store = "<% index .Params `cacheStore` %>"
 }
