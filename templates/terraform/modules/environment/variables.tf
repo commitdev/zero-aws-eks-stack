@@ -200,8 +200,8 @@ variable "cache_store" {
   description = "Cache store - redis or memcached"
 }
 
-variable "cache_transit_encryption_enabled" {
-  description = "Enable TLS"
+variable "cache_redis_transit_encryption_enabled" {
+  description = "Enable TLS for redis traffic. When this is enabled, your application needs to handle TLS connection. Note: redis-cli can not handle TLS."
   type        = bool
   default     = true
 }

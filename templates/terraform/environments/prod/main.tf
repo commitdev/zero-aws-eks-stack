@@ -119,10 +119,6 @@ module "prod" {
   cache_cluster_size  = 1
   cache_instance_type = "cache.r6g.large"
 
-  ## for Redis only
-  ### when this is enabled, your application needs to handle TLS connection. Note: redis-cli can not handle TLS.
-  cache_transit_encryption_enabled = true
-
   # Roles configuration
   roles = [
     {

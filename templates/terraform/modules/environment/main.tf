@@ -180,6 +180,8 @@ module "user_access" {
 }
 
 module "cache" {
+  count = var.cache_store == "none" ? 0 : 1
+
   source  = "commitdev/zero/aws//modules/cache"
   version = "0.1.16"
 
@@ -196,7 +198,7 @@ module "cache" {
   availability_zones = module.vpc.azs
   security_groups    = [module.eks.worker_security_group_id]
 
-  transit_encryption_enabled = var.cache_transit_encryption_enabled
+  redis_transit_encryption_enabled = var.cache_redis_transit_encryption_enabled
 }
 
 output "s3_hosting" {

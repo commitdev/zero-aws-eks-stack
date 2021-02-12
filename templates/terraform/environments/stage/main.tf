@@ -138,11 +138,6 @@ module "stage" {
   ## See how to define node and instance type: https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/nodes-select-size.html
   cache_cluster_size  = 1
   cache_instance_type = "cache.t2.micro"
-  <% if eq (index .Params `cacheStore`) "redis" %>
-  ## for Redis only
-  ### when this is enabled, your application needs to handle TLS connection. Note: redis-cli can not handle TLS.
-  cache_transit_encryption_enabled = true
-  <% end %>
 
   # Roles configuration
   roles = [
