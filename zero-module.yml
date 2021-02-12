@@ -66,6 +66,12 @@ parameters:
     options:
       - "postgres"
       - "mysql"
+  - field: cacheStore
+    label: "Cache store to use (default: no cache)"
+    options:
+      - "none"
+      - "redis"
+      - "memcached"
   - field: loggingType
     label: Application logging to configure. Cloudwatch is cheaper with a more limited feature set. Elasticsearch + Kibana will set up more infrastructure but enable a much richer logging search and visualization experience.
     options:

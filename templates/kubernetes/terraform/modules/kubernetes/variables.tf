@@ -141,3 +141,9 @@ variable "notification_service_highly_available" {
   type        = bool
   default     = true
 }
+
+variable "cache_store" {
+  description = "Cache store - redis or memcached"
+  type        = string
+  default     = "none"
+}

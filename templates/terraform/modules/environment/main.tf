@@ -179,6 +179,27 @@ module "user_access" {
   users = local.user_access_users
 }
 
+module "cache" {
+  count = var.cache_store == "none" ? 0 : 1
+
+  source  = "commitdev/zero/aws//modules/cache"
+  version = "0.1.16"
+
+  project     = var.project
+  environment = var.environment
+
+  cache_store = var.cache_store
+
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnets
+
+  cluster_size       = var.cache_cluster_size
+  instance_type      = var.cache_instance_type
+  availability_zones = module.vpc.azs
+  security_groups    = [module.eks.worker_security_group_id]
+
+  redis_transit_encryption_enabled = var.cache_redis_transit_encryption_enabled
+}
 
 output "s3_hosting" {
   description = "used by access policy for s3 hosting bucket"

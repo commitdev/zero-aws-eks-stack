@@ -130,6 +130,15 @@ module "stage" {
   sendgrid_enabled = <%if eq (index .Params `sendgridApiKey`) "" %>false<% else %>true<% end %>
   sendgrid_api_key_secret_name = "${local.project}-sendgrid-<% index .Params `randomSeed` %>"
 
+  # Cache configuration
+  ## you may define "redis" or "memcached" as your cache store. If you define "none", there will be no cache service launched.
+  ## Check https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/SelectEngine.html to compare redis or memcached.
+  cache_store = "<% index .Params `cacheStore` %>"
+
+  ## See how to define node and instance type: https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/nodes-select-size.html
+  cache_cluster_size  = 1
+  cache_instance_type = "cache.t2.micro"
+
   # Roles configuration
   roles = [
     {
