@@ -67,7 +67,7 @@ parameters:
       - "postgres"
       - "mysql"
   - field: cacheStore
-    label: Cache store to use (default: no cache)
+    label: Cache store to use (by default no cache)
     options:
       - ""
       - "redis"
