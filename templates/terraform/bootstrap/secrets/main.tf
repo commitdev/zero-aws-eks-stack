@@ -51,6 +51,6 @@ module "slack_api_key" {
 
   name  = "${local.project}-slack-<% index .Params `randomSeed` %>"
   type  = "string"
-  value = var.sendgrid_api_key
+  value = var.slack_api_key
   tags  = map("slack", local.project)
 }
