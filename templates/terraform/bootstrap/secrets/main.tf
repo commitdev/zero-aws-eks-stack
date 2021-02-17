@@ -43,3 +43,14 @@ module "sendgrid_api_key" {
   value = var.sendgrid_api_key
   tags  = map("sendgrid", local.project)
 }
+
+module "slack_api_key" {
+  count   = <%if eq (index .Params `notificationServiceSlackApiKey`) "" %>0<% else %>1<% end %>
+  source  = "commitdev/zero/aws//modules/secret"
+  version = "0.0.2"
+
+  name  = "${local.project}-slack-<% index .Params `randomSeed` %>"
+  type  = "string"
+  value = var.sendgrid_api_key
+  tags  = map("slack", local.project)
+}
