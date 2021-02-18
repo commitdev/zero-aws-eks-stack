@@ -1,5 +1,7 @@
 locals {
-  sendgrid_api_key_secret_name = "${var.project}-sendgrid-${var.random_seed}" # Created in terraform/bootstrap/secrets
+  # Created in terraform/bootstrap/secrets
+  sendgrid_api_key_secret_name = "${var.project}-sendgrid-${var.random_seed}"
+  slack_api_key_secret_name    = "${var.project}-slack-${var.random_seed}"
 }
 
 data "aws_secretsmanager_secret" "sendgrid_api_key" {
@@ -9,6 +11,15 @@ data "aws_secretsmanager_secret" "sendgrid_api_key" {
 data "aws_secretsmanager_secret_version" "sendgrid_api_key" {
   count     = var.notification_service_enabled ? 1 : 0
   secret_id = data.aws_secretsmanager_secret.sendgrid_api_key[0].id
+}
+
+data "aws_secretsmanager_secret" "slack_api_key" {
+  count = var.notification_service_enabled ? 1 : 0
+  name  = local.slack_api_key_secret_name
+}
+data "aws_secretsmanager_secret_version" "slack_api_key" {
+  count     = var.notification_service_enabled ? 1 : 0
+  secret_id = data.aws_secretsmanager_secret.slack_api_key[0].id
 }
 
 resource "kubernetes_namespace" "notification_service" {
@@ -24,13 +35,19 @@ resource "helm_release" "notification_service" {
   name       = "zero-notification-service"
   repository = "https://commitdev.github.io/zero-notification-service/"
   chart      = "zero-notification-service"
-  version    = "0.0.4"
+  version    = "0.0.5"
   namespace  = kubernetes_namespace.notification_service[0].metadata[0].name
 
   set {
     name  = "application.structuredLogging"
     value = "true"
   }
+
+  # Uncomment to set the image tag of the application to use separately from the chart version
+  # set {
+  #   name  = "image.tag"
+  #   value = "0.0.0"
+  # }
 
   set {
     name  = "autoscaling.enabled"
@@ -45,9 +62,14 @@ resource "helm_release" "notification_service" {
     value = var.notification_service_highly_available ? "4" : "2"
   }
 
-  # This will become a secret provided as an env var
+  # These will become secrets provided as env vars
   set_sensitive {
     name  = "application.sendgridApiKey"
     value = data.aws_secretsmanager_secret_version.sendgrid_api_key[0].secret_string
+  }
+
+  set_sensitive {
+    name  = "application.slackApiKey"
+    value = data.aws_secretsmanager_secret_version.slack_api_key[0].secret_string
   }
 }

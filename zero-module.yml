@@ -82,9 +82,19 @@ parameters:
     options:
       - "none"
       - "prometheus"
+  - field: notificationServiceEnabled
+    label: "Install the Zero Notification Service in your cluster?"
+    info: Provides easy notification capability through email, slack, etc. - https://github.com/commitdev/zero-notification-service
+    default: yes
+    options:
+      - "yes"
+      - "no"
   - field: sendgridApiKey
     label: "API key to setup email integration (optional: leave blank to opt-out of Sendgrid setup)"
-    info: Signup at https://signup.sendgrid.com or create an API key from https://app.sendgrid.com/settings/api_keys. Sendgrid is an email delivery service enabling transactional email sending and more.
+    info: Signup at https://signup.sendgrid.com or create an API key at https://app.sendgrid.com/settings/api_keys - Sendgrid is an email delivery service enabling transactional email sending and more.
+  - field: notificationServiceSlackApiKey
+    label: "API key of your Slack bot if you want to use Slack with the Zero Notification Service. Leave blank if not applicable."
+    info: See https://slack.com/intl/en-ca/help/articles/215770388-Create-and-regenerate-API-tokens
   - field: accountId
     label: AWS Account ID
     execute: aws sts get-caller-identity --query "Account" | tr -d '"'
