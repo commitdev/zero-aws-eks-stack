@@ -57,7 +57,7 @@ resource "null_resource" "cert_manager_issuer" {
   }
   # local exec call requires kubeconfig to be updated
   provisioner "local-exec" {
-    command = "kubectl apply -f - <<EOF\n${data.template_file.cert_manager_issuer.rendered}\nEOF"
+    command = "kubectl apply ${local.k8s_exec_context} -f - <<EOF\n${data.template_file.cert_manager_issuer.rendered}\nEOF"
   }
   depends_on = [helm_release.cert_manager]
 }

@@ -230,7 +230,7 @@ resource "null_resource" "oathkeeper_kratos_proxy_rules" {
   }
   # local exec call requires kubeconfig to be updated
   provisioner "local-exec" {
-    command = "kubectl apply -f - <<EOF\n${data.template_file.oathkeeper_kratos_proxy_rules[0].rendered}\nEOF"
+    command = "kubectl apply ${local.k8s_exec_context} -f - <<EOF\n${data.template_file.oathkeeper_kratos_proxy_rules[0].rendered}\nEOF"
   }
   depends_on = [helm_release.oathkeeper]
 }
