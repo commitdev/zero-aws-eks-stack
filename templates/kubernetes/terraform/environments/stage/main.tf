@@ -74,13 +74,22 @@ module "kubernetes" {
   ]
 
   domain_name                 = local.domain_name
-  auth_enabled                = <% if eq (index .Params `userAuth`) "yes" %>true<% else %>false<% end %>
-  auth_domain                 = "auth.${local.domain_name}"
-  backend_service_domain      = "<% index .Params `stagingBackendSubdomain` %>${local.domain_name}"
-  frontend_service_domain     = "<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}"
-  # This domain or address must be verified by the mail provider (Sendgrid, SES, etc.)
-  user_auth_mail_from_address = "noreply@${local.domain_name}"
-
+  user_auth = <% if eq (index .Params `userAuth`) "yes" %>[
+    {
+      name = local.project
+      auth_namespace                = "user-auth"
+      auth_domain                   = "auth.${local.domain_name}"
+      frontend_service_domain       = "<% index .Params `stagingFrontendSubdomain` %>.${local.domain_name}"
+      backend_service_domain        = "<% index .Params `stagingBackendSubdomain` %>.${local.domain_name}"
+      jwks_secret_name              = "${local.project}-${local.environment}-oathkeeper-jwks-${local.random_seed}"
+      # This domain or address must be verified by the mail provider (Sendgrid, SES, etc.)
+      user_auth_mail_from_address   = "noreply@${local.domain_name}"
+    }
+    ## User auth: Kratos requires database and a secret (as: `user_auth[0].name`)
+    ## Oathkeeper requires a private key (as `user_auth[0].jwks_secret_name`)
+    ## per environment one of each (database/database secret/private key) is created in the pre-k8s step
+    ## If you need to add another user-auth instance you will have to create another set of these resources
+  ]<% else %>[]<% end %>
   notification_service_enabled          = <%if eq (index .Params `notificationServiceEnabled`) "yes" %>true<% else %>false<% end %>
   notification_service_highly_available = false
 
