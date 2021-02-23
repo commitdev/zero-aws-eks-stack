@@ -1,3 +1,7 @@
+locals {
+  k8s_exec_context = "--context ${data.aws_eks_cluster.cluster.name} --server ${data.aws_eks_cluster.cluster.endpoint}"
+}
+
 data "aws_caller_identity" "current" {}
 
 
