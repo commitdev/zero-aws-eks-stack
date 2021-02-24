@@ -101,7 +101,7 @@ variable "logging_type" {
     condition = (
       var.logging_type == "cloudwatch" || var.logging_type == "kibana" || var.logging_type == "none"
     )
-    error_message = "Invalid value. Valid values are cloudwatch, kibana, or none"
+    error_message = "Invalid value. Valid values are cloudwatch, kibana, or none."
   }
 }
 
