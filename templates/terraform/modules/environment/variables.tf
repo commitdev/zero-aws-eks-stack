@@ -56,11 +56,6 @@ variable "hosted_domains" {
   }))
 }
 
-variable "domain_name" {
-  description = "Domain to create a R53 Zone and ACM Cert for"
-  type        = string
-}
-
 variable "db_instance_class" {
   description = "The AWS instance class of the db"
 }

@@ -105,8 +105,6 @@ module "stage" {
     },<% end %>
   ]
 
-  domain_name = local.domain_name
-
   # NAT configuration - NAT allows traffic from private subnets to access the public internet
 
   ## Instead of using AWS NAT gateway, use a NAT instance which is cheaper by about $30/month, though NAT gateways are more reliable. Only recommended for non-production environments.
