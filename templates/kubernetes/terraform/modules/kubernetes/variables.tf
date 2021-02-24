@@ -64,7 +64,7 @@ variable "metrics_type" {
     condition = (
       var.metrics_type == "prometheus" || var.metrics_type == "none"
     )
-    error_message = "Invalid value. Valid values are none or prometheus"
+    error_message = "Invalid value. Valid values are none or prometheus."
   }
 }
 
