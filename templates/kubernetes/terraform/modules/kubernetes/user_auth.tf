@@ -214,7 +214,7 @@ resource "helm_release" "kratos" {
 }
 
 data "template_file" "oathkeeper_kratos_proxy_rules" {
-  count = var.auth_enabled ? 1 : 0
+  count    = var.auth_enabled ? 1 : 0
   template = file("${path.module}/files/oathkeeper_kratos_proxy_rules.yaml.tpl")
   vars = {
     backend_service_domain    = var.backend_service_domain

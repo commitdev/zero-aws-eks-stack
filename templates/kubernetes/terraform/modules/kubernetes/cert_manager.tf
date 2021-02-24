@@ -2,6 +2,68 @@ locals {
   cert_manager_version     = "1.1.0"
   cluster_issuer_name      = var.cert_manager_use_production_acme_environment ? "clusterissuer-letsencrypt-production" : "clusterissuer-letsencrypt-staging"
   cert_manager_acme_server = var.cert_manager_use_production_acme_environment ? "https://acme-v02.api.letsencrypt.org/directory" : "https://acme-staging-v02.api.letsencrypt.org/directory"
+
+  # Enable the HTTP-01 challenge provider to resolve a challenge through the ingress
+  cluster_issuer_http = yamlencode({
+    "apiVersion" = "cert-manager.io/v1"
+    "kind"       = "ClusterIssuer"
+    "metadata" = {
+      "name" = local.cluster_issuer_name
+    }
+    "spec" = {
+      "acme" = {
+        "email" = var.cert_manager_acme_registration_email
+        "privateKeySecretRef" = {
+          "name" = "clusterissuer-letsencrypt-${var.environment}-secret" # Name of a secret used to store the ACME account private key
+        }
+        "server" = local.cert_manager_acme_server # Email address used for ACME registration
+        "solvers" = [
+          {
+            "http01" = {
+              "ingress" = {
+                "class" = "nginx"
+              }
+            }
+          },
+        ]
+      }
+    }
+  })
+
+  # Create solver records for each domain
+  dns_solvers = [for index, domain in var.external_dns_zones : {
+    "dns01" = {
+      "route53" = {
+        "hostedZoneID" = data.aws_route53_zone.zones[index].zone_id
+        "region"       = var.region
+      }
+    }
+    "selector" = {
+      "dnsZones" = [
+        domain,
+      ]
+    }
+    }
+  ]
+
+  # Enable the DNS-01 challenge provider to resolve a challenge by creating route53 records
+  cluster_issuer_dns = yamlencode({
+    "apiVersion" = "cert-manager.io/v1"
+    "kind"       = "ClusterIssuer"
+    "metadata" = {
+      "name" = "${local.cluster_issuer_name}-dns"
+    }
+    "spec" = {
+      "acme" = {
+        "email" = var.cert_manager_acme_registration_email # Email address used for ACME registration
+        "privateKeySecretRef" = {
+          "name" = "clusterissuer-letsencrypt-${var.environment}-secret" # Name of a secret used to store the ACME account private key
+        }
+        "server"  = local.cert_manager_acme_server
+        "solvers" = local.dns_solvers
+      }
+    }
+  })
 }
 
 resource "kubernetes_namespace" "cert_manager" {
@@ -11,8 +73,9 @@ resource "kubernetes_namespace" "cert_manager" {
 }
 
 # Reference an existing route53 zone
-data "aws_route53_zone" "public" {
-  name = var.external_dns_zone
+data "aws_route53_zone" "zones" {
+  count = length(var.external_dns_zones)
+  name  = var.external_dns_zones[count.index]
 }
 
 resource "helm_release" "cert_manager" {
@@ -36,28 +99,26 @@ resource "helm_release" "cert_manager" {
   }
 }
 
-# Cert-manager issuer manifest
-data "template_file" "cert_manager_issuer" {
-  template = file("${path.module}/files/cert_manager_issuer.yaml.tpl")
-  vars = {
-    name                    = local.cluster_issuer_name
-    environment             = var.environment
-    acme_registration_email = var.cert_manager_acme_registration_email
-    acme_server             = local.cert_manager_acme_server
-    region                  = var.region
-    hosted_zone_id          = data.aws_route53_zone.public.zone_id
-  }
-}
-
-# Manually kubectl apply the cert-manager issuer, as the kubernetes terraform provider
+# Manually kubectl apply the cert-manager issuers, as the kubernetes terraform provider
 # does not have support for custom resources.
-resource "null_resource" "cert_manager_issuer" {
+resource "null_resource" "cert_manager_http_issuer" {
   triggers = {
-    manifest_sha1 = sha1(data.template_file.cert_manager_issuer.rendered)
+    manifest_sha1 = sha1(local.cluster_issuer_http)
   }
   # local exec call requires kubeconfig to be updated
   provisioner "local-exec" {
-    command = "kubectl apply ${local.k8s_exec_context} -f - <<EOF\n${data.template_file.cert_manager_issuer.rendered}\nEOF"
+    command = "kubectl apply ${local.k8s_exec_context} -f - <<EOF\n${local.cluster_issuer_http}\nEOF"
+  }
+  depends_on = [helm_release.cert_manager]
+}
+
+resource "null_resource" "cert_manager_dns_issuer" {
+  triggers = {
+    manifest_sha1 = sha1(local.cluster_issuer_dns)
+  }
+  # local exec call requires kubeconfig to be updated
+  provisioner "local-exec" {
+    command = "kubectl apply ${local.k8s_exec_context} -f - <<EOF\n${local.cluster_issuer_dns}\nEOF"
   }
   depends_on = [helm_release.cert_manager]
 }
@@ -100,7 +161,7 @@ data "aws_iam_policy_document" "cert_manager_policy_doc" {
       "route53:ListResourceRecordSets"
     ]
 
-    resources = ["arn:aws:route53:::hostedzone/${data.aws_route53_zone.public.zone_id}"]
+    resources = [for domain in var.external_dns_zones : "arn:aws:route53:::hostedzone/${domain}"]
   }
 
   statement {
