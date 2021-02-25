@@ -152,7 +152,7 @@ module "logging" {
 
 module "sendgrid" {
   source  = "commitdev/zero/aws//modules/sendgrid"
-  version = "0.0.2"
+  version = "0.1.16"
   count   = var.sendgrid_enabled ? 1 : 0
 
   zone_name                    = var.sendgrid_zone_name

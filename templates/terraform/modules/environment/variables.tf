@@ -159,7 +159,7 @@ variable "sendgrid_zone_name" {
 variable "sendgrid_domain_prefix" {
   description = "Prefix for mailing domain used by sendgrid. This will be concatenated with the zone name"
   type        = string
-  default     = "mail."
+  default     = ""
 }
 
 variable "roles" {
