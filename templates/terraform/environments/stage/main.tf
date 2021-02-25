@@ -85,6 +85,7 @@ module "stage" {
       signed_urls : false,
       trusted_signers : ["self"],
       cors_origins : [],
+      hosted_zone : local.domain_name,
     },
     {
       domain : "<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}",
@@ -92,6 +93,7 @@ module "stage" {
       signed_urls : false,
       trusted_signers : ["self"],
       cors_origins : [],
+      hosted_zone : local.domain_name,
     },
     <% if eq (index .Params `fileUploads`) "yes" %>{
       domain : "files.${local.domain_name}",
@@ -99,13 +101,12 @@ module "stage" {
       signed_urls : true,
       trusted_signers : ["self"],
       cors_origins : ["https://<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}"],
+      hosted_zone : local.domain_name,
     },<% end %>
   ]
 
-  domain_name = local.domain_name
-
   # NAT configuration - NAT allows traffic from private subnets to access the public internet
-  
+
   ## Instead of using AWS NAT gateway, use a NAT instance which is cheaper by about $30/month, though NAT gateways are more reliable. Only recommended for non-production environments.
   vpc_enable_nat_gateway = false
 
@@ -129,6 +130,7 @@ module "stage" {
 
   sendgrid_enabled = <%if eq (index .Params `sendgridApiKey`) "" %>false<% else %>true<% end %>
   sendgrid_api_key_secret_name = "${local.project}-sendgrid-<% index .Params `randomSeed` %>"
+  sendgrid_zone_name = local.domain_name
 
   # Cache configuration
   ## you may define "redis" or "memcached" as your cache store. If you define "none", there will be no cache service launched.

@@ -8,6 +8,7 @@ data "aws_iam_policy_document" "resource_access_backendservice" {
     ]
     resources = ["arn:aws:ec2:::prod-*"]
   }
+<% if eq (index .Params `fileUploads`) "yes" %>
   statement {
     effect = "Allow"
     actions = [
@@ -16,5 +17,6 @@ data "aws_iam_policy_document" "resource_access_backendservice" {
     ]
     resources = ["arn:aws:s3:::files.${local.domain_name}/*"]
   }
+<% end %>
   # can be more statements here
 }

@@ -74,6 +74,7 @@ module "prod" {
       signed_urls : false,
       trusted_signers : ["self"],
       cors_origins : [],
+      hosted_zone : local.domain_name,
     },
     {
       domain : "<% index .Params `productionFrontendSubdomain` %>${local.domain_name}",
@@ -81,6 +82,7 @@ module "prod" {
       signed_urls : false,
       trusted_signers : ["self"],
       cors_origins : [],
+      hosted_zone : local.domain_name,
     },
     <% if eq (index .Params `fileUploads`) "yes" %>{
       domain : "files.${local.domain_name}",
@@ -88,10 +90,9 @@ module "prod" {
       signed_urls : true,
       trusted_signers : ["self"],
       cors_origins : ["https://<% index .Params `productionFrontendSubdomain` %>${local.domain_name}"],
+      hosted_zone : local.domain_name,
     },<% end %>
   ]
-
-  domain_name = local.domain_name
 
   # DB configuration
   database = "<% index .Params `database` %>"
@@ -109,6 +110,7 @@ module "prod" {
 
   sendgrid_enabled = <%if eq (index .Params `sendgridApiKey`) "" %>false<% else %>true<% end %>
   sendgrid_api_key_secret_name = "${local.project}-sendgrid-<% index .Params `randomSeed` %>"
+  sendgrid_zone_name = local.domain_name
 
   # Cache configuration
   ## you may define "redis" or "memcached" as your cache store. If you define "none", there will be no cache service launched.

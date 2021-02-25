@@ -23,8 +23,9 @@ variable "cluster_name" {
   description = "Kubernetes cluster name"
 }
 
-variable "external_dns_zone" {
-  description = "Domain of R53 zone that external-dns will have access to"
+variable "external_dns_zones" {
+  description = "Domains of R53 zones that external-dns and cert-manager will have access to"
+  type        = list(string)
 }
 
 variable "external_dns_owner_id" {
@@ -48,9 +49,9 @@ variable "logging_type" {
 
   validation {
     condition = (
-      var.logging_type == "cloudwatch" || var.logging_type == "kibana"
+      var.logging_type == "cloudwatch" || var.logging_type == "kibana" || var.logging_type == "none"
     )
-    error_message = "Invalid value. Valid values are cloudwatch or kibana."
+    error_message = "Invalid value. Valid values are cloudwatch, kibana, or none."
   }
 }
 

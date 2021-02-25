@@ -9,7 +9,7 @@ locals {
   server_address         = var.vpn_server_address
   server_privatekey_name = "${var.project}-${var.environment}-vpn-wg-privatekey-${var.random_seed}"
   client_publickeys      = var.vpn_client_publickeys
-  client_endpoint_dns	 = "vpn.${var.external_dns_zone}"
+  client_endpoint_dns    = "vpn.${var.domain_name}"
 }
 
 ## get destination database subnets
@@ -82,7 +82,7 @@ resource "kubernetes_config_map" "vpn_configmap" {
   }
 
   data = {
-    "wg0.conf"      = data.template_file.vpn_server_conf.rendered
+    "wg0.conf" = data.template_file.vpn_server_conf.rendered
   }
 }
 
@@ -97,7 +97,7 @@ resource "kubernetes_service" "wireguard" {
 
     annotations = {
       "service.beta.kubernetes.io/aws-load-balancer-type" = "nlb"
-      "external-dns.alpha.kubernetes.io/hostname" = local.client_endpoint_dns
+      "external-dns.alpha.kubernetes.io/hostname"         = local.client_endpoint_dns
     }
   }
 

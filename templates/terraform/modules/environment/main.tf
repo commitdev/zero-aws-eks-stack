@@ -12,7 +12,7 @@ locals {
       ]
     }
   ]
- 
+
   user_access_roles = [
     for r in var.roles : {
       name         = r.name
@@ -25,7 +25,7 @@ locals {
     for r in module.user_access.eks_iam_role_mapping : {
       iam_role_arn  = r.arn
       k8s_role_name = r.name
-      k8s_groups    = flatten(concat([r.name], [
+      k8s_groups = flatten(concat([r.name], [
         for o in var.roles : o.k8s_groups if r.name == "${var.project}-kubernetes-${o.name}-${var.environment}"
       ]))
     }
@@ -79,15 +79,6 @@ module "eks" {
   iam_role_mapping = local.eks_kubernetes_iam_role_mapping
 }
 
-
-module "wildcard_domain" {
-  source  = "commitdev/zero/aws//modules/certificate"
-  version = "0.1.0"
-
-  zone_name   = var.domain_name
-  domain_name = "*.${var.domain_name}"
-}
-
 module "assets_domains" {
   source  = "commitdev/zero/aws//modules/certificate"
   version = "0.1.0"
@@ -96,7 +87,7 @@ module "assets_domains" {
     aws = aws.for_cloudfront
   }
 
-  zone_name         = var.domain_name
+  zone_name         = var.hosted_domains[count.index].hosted_zone
   domain_name       = var.hosted_domains[count.index].domain
   alternative_names = var.hosted_domains[count.index].aliases
 }
@@ -161,11 +152,12 @@ module "logging" {
 
 module "sendgrid" {
   source  = "commitdev/zero/aws//modules/sendgrid"
-  version = "0.0.2"
+  version = "0.1.16"
   count   = var.sendgrid_enabled ? 1 : 0
 
-  zone_name                    = var.domain_name
+  zone_name                    = var.sendgrid_zone_name
   sendgrid_api_key_secret_name = var.sendgrid_api_key_secret_name
+  sendgrid_domain_prefix       = var.sendgrid_domain_prefix
 }
 
 module "user_access" {

@@ -34,7 +34,7 @@ data "aws_iam_policy_document" "external_dns_policy_doc" {
 
     actions = ["route53:ChangeResourceRecordSets"]
 
-    resources = ["arn:aws:route53:::hostedzone/*"]
+    resources = [for domain in var.external_dns_zones : "arn:aws:route53:::hostedzone/${domain}"]
   }
 }
 
@@ -112,17 +112,18 @@ resource "kubernetes_deployment" "external_dns" {
         container {
           name  = "external-dns"
           image = "registry.opensource.zalan.do/teapot/external-dns:latest"
-          args = [
+          args = concat([
             "--source=ingress",
             "--source=service",
-            "--domain-filter=${var.external_dns_zone}", # Give access only to the specified zone
             "--provider=aws",
             "--aws-zone-type=public",
             "--policy=upsert-only", # Prevent ExternalDNS from deleting any records
             "--registry=txt",
             "--txt-owner-id=${var.cluster_name}", # ID of txt record to manage state
             "--aws-batch-change-size=2",          # Set the batch size to 2 so that a single record failure won't block other updates
-          ]
+            ],
+            # Give access only to the specified zones
+          [for domain in var.external_dns_zones : "--domain-filter=${domain}"])
         }
 
         security_context {

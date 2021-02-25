@@ -43,7 +43,7 @@ module "kubernetes" {
   # Authenticate with the EKS cluster via the cluster id
   cluster_name = "${local.project}-prod-${local.region}"
 
-  external_dns_zone     = local.domain_name
+  external_dns_zones    = [local.domain_name]
   external_dns_owner_id = "${local.project}-prod-${local.region}"
 
   # Registration email for LetsEncrypt
@@ -62,7 +62,7 @@ module "kubernetes" {
       service_account = "backend-service"
       namespace       = local.project
       policy          = data.aws_iam_policy_document.resource_access_backendservice
-    }
+    },
     # Add additional mappings here
   ]
 

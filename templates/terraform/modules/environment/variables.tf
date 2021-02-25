@@ -52,12 +52,8 @@ variable "hosted_domains" {
     signed_urls     = bool
     trusted_signers = list(string)
     cors_origins    = list(string)
+    hosted_zone     = string
   }))
-}
-
-variable "domain_name" {
-  description = "Domain to create a R53 Zone and ACM Cert for"
-  type        = string
 }
 
 variable "db_instance_class" {
@@ -81,9 +77,9 @@ variable "vpc_use_single_nat_gateway" {
 }
 
 variable "vpc_nat_instance_types" {
-   description = "Candidates of instance type for the NAT instance"
-   type        = list
-   default     = ["t3.nano"]
+  description = "Candidates of instance type for the NAT instance"
+  type        = list
+  default     = ["t3.nano"]
 }
 
 variable "database" {
@@ -96,12 +92,11 @@ variable "logging_type" {
   description = "Which application logging mechanism to use (cloudwatch, kibana)"
   type        = string
   default     = "cloudwatch"
-
   validation {
     condition = (
-      var.logging_type == "cloudwatch" || var.logging_type == "kibana"
+      var.logging_type == "cloudwatch" || var.logging_type == "kibana" || var.logging_type == "none"
     )
-    error_message = "Invalid value. Valid values are cloudwatch or kibana."
+    error_message = "Invalid value. Valid values are cloudwatch, kibana, or none."
   }
 }
 
@@ -156,6 +151,17 @@ variable "sendgrid_api_key_secret_name" {
   type        = string
 }
 
+variable "sendgrid_zone_name" {
+  description = "Route53 zone to create CNAME records for sendgrid authorization"
+  type        = string
+}
+
+variable "sendgrid_domain_prefix" {
+  description = "Prefix for mailing domain used by sendgrid. This will be concatenated with the zone name"
+  type        = string
+  default     = ""
+}
+
 variable "roles" {
   type = list(object({
     name         = string
@@ -179,7 +185,7 @@ variable "user_role_mapping" {
 
 variable "ci_user_name" {
   type        = string
-  description = "CI user name" 
+  description = "CI user name"
 }
 
 variable "cache_instance_type" {
