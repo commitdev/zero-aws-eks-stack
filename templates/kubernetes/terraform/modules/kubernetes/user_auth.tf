@@ -9,7 +9,8 @@ locals {
 
 module "user_auth" {
   count = length(var.user_auth)
-  source                      = "./user_auth"
+  source                      = "commitdev/zero/aws//modules/user_auth"
+  version                     = "0.1.17"
 
   project                     = var.user_auth[count.index].name
   auth_domain                 = var.user_auth[count.index].auth_domain

@@ -121,7 +121,8 @@ variable "cache_store" {
 
 variable "user_auth" {
   description = "a list of maps {name, domain, upstream_auth, upstream_api} configuring ingress of oathkeeper"
-  type = list(object({
+  default     = []
+  type        = list(object({
     name                        = string
     frontend_service_domain     = string
     backend_service_domain      = string
