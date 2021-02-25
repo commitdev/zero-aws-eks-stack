@@ -89,7 +89,7 @@ module "kubernetes" {
     ## Oathkeeper requires a private key (as `user_auth[0].jwks_secret_name`)
     ## per environment one of each (database/database secret/private key) is created in the pre-k8s step
     ## If you need to add another user-auth instance you will have to create another set of these resources
-  ]<% else %>
+  ]<% end %>
   notification_service_enabled          = <%if eq (index .Params `notificationServiceEnabled`) "yes" %>true<% else %>false<% end %>
   notification_service_highly_available = false
 
