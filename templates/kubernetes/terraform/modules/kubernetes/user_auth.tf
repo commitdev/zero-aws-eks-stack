@@ -13,7 +13,6 @@ module "user_auth" {
   version                     = "0.1.17"
 
   project                     = var.user_auth[count.index].name
-  auth_domain                 = var.user_auth[count.index].auth_domain
   auth_namespace              = var.user_auth[count.index].auth_namespace
   frontend_service_domain     = var.user_auth[count.index].frontend_service_domain
   backend_service_domain      = var.user_auth[count.index].backend_service_domain

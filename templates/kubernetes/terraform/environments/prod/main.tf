@@ -79,7 +79,6 @@ module "kubernetes" {
     {
       name = local.project
       auth_namespace                = "user-auth"
-      auth_domain                   = "auth.${local.domain_name}"
       frontend_service_domain       = "<% index .Params `productionFrontendSubdomain` %>.${local.domain_name}"
       backend_service_domain        = "<% index .Params `productionBackendSubdomain` %>.${local.domain_name}"
       jwks_secret_name              = "${local.project}-${local.environment}-oathkeeper-jwks-${local.random_seed}"

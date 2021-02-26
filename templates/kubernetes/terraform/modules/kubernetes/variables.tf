@@ -126,7 +126,6 @@ variable "user_auth" {
     name                        = string
     frontend_service_domain     = string
     backend_service_domain      = string
-    auth_domain                 = string
     auth_namespace              = string
     jwks_secret_name            = string
     user_auth_mail_from_address = string
