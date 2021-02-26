@@ -17,6 +17,7 @@ module "user_auth" {
   frontend_service_domain     = var.user_auth[count.index].frontend_service_domain
   backend_service_domain      = var.user_auth[count.index].backend_service_domain
   user_auth_mail_from_address = var.user_auth[count.index].user_auth_mail_from_address
+  whitelisted_return_urls     = var.user_auth[count.index].whitelisted_return_urls
   jwks_secret_name            = var.user_auth[count.index].jwks_secret_name
   k8s_local_exec_context      = local.k8s_exec_context
 }

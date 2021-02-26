@@ -80,6 +80,7 @@ module "kubernetes" {
       auth_namespace                = "user-auth"
       frontend_service_domain       = "<% index .Params `stagingFrontendSubdomain` %>.${local.domain_name}"
       backend_service_domain        = "<% index .Params `stagingBackendSubdomain` %>.${local.domain_name}"
+      whitelisted_return_urls       = ["https://<% index .Params `stagingFrontendSubdomain` %>.${local.domain_name}"]
       jwks_secret_name              = "${local.project}-${local.environment}-oathkeeper-jwks-${local.random_seed}"
       # This domain or address must be verified by the mail provider (Sendgrid, SES, etc.)
       user_auth_mail_from_address   = "noreply@${local.domain_name}"
