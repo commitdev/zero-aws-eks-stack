@@ -120,7 +120,7 @@ module "stage" {
 
   # Logging configuration
   logging_type = "<% index .Params `loggingType` %>"
-  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_version = "7.7"
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_version = "7.9"
   <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_create_service_role = true # Set this to false if you need to create more than one ES cluster in an AWS account
   <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_az_count = "1"
   <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_instance_type = "t2.medium.elasticsearch"

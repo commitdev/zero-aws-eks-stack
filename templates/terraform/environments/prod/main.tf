@@ -101,7 +101,7 @@ module "prod" {
 
   # Logging configuration
   logging_type = "<% index .Params `loggingType` %>"
-  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_version = "7.7"
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_version = "7.9"
   <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_az_count = "2"
   <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_instance_type = "m5.large.elasticsearch"
   <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_instance_count = "2" # Must be a mulitple of the az count
