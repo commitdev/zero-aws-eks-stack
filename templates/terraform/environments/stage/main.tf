@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.13"
+  required_version = ">= 0.14"
   backend "s3" {
     bucket         = "<% .Name %>-stage-terraform-state"
     key            = "infrastructure/terraform/environments/stage/main"
