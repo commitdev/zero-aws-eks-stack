@@ -130,5 +130,6 @@ variable "user_auth" {
     jwks_secret_name            = string
     user_auth_mail_from_address = string
     whitelisted_return_urls     = list(string)
+    cookie_sigining_secret_key  = string
   }))
 }
