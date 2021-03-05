@@ -19,5 +19,6 @@ module "user_auth" {
   user_auth_mail_from_address = var.user_auth[count.index].user_auth_mail_from_address
   whitelisted_return_urls     = var.user_auth[count.index].whitelisted_return_urls
   jwks_secret_name            = var.user_auth[count.index].jwks_secret_name
+  cookie_sigining_secret_key  = var.user_auth[count.index].cookie_sigining_secret_key
   k8s_local_exec_context      = local.k8s_exec_context
 }
