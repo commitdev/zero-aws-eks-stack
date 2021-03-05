@@ -101,36 +101,6 @@ variable "internal_domain" {
   default     = ""
 }
 
-variable "auth_enabled" {
-  description = "Domain to use for authentication"
-  type        = string
-  default     = ""
-}
-
-variable "auth_domain" {
-  description = "Domain to use for authentication"
-  type        = string
-  default     = ""
-}
-
-variable "backend_service_domain" {
-  description = "Domain of the backend service"
-  type        = string
-  default     = ""
-}
-
-variable "frontend_service_domain" {
-  description = "Domain of the frontend"
-  type        = string
-  default     = ""
-}
-
-variable "user_auth_mail_from_address" {
-  description = "Mail from the user management system will come from this address"
-  type        = string
-  default     = ""
-}
-
 variable "notification_service_enabled" {
   description = "If enabled, will install the Zero notification service in the cluster to enable easy implementation of notification via email, sms, push, etc."
   type        = bool
@@ -147,4 +117,19 @@ variable "cache_store" {
   description = "Cache store - redis or memcached"
   type        = string
   default     = "none"
+}
+
+variable "user_auth" {
+  description = "a list of maps {name, domain, upstream_auth, upstream_api} configuring ingress of oathkeeper"
+  default     = []
+  type        = list(object({
+    name                        = string
+    frontend_service_domain     = string
+    backend_service_domain      = string
+    auth_namespace              = string
+    jwks_secret_name            = string
+    user_auth_mail_from_address = string
+    whitelisted_return_urls     = list(string)
+    cookie_sigining_secret_key  = string
+  }))
 }

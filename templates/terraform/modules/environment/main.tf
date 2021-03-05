@@ -111,7 +111,7 @@ module "s3_hosting" {
 
 module "db" {
   source  = "commitdev/zero/aws//modules/database"
-  version = "0.1.12"
+  version = "0.1.18"
 
   project                   = var.project
   environment               = var.environment
@@ -134,7 +134,7 @@ module "ecr" {
 
 module "logging" {
   source  = "commitdev/zero/aws//modules/logging"
-  version = "0.1.2"
+  version = "0.1.18"
 
   count = var.logging_type == "kibana" ? 1 : 0
 

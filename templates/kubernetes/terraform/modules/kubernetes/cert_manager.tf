@@ -126,7 +126,7 @@ resource "null_resource" "cert_manager_dns_issuer" {
 # Create a role using oidc to map service accounts
 module "iam_assumable_role_cert_manager" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version                       = "~> v2.14.0"
+  version                       = "~> v3.12.0"
   create_role                   = true
   role_name                     = "${var.project}-k8s-${var.environment}-cert-manager"
   provider_url                  = replace(data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer, "https://", "")
