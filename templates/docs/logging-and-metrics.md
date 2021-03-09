@@ -31,7 +31,7 @@ Grafana also runs in the cluster and connects to various data sources including 
 It can create graphs, dashboards, and alerts which can be sent out via email, Slack, PagerDuty or many other integrations.
 
 You can view the Grafana dashboard at http://grafana.metrics.svc.cluster.local after logging into the VPN.
-The default username is 'admin' and the password is '<% .Name %>'. This account could be shared across multiple team members, you could create mulitple accounts per-person or -team, or you could add an external auth provider like Google.
+The default username is 'admin' and the password is '<% .Name %>'. This account could be shared across multiple team members, you could create multiple accounts per-person or per-team, or you could add an external auth provider like Google.
 
 The UIs for Grafana and Kibana are only available from inside the private network (via the VPN) so there is already a certain amount of access restriction.
 
