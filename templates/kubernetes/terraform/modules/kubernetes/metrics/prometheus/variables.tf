@@ -10,6 +10,10 @@ variable "environment" {
   description = "Environment"
 }
 
+variable "cluster_name" {
+  description = "Kubernetes cluster name"
+}
+
 variable "prometheus_retention_days" {
   description = "Days of retention for Prometheus stats"
   type        = number
@@ -24,6 +28,12 @@ variable "prometheus_storage_capacity" {
 
 variable "internal_domain" {
   description = "Internal domain in which to create an ingress"
+  type        = string
+  default     = ""
+}
+
+variable "elasticsearch_domain" {
+  description = "Name of elasticsearch cluster to add as a data source"
   type        = string
   default     = ""
 }

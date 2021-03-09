@@ -51,6 +51,7 @@ Then you should be able to run commands normally:
 $ kubectl get pods -A
 ```
 
+[Kubernetes Resources](docs/kubernetes.md)
 
 ### Apply Configuration
 To init and apply the terraform configs, simply run the `make` and specify the
@@ -62,10 +63,10 @@ $ make ENVIRONMENT=<environment>
 #### Extra features built into my kubernetes cluster
 Outlines and best practices utilities that comes with your EKS cluster.
 Please see [Link][zero-k8s-guide]
-- Logging
-- Monitoring
+- [Logging and Metrics](docs/logging-and-metrics.md)
 - Ingress / TLS certificates (auto provisioning)
 - AWS IAM integration with Kubernetes RBAC
+- VPN using Wireguard
 ...
 
 #### Sending Email with Sendgrid
@@ -89,6 +90,32 @@ $ curl --request POST \
 }'
 ```
 For Application use, see [Sendgrid resources][sendgrid-send-mail] on how to setup templates to send dynamic transactional emails. To setup emailing from your application deployment, you should create a kubernetes secret with your Sendgrid API Key(already stored in [AWS secret-manager](./terraform/bootstrap/secrets/main.tf)) in your application's namespace. Then mount the secret as an environment variable in your deployment.
+
+
+## WireGuard VPN support
+WireGuard® is an extremely simple yet fast and modern VPN that utilizes state-of-the-art cryptography. This allows users to access internal resources securely.
+
+A WireGuard pod will be started inside the cluster and users can be added to it by appending lines to `kubernetes/terraform/environments/<env>/main.tf`:
+```
+  vpn_client_publickeys = [
+    # name, IP, public key
+    ["Your Name", "10.10.199.203/32", "yz6gNspLJE/HtftBwcj5x0yK2XG6+/SHIaZ****vFRc="],
+  ]
+```
+
+A new user can add themselves to the VPN server easily. Any user with access to the kubernetes cluster should be able to run the script `scripts/add-vpn-user.sh`
+This will ask for their name, and automatically generate a line like the one above, which they can then add to the terraform and apply themselves, or give the line to an administrator and ask them to apply it.
+The environment they are added to will be decided by the current `kubectl` context. You can see your current context with `kubectl config current-context`.
+A user will need to repeat this for each environment they need access to (for example, staging and production.)
+
+*Note that this will try to detect the next available IP address for the user but you should still take care to ensure there are no duplicate IPs in the list.*
+
+It will also generate a WireGuard client config file on their local machine which will be properly populated with all the values to allow them to connect to the server.
+
+The WireGuard client can be downloaded at [https://www.wireguard.com/install/](https://www.wireguard.com/install/)
+
+Once connected to the VPN, the user should have direct access to anything running inside the AWS VPC. AWS resources can be referred to by their internal DNS names, and even things inside the kubernetes cluster may be reached direcly using their `.svc.cluster.local` names.
+
 
 #### Application database user creation
 A database user will automatically be created for a backend application with a random password, and the credentials will be stored in a kubernetes secret in the application namespace so they are available to the application.
@@ -145,6 +172,8 @@ Commonly used links in AWS console
 Tearing down the infrastructure requires multiple steps, as some of the resources have protection mechanism so they're not accidentally deleted
 
 _Note: the following steps are not reversible, tearing down the cluster results in lost data/resources._
+<details>
+  <summary>Teardown steps</summary>
 
 ```
 export ENVIRONMENT=stage/prod
@@ -173,10 +202,11 @@ make teardown-secrets
 ```
 make teardown-remote-state
 ```
+</details>
 
 ### Suggested readings
 - [Terraform workflow][tf-workflow]
-- [Why do I want code as infrastructure][why-infra-as-code]
+- [Why do I want infrastructure as code?][why-infra-as-code]
 
 
 

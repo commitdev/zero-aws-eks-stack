@@ -10,7 +10,7 @@ module "iam_assumable_role_cloudwatch" {
   role_name                     = "<% .Name %>-k8s-${var.environment}-cloudwatch"
   provider_url                  = replace(data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer, "https://", "")
   role_policy_arns              = [data.aws_iam_policy.CloudWatchAgentServerPolicy.arn]
-  oidc_fully_qualified_subjects = [ "system:serviceaccount:amazon-cloudwatch:cloudwatch-agent" ]
+  oidc_fully_qualified_subjects = ["system:serviceaccount:amazon-cloudwatch:cloudwatch-agent"]
 }
 
 # Create a role using oidc to map service accounts
@@ -21,7 +21,7 @@ module "iam_assumable_role_fluentd" {
   role_name                     = "<% .Name %>-k8s-${var.environment}-fluentd"
   provider_url                  = replace(data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer, "https://", "")
   role_policy_arns              = [data.aws_iam_policy.CloudWatchAgentServerPolicy.arn]
-  oidc_fully_qualified_subjects = [ "system:serviceaccount:amazon-cloudwatch:fluentd" ]
+  oidc_fully_qualified_subjects = ["system:serviceaccount:amazon-cloudwatch:fluentd"]
 }
 
 

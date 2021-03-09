@@ -142,8 +142,8 @@ module "logging" {
   environment           = var.environment
   vpc_id                = module.vpc.vpc_id
   elasticsearch_version = var.logging_es_version
-  security_groups       = [module.eks.worker_security_group_id]                              # TODO : Add vpn SG when available
-  subnet_ids            = slice(module.vpc.private_subnets.*, 1, (1 + var.logging_az_count)) # We will use 2 subnets
+  security_groups       = [module.eks.worker_security_group_id]
+  subnet_ids            = slice(module.vpc.private_subnets, 0, var.logging_az_count)
   instance_type         = var.logging_es_instance_type
   instance_count        = var.logging_es_instance_count
   ebs_volume_size_in_gb = var.logging_volume_size_in_gb
