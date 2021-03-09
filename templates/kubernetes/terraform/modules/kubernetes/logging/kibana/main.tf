@@ -8,7 +8,17 @@ resource "kubernetes_namespace" "logging" {
 }
 
 
-
+# Utility dns record for people using vpn
+resource "kubernetes_service" "elasticsearch" {
+  metadata {
+    namespace = kubernetes_namespace.logging.metadata[0].name
+    name      = "kibana"
+  }
+  spec {
+    type          = "ExternalName"
+    external_name = data.aws_elasticsearch_domain.logging_cluster.endpoint
+  }
+}
 # # Kibana ingress - Allows us to modify the path, but proxies out to elasticsearch
 # resource "kubernetes_ingress" "kibana_ingress" {
 #   metadata {
@@ -46,22 +56,4 @@ resource "kubernetes_namespace" "logging" {
 #     }
 
 #   depends_on = [kubernetes_namespace.logging]
-# }
-
-
-# # Create prometheus exporter to gather metrics about the elasticsearch cluster
-# resource "helm_release" "elasticsearch_prometheus_exporter" {
-#   name       = "elasticsearch-exporter"
-#   repository = "stable"
-#   chart      = "elasticsearch-exporter"
-#   version    = "3.4.0"
-#   namespace  = "monitoring"
-#   set {
-#     name  = "es.uri"
-#     value = "http://elasticsearch.logging.svc.cluster.local"
-#   }
-#   set {
-#     name  = "serviceMonitor.enabled"
-#     value = "true"
-#   }
 # }

@@ -16,12 +16,14 @@ module "logging_kibana" {
 }
 
 module "metrics_prometheus" {
-  count           = var.metrics_type == "prometheus" ? 1 : 0
-  source          = "./metrics/prometheus"
-  project         = var.project
-  environment     = var.environment
-  region          = var.region
-  internal_domain = var.internal_domain
+  count                = var.metrics_type == "prometheus" ? 1 : 0
+  source               = "./metrics/prometheus"
+  project              = var.project
+  environment          = var.environment
+  region               = var.region
+  cluster_name         = var.cluster_name
+  internal_domain      = var.internal_domain
+  elasticsearch_domain = var.logging_type == "kibana" ? "${var.project}-${var.environment}-logging" : ""
 }
 
 module "ingress" {

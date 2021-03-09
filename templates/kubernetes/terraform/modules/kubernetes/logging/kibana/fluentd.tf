@@ -9,8 +9,8 @@ data "aws_elasticsearch_domain" "logging_cluster" {
 
 resource "kubernetes_service_account" "fluentd" {
   metadata {
-    name        = "fluentd"
-    namespace   = kubernetes_namespace.logging.metadata[0].name
+    name      = "fluentd"
+    namespace = kubernetes_namespace.logging.metadata[0].name
   }
 }
 

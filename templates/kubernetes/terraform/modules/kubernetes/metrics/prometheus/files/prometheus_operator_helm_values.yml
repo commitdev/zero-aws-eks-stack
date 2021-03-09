@@ -1,10 +1,29 @@
-
 ## Using default values from https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
 ##
 grafana:
 
   persistence:
     enabled: true
+
+  ## Configure additional grafana datasources (passed through tpl)
+  ## ref: http://docs.grafana.org/administration/provisioning/#datasources
+  additionalDataSources:
+  - name: Elasticsearch
+    type: elasticsearch
+    database: fluentd-*
+    access: proxy
+    editable: false
+    version: 1
+    jsonData:
+      esVersion: 70
+      timeField: "@timestamp"
+  - name: CloudWatch
+    type: cloudwatch
+    access: proxy
+    editable: false
+    version: 1
+    jsonData:
+        authType: default
 
   # Custom Dashboard
   dashboardProviders:
@@ -75,8 +94,11 @@ grafana:
             "uid": "Example",
             "version": 1
           }
+  # Enable the image-renderer deployment & service - disable this if you don't want to send images via alerts
+  imageRenderer:
+    enabled: true
 
-## Manages Prometheus and Alertmanager components
+  ## Manages Prometheus and Alertmanager components
 ##
 prometheusOperator:
   securityContext:
@@ -116,3 +138,25 @@ prometheus:
       runAsNonRoot: false
       runAsUser: 0
       fsGroup: 0
+
+    # Don't apply a selector when looking for service and pod monitors, just discover all of them
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+
+
+  ## Additional ServiceMonitors to create
+  additionalServiceMonitors:
+    - name: "nginx-ingress-controller-metrics"
+
+      ## Label selector for services to which this ServiceMonitor applies
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: ingress-nginx
+
+      namespaceSelector:
+        matchNames: [ ingress-nginx ]
+
+      ## Endpoints of the selected service to be monitored
+      endpoints:
+        - port: "metrics"
+          interval: 30s

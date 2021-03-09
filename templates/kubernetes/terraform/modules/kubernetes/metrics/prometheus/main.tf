@@ -35,6 +35,16 @@ data "aws_security_group" "eks_workers" {
   }
 }
 
+# Look up the elasticsearch cluster if supplied
+data "aws_elasticsearch_domain" "logging_cluster" {
+  count       = var.elasticsearch_domain == "" ? 0 : 1
+  domain_name = var.elasticsearch_domain
+}
+
+data "aws_eks_cluster" "cluster" {
+  name = var.cluster_name
+}
+
 # Install the prometheus stack, including prometheus-operator and grafana
 resource "helm_release" "prometheus_stack" {
   name       = "kube-prometheus-stack"
@@ -69,8 +79,8 @@ resource "helm_release" "prometheus_stack" {
 
   set {
     name  = "grafana.env.GF_SERVER_ROOT_URL"
-    type = "string"
-    value = var.internal_domain == "" ? "https://grafana.metrics.svc.cluster.local/" : "https://${local.grafana_hostname}/"
+    type  = "string"
+    value = var.internal_domain == "" ? "http://grafana.metrics.svc.cluster.local/" : "http://${local.grafana_hostname}/"
   }
 
   set {
@@ -79,6 +89,29 @@ resource "helm_release" "prometheus_stack" {
     value = var.internal_domain == "" ? "grafana.metrics.svc.cluster.local" : local.grafana_hostname
   }
 
+  # Elasticsearch data source
+  set {
+    name  = "grafana.additionalDataSources[0].url"
+    value = var.elasticsearch_domain == "" ? "" : "https://${data.aws_elasticsearch_domain.logging_cluster[0].endpoint}"
+  }
+
+  # Cloudwatch data source
+  set {
+    name  = "grafana.additionalDataSources[1].jsonData.defaultRegion"
+    value = var.region
+  }
+
+  set {
+    name  = "grafana.additionalDataSources[1].jsonData.assumeRoleArn"
+    value = ""
+  }
+
+
+  # Use the IRSA role we create below in the service account to give grafana access to Cloudwatch
+  set {
+    name  = "grafana.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = module.iam_assumable_role_irsa.this_iam_role_arn
+  }
 
   # Prometheus dynamic config
   set {
@@ -105,7 +138,6 @@ resource "helm_release" "prometheus_stack" {
     name  = "prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage"
     value = kubernetes_persistent_volume.prometheus_nfs_pv.spec[0].capacity.storage
   }
-
 }
 
 # Grafana ingress
@@ -162,9 +194,31 @@ resource "kubernetes_service" "grafana" {
 
     selector = {
       "app.kubernetes.io/instance" = "kube-prometheus-stack"
-      "app.kubernetes.io/name" = "grafana"
+      "app.kubernetes.io/name"     = "grafana"
     }
 
-    type                    = "ClusterIP"
+    type = "ClusterIP"
+  }
+}
+
+
+# Create prometheus exporter to gather metrics about the elasticsearch cluster
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-elasticsearch-exporter
+resource "helm_release" "elasticsearch_prometheus_exporter" {
+  count = var.elasticsearch_domain == "" ? 0 : 1
+
+  name       = "prometheus-elasticsearch-exporter"
+  repository = "https://prometheus-community.github.io/helm-charts"
+  chart      = "prometheus-elasticsearch-exporter"
+  version    = "4.3.0"
+  namespace  = "metrics"
+
+  set {
+    name  = "es.uri"
+    value = "https://${data.aws_elasticsearch_domain.logging_cluster[0].endpoint}"
+  }
+  set {
+    name  = "serviceMonitor.enabled"
+    value = "true"
   }
 }

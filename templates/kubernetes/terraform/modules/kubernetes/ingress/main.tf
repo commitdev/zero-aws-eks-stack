@@ -225,10 +225,6 @@ resource "kubernetes_deployment" "nginx_ingress_controller" {
           "app.kubernetes.io/name"    = "ingress-nginx",
           "app.kubernetes.io/part-of" = "ingress-nginx"
         }
-        # annotations = {
-        #   "prometheus.io/port"   = "10254",
-        #   "prometheus.io/scrape" = "true"
-        # }
       }
       spec {
         container {
@@ -249,6 +245,10 @@ resource "kubernetes_deployment" "nginx_ingress_controller" {
           port {
             name           = "https"
             container_port = 443
+          }
+          port {
+            name           = "metrics"
+            container_port = 10254
           }
           env {
             name = "POD_NAME"
@@ -319,7 +319,7 @@ resource "kubernetes_service" "ingress_nginx" {
     name      = "ingress-nginx"
     namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
     labels = {
-      "app.kubernetes.io/name"    = "ingress-nginx",
+      "app.kubernetes.io/name"    = "ingress-nginx", # Referenced by prometheus servicemonitor if prometheus is used
       "app.kubernetes.io/part-of" = "ingress-nginx"
     }
   }
@@ -333,6 +333,11 @@ resource "kubernetes_service" "ingress_nginx" {
       name        = "https"
       port        = 443
       target_port = "https"
+    }
+    port {
+      name        = "metrics"
+      port        = 10254
+      target_port = "metrics"
     }
     selector = {
       "app.kubernetes.io/name"    = "ingress-nginx",
