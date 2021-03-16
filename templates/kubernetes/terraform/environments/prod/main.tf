@@ -20,7 +20,9 @@ locals {
   region       = "<% index .Params `region` %>"
   account_id   = "<% index .Params `accountId` %>"
   domain_name  = "<% index .Params `productionHostRoot` %>"
+  environment  = "prod"
   file_uploads = <% if eq (index .Params `fileUploads`) "yes" %>true<% else %>false<% end %>
+  random_seed  = "<% index .Params `randomSeed` %>"
 }
 
 provider "aws" {
@@ -37,7 +39,7 @@ module "kubernetes" {
   project             = local.project
   region              = local.region
   allowed_account_ids = [local.account_id]
-  random_seed         = "<% index .Params `randomSeed` %>"
+  random_seed         = local.random_seed
   cf_signing_enabled  = local.file_uploads
 
   # Authenticate with the EKS cluster via the cluster id
