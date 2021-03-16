@@ -63,23 +63,13 @@ resource "helm_release" "notification_service" {
   }
 
   # These will become secrets provided as env vars
-  dynamic set_sensitive {
-    for_each = var.notification_service_enabled && var.notification_service_sendgrid_enabled ? [data.aws_secretsmanager_secret_version.sendgrid_api_key[0].secret_string] : []
-    iterator = sendgrid_api_key
-    content {
-
-      name  = "application.sendgridApiKey"
-      value = sendgrid_api_key.value
-    }
+  set_sensitive {
+    name  = "application.sendgridApiKey"
+    value = var.notification_service_enabled && var.notification_service_sendgrid_enabled ? data.aws_secretsmanager_secret_version.sendgrid_api_key[0].secret_string : ""
   }
 
-  dynamic set_sensitive {
-    for_each = var.notification_service_enabled && var.notification_service_slack_enabled ? [data.aws_secretsmanager_secret_version.slack_api_key[0].secret_string] : []
-    iterator = slack_api_key
-    content {
-
-      name  = "application.slackApiKey"
-      value = slack_api_key.value
-    }
+  set_sensitive {
+    name  = "application.slackApiKey"
+    value = var.notification_service_enabled && var.notification_service_slack_enabled ? data.aws_secretsmanager_secret_version.slack_api_key[0].secret_string : ""
   }
 }
