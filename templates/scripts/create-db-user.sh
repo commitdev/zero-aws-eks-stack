@@ -34,7 +34,8 @@ echo "Some environment variables (REGION, SEED, PROJECT_NAME, ENVIRONMENT, NAMES
 DOCKER_IMAGE_TAG=commitdev/zero-k8s-utilities:0.0.3
 
 # database info preparation
-DB_ENDPOINT=database.${PROJECT_NAME}
+# this script will run both before and after make-apply-k8s, therefore the database service is not always available
+DB_ENDPOINT=$(aws rds describe-db-instances --region=$REGION  --db-instance-identifier "${PROJECT_NAME}-${ENVIRONMENT}" --query "DBInstances[0].Endpoint.Address" | jq -r '.')
 DB_NAME_LIST=$(echo ${DATABASE_NAME} | tr -dc 'A-Za-z0-9 ') # used by job
 DB_NAME=$(echo ${DB_NAME_LIST} | cut -d" " -f1) # used by db-pod
 DB_TYPE=${DATABASE_TYPE}

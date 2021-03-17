@@ -20,7 +20,9 @@ locals {
   region       = "<% index .Params `region` %>"
   account_id   = "<% index .Params `accountId` %>"
   domain_name  = "<% index .Params `productionHostRoot` %>"
+  environment  = "prod"
   file_uploads = <% if eq (index .Params `fileUploads`) "yes" %>true<% else %>false<% end %>
+  random_seed  = "<% index .Params `randomSeed` %>"
 }
 
 provider "aws" {
@@ -37,7 +39,7 @@ module "kubernetes" {
   project             = local.project
   region              = local.region
   allowed_account_ids = [local.account_id]
-  random_seed         = "<% index .Params `randomSeed` %>"
+  random_seed         = local.random_seed
   cf_signing_enabled  = local.file_uploads
 
   # Authenticate with the EKS cluster via the cluster id
@@ -79,9 +81,9 @@ module "kubernetes" {
     {
       name = local.project
       auth_namespace                = "user-auth"
-      frontend_service_domain       = "<% index .Params `productionFrontendSubdomain` %>.${local.domain_name}"
-      backend_service_domain        = "<% index .Params `productionBackendSubdomain` %>.${local.domain_name}"
-      whitelisted_return_urls       = ["https://<% index .Params `productionFrontendSubdomain` %>.${local.domain_name}"]
+      frontend_service_domain       = "<% index .Params `productionFrontendSubdomain` %>${local.domain_name}"
+      backend_service_domain        = "<% index .Params `productionBackendSubdomain` %>${local.domain_name}"
+      whitelisted_return_urls       = ["https://<% index .Params `productionFrontendSubdomain` %>${local.domain_name}"]
       jwks_secret_name              = "${local.project}-${local.environment}-oathkeeper-jwks-${local.random_seed}"
       # This domain or address must be verified by the mail provider (Sendgrid, SES, etc.)
       user_auth_mail_from_address   = "noreply@${local.domain_name}"
@@ -93,6 +95,8 @@ module "kubernetes" {
     ## If you need to add another user-auth instance you will have to create another set of these resources
   ]<% end %>
   notification_service_enabled          = <%if eq (index .Params `notificationServiceEnabled`) "yes" %>true<% else %>false<% end %>
+  notification_service_sendgrid_enabled = <%if ne (index .Params `sendgridApiKey`) "" %>true<% else %>false<% end %>
+  notification_service_slack_enabled    = <%if ne (index .Params `notificationServiceSlackApiKey`) "" %>true<% else %>false<% end %>
   notification_service_highly_available = true
 
   cache_store =  "<% index .Params `cacheStore` %>"

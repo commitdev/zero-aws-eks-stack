@@ -5,20 +5,20 @@ locals {
 }
 
 data "aws_secretsmanager_secret" "sendgrid_api_key" {
-  count = var.notification_service_enabled ? 1 : 0
+  count = var.notification_service_enabled && var.notification_service_sendgrid_enabled ? 1 : 0
   name  = local.sendgrid_api_key_secret_name
 }
 data "aws_secretsmanager_secret_version" "sendgrid_api_key" {
-  count     = var.notification_service_enabled ? 1 : 0
+  count = var.notification_service_enabled && var.notification_service_sendgrid_enabled ? 1 : 0
   secret_id = data.aws_secretsmanager_secret.sendgrid_api_key[0].id
 }
 
 data "aws_secretsmanager_secret" "slack_api_key" {
-  count = var.notification_service_enabled ? 1 : 0
+  count = var.notification_service_enabled && var.notification_service_slack_enabled ? 1 : 0
   name  = local.slack_api_key_secret_name
 }
 data "aws_secretsmanager_secret_version" "slack_api_key" {
-  count     = var.notification_service_enabled ? 1 : 0
+  count     = var.notification_service_enabled && var.notification_service_slack_enabled ? 1 : 0
   secret_id = data.aws_secretsmanager_secret.slack_api_key[0].id
 }
 
@@ -65,11 +65,11 @@ resource "helm_release" "notification_service" {
   # These will become secrets provided as env vars
   set_sensitive {
     name  = "application.sendgridApiKey"
-    value = data.aws_secretsmanager_secret_version.sendgrid_api_key[0].secret_string
+    value = var.notification_service_enabled && var.notification_service_sendgrid_enabled ? data.aws_secretsmanager_secret_version.sendgrid_api_key[0].secret_string : ""
   }
 
   set_sensitive {
     name  = "application.slackApiKey"
-    value = data.aws_secretsmanager_secret_version.slack_api_key[0].secret_string
+    value = var.notification_service_enabled && var.notification_service_slack_enabled ? data.aws_secretsmanager_secret_version.slack_api_key[0].secret_string : ""
   }
 }
