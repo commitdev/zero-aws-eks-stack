@@ -10,10 +10,11 @@ locals {
 module "user_auth" {
   count = length(var.user_auth)
   source                      = "commitdev/zero/aws//modules/user_auth"
-  version                     = "0.1.18"
+  version                     = "0.1.19"
 
   project                     = var.user_auth[count.index].name
   auth_namespace              = var.user_auth[count.index].auth_namespace
+  create_namespace            = false
   frontend_service_domain     = var.user_auth[count.index].frontend_service_domain
   backend_service_domain      = var.user_auth[count.index].backend_service_domain
   user_auth_mail_from_address = var.user_auth[count.index].user_auth_mail_from_address
