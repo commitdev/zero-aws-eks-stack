@@ -34,7 +34,8 @@ data "aws_iam_policy_document" "external_dns_policy_doc" {
 
     actions = ["route53:ChangeResourceRecordSets"]
 
-    resources = [for domain in var.external_dns_zones : "arn:aws:route53:::hostedzone/${domain}"]
+    // data.aws_route53_zone.zones declared in ./cert-manager.tf
+    resources = [for index, domain in var.external_dns_zones : "arn:aws:route53:::hostedzone/${data.aws_route53_zone.zones[index].zone_id}"]
   }
 }
 

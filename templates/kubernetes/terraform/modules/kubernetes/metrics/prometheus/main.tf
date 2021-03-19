@@ -221,4 +221,5 @@ resource "helm_release" "elasticsearch_prometheus_exporter" {
     name  = "serviceMonitor.enabled"
     value = "true"
   }
+  depends_on = [helm_release.prometheus_stack]
 }
