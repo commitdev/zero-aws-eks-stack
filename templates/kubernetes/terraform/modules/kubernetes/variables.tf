@@ -139,6 +139,7 @@ variable "user_auth" {
     frontend_service_domain     = string
     backend_service_domain      = string
     auth_namespace              = string
+    kratos_secret_name          = string
     jwks_secret_name            = string
     user_auth_mail_from_address = string
     whitelisted_return_urls     = list(string)
