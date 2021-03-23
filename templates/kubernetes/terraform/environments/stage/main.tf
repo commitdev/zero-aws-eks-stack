@@ -78,8 +78,9 @@ module "kubernetes" {
   domain_name                 = local.domain_name
   <% if eq (index .Params `userAuth`) "yes" %>user_auth = [
     {
-      name = local.project
+      name                          = local.project
       auth_namespace                = "user-auth"
+      kratos_secret_name            = local.project
       frontend_service_domain       = "<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}"
       backend_service_domain        = "<% index .Params `stagingBackendSubdomain` %>${local.domain_name}"
       whitelisted_return_urls       = ["https://<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}"]
