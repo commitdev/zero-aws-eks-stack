@@ -134,7 +134,7 @@ module "ecr" {
 
 module "logging" {
   source  = "commitdev/zero/aws//modules/logging"
-  version = "0.1.18"
+  version = "0.1.20"
 
   count = var.logging_type == "kibana" ? 1 : 0
 
