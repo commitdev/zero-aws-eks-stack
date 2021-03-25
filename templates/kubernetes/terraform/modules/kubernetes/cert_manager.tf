@@ -97,6 +97,22 @@ resource "helm_release" "cert_manager" {
     name  = "installCRDs"
     value = true
   }
+  set {
+    name  = "prometheus.enabled"
+    value = var.metrics_type == "prometheus"
+  }
+  set {
+    name  = "prometheus.servicemonitor.enabled"
+    value = var.metrics_type == "prometheus"
+  }
+  set {
+    name  = "prometheus.servicemonitor.labels.app"
+    value = var.metrics_type == "prometheus" ? "kube-prometheus-stack-prometheus" : ""
+  }
+  set {
+    name  = "prometheus.servicemonitor.namespace"
+    value = "metrics"
+  }
 }
 
 # Manually kubectl apply the cert-manager issuers, as the kubernetes terraform provider

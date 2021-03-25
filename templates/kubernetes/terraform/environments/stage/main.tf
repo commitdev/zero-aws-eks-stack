@@ -75,7 +75,8 @@ module "kubernetes" {
     # ["Test User 2", "10.10.199.202/32", "h2jMuaXNIlx7Z0a3owWFjPsAA8B+ZpQH3FbZK393+08="],
   ]
 
-  domain_name                 = local.domain_name
+  domain_name = local.domain_name
+
   <% if eq (index .Params `userAuth`) "yes" %>user_auth = [
     {
       name                          = local.project

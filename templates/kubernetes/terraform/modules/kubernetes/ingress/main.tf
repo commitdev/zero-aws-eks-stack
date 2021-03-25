@@ -49,6 +49,7 @@ resource "kubernetes_config_map" "nginx_configuration" {
     use-proxy-protocol     = "false"
     log-format-escape-json = "true"
     log-format-upstream    = replace(local.log_format, "\n", "")
+    generate-request-id    = "true"
   }
 }
 
