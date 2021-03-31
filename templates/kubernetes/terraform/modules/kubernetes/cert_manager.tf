@@ -177,7 +177,7 @@ data "aws_iam_policy_document" "cert_manager_policy_doc" {
       "route53:ListResourceRecordSets"
     ]
 
-    resources = [for index, domain in var.external_dns_zones : "arn:aws:route53:::hostedzone/${data.aws_route53_zone.zones[index].zone_id}"]
+    resources = [for zone in data.aws_route53_zone.zones : "arn:aws:route53:::hostedzone/${zone.zone_id}"]
   }
 
   statement {

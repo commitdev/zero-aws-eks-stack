@@ -102,4 +102,8 @@ module "kubernetes" {
   notification_service_highly_available = true
 
   cache_store =  "<% index .Params `cacheStore` %>"
+
+  # Should not be less than 2 for production. 2 can handle a significant amount of traffic and should give a reasonable amount of redundancy in the case of
+  # needing to do deployments of the controller or unexpected termination of a node with a controller pod on it.
+  nginx_ingress_replicas = 2
 }

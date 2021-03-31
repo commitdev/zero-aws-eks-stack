@@ -27,10 +27,11 @@ module "metrics_prometheus" {
 }
 
 module "ingress" {
-  source                     = "./ingress"
-  environment                = var.environment
-  region                     = var.region
-  load_balancer_ssl_cert_arn = ""
+  source  = "commitdev/zero/aws//modules/kubernetes/nginx_ingress"
+  version = "0.2.0"
+
+  replica_count  = var.nginx_ingress_replicas
+  enable_metrics = var.metrics_type == "prometheus"
 }
 
 resource "kubernetes_namespace" "app_namespace" {

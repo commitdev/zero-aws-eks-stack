@@ -132,9 +132,10 @@ variable "cache_store" {
 }
 
 variable "user_auth" {
-  description = "a list of maps {name, domain, upstream_auth, upstream_api} configuring ingress of oathkeeper"
+  description = "a list of maps configuring oathkeeper instances"
   default     = []
-  type        = list(object({
+
+  type = list(object({
     name                        = string
     frontend_service_domain     = string
     backend_service_domain      = string
@@ -145,4 +146,10 @@ variable "user_auth" {
     whitelisted_return_urls     = list(string)
     cookie_sigining_secret_key  = string
   }))
+}
+
+variable "nginx_ingress_replicas" {
+  description = "The number of ingress controller pods to run in the cluster. Production environments should not have less than 2"
+  type        = number
+  default     = 2
 }
