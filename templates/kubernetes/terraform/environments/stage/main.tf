@@ -101,4 +101,6 @@ module "kubernetes" {
   notification_service_highly_available = false
 
   cache_store = "<% index .Params `cacheStore` %>"
+
+  nginx_ingress_replicas = 1
 }
