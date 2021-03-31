@@ -27,7 +27,7 @@ module "metrics_prometheus" {
 }
 
 module "ingress" {
-  source  = "commitdev/zero/aws//modules/kubernetes/nginx_ingress"
+  source  = "commitdev/zero/aws//modules/kubernetes/ingress_nginx"
   version = "0.2.0"
 
   replica_count  = var.nginx_ingress_replicas
