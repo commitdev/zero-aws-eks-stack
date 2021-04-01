@@ -142,21 +142,3 @@ prometheus:
     # Don't apply a selector when looking for service and pod monitors, just discover all of them
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
-
-
-  ## Additional ServiceMonitors to create
-  additionalServiceMonitors:
-    - name: "nginx-ingress-controller-metrics"
-
-      ## Label selector for services to which this ServiceMonitor applies
-      selector:
-        matchLabels:
-          app.kubernetes.io/name: ingress-nginx
-
-      namespaceSelector:
-        matchNames: [ ingress-nginx ]
-
-      ## Endpoints of the selected service to be monitored
-      endpoints:
-        - port: "metrics"
-          interval: 30s
