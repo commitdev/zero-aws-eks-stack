@@ -1,7 +1,9 @@
 name: zero-aws-eks-stack
 description: 'zero module for an AWS kubernetes stack on EKS'
 author: 'Commit'
-zeroVersion: '>= 0.1.0'
+zeroVersion: '>= 0.1.1'
+commands:
+  check: sh scripts/check.sh
 
 template:
   strictMode: true
