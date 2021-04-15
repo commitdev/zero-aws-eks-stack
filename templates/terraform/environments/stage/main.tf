@@ -29,7 +29,7 @@ provider "aws" {
   allowed_account_ids = [local.account_id]
 }
 
-# remote state of "shared"
+# remote state of "shared" - contains mostly IAM users that will be shared between environments
 data "terraform_remote_state" "shared" {
   backend = "s3"
   config = {
@@ -49,7 +49,7 @@ module "rds_dev_secret" {
   name          = "${local.project}-stage-rds-${local.random_seed}-devenv"
   type          = "random"
   random_length = 32
-  tags          = map("rds", "${local.project}-stage-devenv")
+  tags          = { rds: "${local.project}-stage-devenv" }
 }
 
 # Instantiate the staging environment

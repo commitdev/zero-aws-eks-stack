@@ -26,14 +26,14 @@ locals {
   # Users configuration
   ci_user_name = "${local.project}-ci-user"
   users = [
-        {
-          name  = local.ci_user_name
-          roles = [
-            { name = "deployer", environments = ["stage", "prod"] }
-          ]
-          global_roles       = []
-          create_access_keys = true
-    #    },
+    {
+      name = local.ci_user_name
+      roles = [
+        { name = "deployer", environments = ["stage", "prod"] }
+      ]
+      global_roles       = []
+      create_access_keys = true
+    },
     #    {
     #      name  = "dev1"
     #      roles = [
@@ -58,7 +58,7 @@ locals {
     #      ]
     #      global_roles       = ["mfa-required", "console-allowed"]
     #      create_access_keys = false
-        },
+    #    },
   ]
 }
 
@@ -85,7 +85,7 @@ resource "aws_iam_group_membership" "mfa_required_group" {
 
   group = aws_iam_group.mfa_required.name
 
-  depends_on = [ aws_iam_user.access_user ]
+  depends_on = [aws_iam_user.access_user]
 }
 
 resource "aws_iam_group_membership" "console_allowed_group" {
@@ -97,35 +97,38 @@ resource "aws_iam_group_membership" "console_allowed_group" {
 
   group = aws_iam_group.console_allowed.name
 
-  depends_on = [ aws_iam_user.access_user ]
+  depends_on = [aws_iam_user.access_user]
 }
 
 ## Create access/secret key pair and save to secret manager
 resource "aws_iam_access_key" "access_user" {
-  for_each = { for u in local.users : u.name => u.roles if u.create_access_keys}
+  for_each = { for u in local.users : u.name => u.roles if u.create_access_keys }
 
   user = aws_iam_user.access_user[each.key].name
 
-  depends_on = [ aws_iam_user.access_user ]
+  depends_on = [aws_iam_user.access_user]
 }
 
 module "secret_keys" {
   source  = "commitdev/zero/aws//modules/secret"
   version = "0.0.2"
 
-  for_each = { for u in local.users : u.name => u.roles if u.create_access_keys}
+  for_each = { for u in local.users : u.name => u.roles if u.create_access_keys }
 
-  name   = "${each.key}-aws-keys${local.random_seed}"
-  type   = "map"
-  values = map("access_key_id", aws_iam_access_key.access_user[each.key].id, "secret_key", aws_iam_access_key.access_user[each.key].secret)
-  tags   = map("project", local.project)
+  name = "${each.key}-aws-keys${local.random_seed}"
+  type = "map"
+  values = {
+    access_key_id : aws_iam_access_key.access_user[each.key].id,
+    secret_key : aws_iam_access_key.access_user[each.key].secret
+  }
+  tags = { project : local.project }
 
-  depends_on = [ aws_iam_access_key.access_user ]
+  depends_on = [aws_iam_access_key.access_user]
 }
 
 # Enable AWS CloudTrail to help you audit governance, compliance, and operational risk of your AWS account, with logs stored in S3 bucket.
 module "cloudtrail" {
-  source = "commitdev/zero/aws//modules/cloudtrail"
+  source  = "commitdev/zero/aws//modules/cloudtrail"
   version = "0.1.10"
 
   project = local.project
@@ -141,7 +144,7 @@ output "iam_users" {
 
 output "user_role_mapping" {
   value = [
-    for u in local.users: {
+    for u in local.users : {
       name  = u.name
       roles = u.roles
     }
