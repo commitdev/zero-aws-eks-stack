@@ -13,6 +13,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 0.14.8 # Required as of Apr 15 2021 because of breaking changes in tf 0.15
+
     - name: Install Zero
       id: install_zero
       run: |

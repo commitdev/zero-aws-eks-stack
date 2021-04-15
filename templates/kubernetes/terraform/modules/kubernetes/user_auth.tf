@@ -1,16 +1,7 @@
-locals {
-  # To prevent coupling to rds engine names
-  type_map = {
-    "postgres" : "postgres",
-    "mysql" : "mysql",
-  }
-  db_type          = local.type_map[data.aws_db_instance.database.engine]
-}
-
 module "user_auth" {
-  count = length(var.user_auth)
-  source                      = "commitdev/zero/aws//modules/user_auth"
-  version                     = "0.1.21"
+  count   = length(var.user_auth)
+  source  = "commitdev/zero/aws//modules/user_auth"
+  version = "0.1.21"
 
   name                        = var.user_auth[count.index].name
   auth_namespace              = var.user_auth[count.index].auth_namespace

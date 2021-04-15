@@ -20,7 +20,7 @@ module "rds_master_secret_stage" {
   name          = "${local.project}-stage-rds-<% index .Params `randomSeed` %>"
   type          = "random"
   random_length = 32
-  tags          = map("rds", "${local.project}-stage")
+  tags          = { rds: "${local.project}-stage" }
 }
 
 module "rds_master_secret_prod" {
@@ -30,7 +30,7 @@ module "rds_master_secret_prod" {
   name          = "${local.project}-prod-rds-<% index .Params `randomSeed` %>"
   type          = "random"
   random_length = 32
-  tags          = map("rds", "${local.project}-prod")
+  tags          = { rds: "${local.project}-prod" }
 }
 
 module "sendgrid_api_key" {
@@ -41,7 +41,7 @@ module "sendgrid_api_key" {
   name  = "${local.project}-sendgrid-<% index .Params `randomSeed` %>"
   type  = "string"
   value = var.sendgrid_api_key
-  tags  = map("sendgrid", local.project)
+  tags  = { sendgrid: local.project }
 }
 
 module "slack_api_key" {
@@ -52,5 +52,5 @@ module "slack_api_key" {
   name  = "${local.project}-slack-<% index .Params `randomSeed` %>"
   type  = "string"
   value = var.slack_api_key
-  tags  = map("slack", local.project)
+  tags  = { slack: local.project }
 }

@@ -56,7 +56,7 @@ data "aws_caller_identity" "current" {}
 # Provision the EKS cluster
 module "eks" {
   source  = "commitdev/zero/aws//modules/eks"
-  version = "0.1.12"
+  version = "0.3.1"
   providers = {
     aws = aws.for_eks
   }
@@ -71,10 +71,10 @@ module "eks" {
   private_subnets = module.vpc.private_subnets
   vpc_id          = module.vpc.vpc_id
 
-  worker_instance_type = var.eks_worker_instance_type
-  worker_asg_min_size  = var.eks_worker_asg_min_size
-  worker_asg_max_size  = var.eks_worker_asg_max_size
-  worker_ami           = var.eks_worker_ami # EKS-Optimized AMI for your region: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
+  worker_instance_types = var.eks_worker_instance_types
+  worker_asg_min_size   = var.eks_worker_asg_min_size
+  worker_asg_max_size   = var.eks_worker_asg_max_size
+  use_spot_instances    = var.eks_use_spot_instances
 
   iam_role_mapping = local.eks_kubernetes_iam_role_mapping
 }
@@ -112,6 +112,7 @@ module "s3_hosting" {
 module "db" {
   source  = "commitdev/zero/aws//modules/database"
   version = "0.1.18"
+  count   = (var.database == "none") ? 0 : 1
 
   project                   = var.project
   environment               = var.environment

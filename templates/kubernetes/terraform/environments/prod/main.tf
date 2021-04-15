@@ -106,4 +106,8 @@ module "kubernetes" {
   # Should not be less than 2 for production. 2 can handle a significant amount of traffic and should give a reasonable amount of redundancy in the case of
   # needing to do deployments of the controller or unexpected termination of a node with a controller pod on it.
   nginx_ingress_replicas = 2
+
+  # The Node Termination Handler should be enabled when using spot instances in your cluster, as it is responsible for gracefully draining a node that is due to be terminated.
+  # It can also be used to cleanly handle scheduled maintenance events on On-Demand instances, though it runs as a daemonset, so will run 1 pod on each node in your cluster.
+  enable_node_termination_handler = false
 }

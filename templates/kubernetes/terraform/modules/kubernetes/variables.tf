@@ -70,7 +70,7 @@ variable "metrics_type" {
 
 variable "application_policy_list" {
   description = "Application policies"
-  type        = list
+  type        = list(any)
   default     = []
 }
 
@@ -152,4 +152,10 @@ variable "nginx_ingress_replicas" {
   description = "The number of ingress controller pods to run in the cluster. Production environments should not have less than 2"
   type        = number
   default     = 2
+}
+
+variable "enable_node_termination_handler" {
+  description = "The Node Termination Handler should be enabled when using spot instances in your cluster, as it is responsible for gracefully draining a node that is due to be terminated. It can also be used to cleanly handle scheduled maintenance events on On-Demand instances, though it runs as a daemonset, so will run 1 pod on each node in your cluster"
+  type        = bool
+  default     = false
 }
