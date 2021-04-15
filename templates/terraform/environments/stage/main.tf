@@ -41,7 +41,7 @@ data "terraform_remote_state" "shared" {
   }
 }
 
-# rds shared db password for dev envrionment
+# rds shared db password for dev environment
 module "rds_dev_secret" {
   source  = "commitdev/zero/aws//modules/secret"
   version = "0.0.2"
@@ -67,14 +67,11 @@ module "stage" {
   ecr_repositories = [ local.project ]
 
   # EKS configuration
-  eks_cluster_version      = "1.18"
-  eks_worker_instance_type = "t3.medium"
-  eks_worker_asg_min_size  = 1
-  eks_worker_asg_max_size  = 3
-
-  # EKS-Optimized AMI for your region: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
-  # https://<% index .Params `region` %>.console.aws.amazon.com/systems-manager/parameters/%252Faws%252Fservice%252Feks%252Foptimized-ami%252F1.18%252Famazon-linux-2%252Frecommended%252Fimage_id/description?region=<% index .Params `region` %>
-  eks_worker_ami = "<% index .Params `eksWorkerAMI` %>"
+  eks_cluster_version       = "1.19"
+  eks_worker_instance_types = ["t3.medium", "t2.medium", "t3.large"]
+  eks_worker_asg_min_size   = 1
+  eks_worker_asg_max_size   = 3
+  eks_use_spot_instances    = true
 
   # Hosting configuration. Each domain will have a bucket created for it, but may have mulitple aliases pointing to the same bucket.
   # Note that because of the way terraform handles lists, new records should be added to the end of the list.
@@ -120,12 +117,12 @@ module "stage" {
 
   # Logging configuration
   logging_type = "<% index .Params `loggingType` %>"
-  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_version = "7.9"
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_version          = "7.9"
   <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_create_service_role = true # Set this to false if you need to create more than one ES cluster in an AWS account
-  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_az_count = "1"
-  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_instance_type = "t2.medium.elasticsearch"
-  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_instance_count = "1" # Must be a mulitple of the az count
-  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_volume_size_in_gb = "10" # Maximum value is limited by the instance type
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_az_count            = "1"
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_instance_type    = "t2.medium.elasticsearch"
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_instance_count   = "1" # Must be a mulitple of the az count
+  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_volume_size_in_gb   = "10" # Maximum value is limited by the instance type
   # See https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-limits.html
 
   sendgrid_enabled = <%if eq (index .Params `sendgridApiKey`) "" %>false<% else %>true<% end %>
@@ -137,9 +134,11 @@ module "stage" {
   ## Check https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/SelectEngine.html to compare redis or memcached.
   cache_store = "<% index .Params `cacheStore` %>"
 
+<% if ne (index .Params `cacheStore`) "none" %>
   ## See how to define node and instance type: https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/nodes-select-size.html
   cache_cluster_size  = 1
   cache_instance_type = "cache.t2.micro"
+<% end %>
 
   # Roles configuration
   roles = [

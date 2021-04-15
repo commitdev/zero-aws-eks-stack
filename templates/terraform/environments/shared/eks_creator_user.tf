@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "assumerole_root_only_policy" {
 
     principals {
       type        = "AWS"
-      identifiers = [local.aws_account_id]
+      identifiers = [local.account_id]
     }
   }
 }
@@ -40,6 +40,7 @@ resource "aws_iam_role_policy" "eks_cluster_creator" {
 # Allow the cluster creator role to create a cluster
 data "aws_iam_policy_document" "eks_manage" {
   statement {
+    effect = "Allow"
     actions = [
       "eks:*",
       "ec2:*",
@@ -60,6 +61,7 @@ data "aws_iam_policy_document" "eks_manage" {
   }
 
   statement {
+    effect = "Allow"
     actions = [
       "iam:GetRole",
       "iam:PassRole",
@@ -70,11 +72,41 @@ data "aws_iam_policy_document" "eks_manage" {
       "iam:AttachRolePolicy",
       "iam:DetachRolePolicy",
       "iam:ListAttachedRolePolicies",
-      "iam:ListRolePolicies"
+      "iam:ListRolePolicies",
+      "iam:CreatePolicy",
+      "iam:GetPolicy",
+      "iam:DeletePolicy",
+      "iam:GetPolicyVersion",
+      "iam:ListPolicyVersions",
     ]
     resources = [
-      "arn:aws:iam::${local.aws_account_id}:role/${local.project}-*",
-      "arn:aws:iam::${local.aws_account_id}:role/k8s-${local.project}-*",
+      "arn:aws:iam::${local.account_id}:role/${local.project}-*",
+      "arn:aws:iam::${local.account_id}:role/k8s-${local.project}-*",
+      "arn:aws:iam::${local.account_id}:policy/${local.project}-*",
     ]
   }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["iam:GetRole"]
+    resources = ["arn:aws:iam::${local.account_id}:role/*"]
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["iam:CreateServiceLinkedRole"]
+    resources = ["*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:AWSServiceName"
+
+      values = [
+        "eks.amazonaws.com",
+        "eks-nodegroup.amazonaws.com",
+        "eks-fargate.amazonaws.com",
+      ]
+    }
+  }
+
 }
