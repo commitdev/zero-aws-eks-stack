@@ -10,7 +10,6 @@ locals {
   }
 }
 
-
 resource "helm_release" "node_termination_handler" {
   count      = var.enable_node_termination_handler ? 1 : 0
   name       = "node-termination-handler"
@@ -20,4 +19,3 @@ resource "helm_release" "node_termination_handler" {
   namespace  = local.termination_handler_namespace
   values     = [jsonencode(local.termination_handler_helm_values)]
 }
-
