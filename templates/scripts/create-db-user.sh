@@ -63,7 +63,7 @@ fi
 eval "echo \"$(cat ./db-ops/job-create-db-${DATABASE_TYPE}.yml.tpl)\"" | kubectl apply -f -
 
 # Create a secret in AWS Secrets Manager. The contents of this secret will be automatically pulled into a kubernetes secret by external-secrets
-[[ -z "${CREATE_SECRET}" ]] || aws secretsmanager create-secret --name "${PROJECT_NAME}/kubernetes/${ENVIRONMENT}/${SECRET_NAME}" --description "Application secrets" --secret-string "$(eval "echo \"$(cat ./db-ops/${CREATE_SECRET})\"")"
+[[ -z "${CREATE_SECRET}" ]] || aws secretsmanager create-secret --name "${PROJECT_NAME}/kubernetes/${ENVIRONMENT}/${SECRET_NAME}" --description "Application secrets" --tags "[{\"Key\":\"application-secret\",\"Value\":\"${PROJECT}-${ENVIRONMENT}-${SECRET_NAME}\"}]" --secret-string "$(eval "echo \"$(cat ./db-ops/${CREATE_SECRET})\"")"
 
 ## Delete the entire db-ops namespace
 kubectl -n db-ops wait --for=condition=complete --timeout=10s job db-create-users-$NAMESPACE-${JOB_ID}
