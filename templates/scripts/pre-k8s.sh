@@ -42,7 +42,7 @@ if [[ $? -ne 0 ]]; then
     DATABASE_NAME=user_auth \
     SECRET_NAME=user-auth \
     USER_NAME=kratos \
-    CREATE_SECRET=secret-user-auth.yml.tpl \
+    CREATE_SECRET=secret-user-auth.json.tpl \
     <%- if ne (index .Params `sendgridApiKey`) "" %>
     SMTP_URI=smtps://apikey:${sendgridApiKey}@smtp.sendgrid.net:465 \
     <%- else %>
