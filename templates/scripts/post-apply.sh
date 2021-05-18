@@ -16,7 +16,7 @@ if [[ $? -ne 0 ]]; then
     DATABASE_NAME=${PROJECT} \
     SECRET_NAME=${PROJECT} \
     USER_NAME=${PROJECT} \
-    CREATE_SECRET=secret-application.yml.tpl \
+    CREATE_SECRET=secret-application.json.tpl \
     sh ./create-db-user.sh
 fi
 

@@ -94,6 +94,29 @@ data "aws_iam_policy_document" "operator_access" {
     actions   = ["s3:GetObject", "s3:PutObject"]
     resources = ["arn:aws:s3:::${data.terraform_remote_state.shared.outputs.cloudtrail_bucket_id}/*"]
   }
+
+  # Application secret management - this role can view and edit application secrets in the production environment
+  statement {
+    sid       = "ManageApplicationSecrets"
+    effect    = "Allow"
+    resources = ["arn:aws:secretsmanager:${local.account_id}:${local.account_id}:secret:${local.project}/kubernetes/prod/*"]
+
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:PutSecretValue",
+      "secretsmanager:CreateSecret",
+      "secretsmanager:DeleteSecret",
+      "secretsmanager:ListSecretVersionIds",
+      "secretsmanager:UpdateSecret",
+    ]
+  }
+  statement {
+    sid       = "ListSecrets"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["secretsmanager:ListSecrets"]
+  }
 }
 
 # define AWS policy documents for deployer

@@ -80,20 +80,25 @@ teardown-secrets:
 	aws secretsmanager list-secrets --region $(AWS_DEFAULT_REGION) --query "SecretList[?Tags[?Key=='cf-keypair' && Value=='$(PROJECT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region $(AWS_DEFAULT_REGION) --secret-id || echo "Secret already removed"
 	aws secretsmanager list-secrets --region $(AWS_DEFAULT_REGION) --query "SecretList[?Tags[?Key=='wg' && Value=='$(PROJECT)-$(ENVIRONMENT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region $(AWS_DEFAULT_REGION) --secret-id || echo "Secret already removed"
 	aws secretsmanager list-secrets --region $(AWS_DEFAULT_REGION) --query "SecretList[?Tags[?Key=='oathkeeper-jwks' && Value=='$(PROJECT)-$(ENVIRONMENT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region $(AWS_DEFAULT_REGION) --secret-id || echo "Secret already removed"
+	aws secretsmanager list-secrets --region $(AWS_DEFAULT_REGION) --query "SecretList[?Tags[?Key=='application-secret' && Value=='$(PROJECT)-$(ENVIRONMENT)-$(PROJECT)']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region $(AWS_DEFAULT_REGION) --secret-id || echo "Secret already removed"
+	aws secretsmanager list-secrets --region $(AWS_DEFAULT_REGION) --query "SecretList[?Tags[?Key=='application-secret' && Value=='$(PROJECT)-$(ENVIRONMENT)-user-auth']].[Name] | [0][0]" | xargs aws secretsmanager delete-secret --region $(AWS_DEFAULT_REGION) --secret-id || echo "Secret already removed"
 	aws iam list-role-policies --role-name $(PROJECT)-eks-cluster-creator --query "PolicyNames"   | jq -r ".[]" | xargs -n1 aws iam delete-role-policy --role-name $(PROJECT)-eks-cluster-creator --policy-name
 	aws iam list-attached-role-policies --role-name $(PROJECT)-eks-cluster-creator --query "AttachedPolicies[].PolicyArn" | jq -r ".[]" | xargs -n1 aws iam detach-role-policy --role-name $(PROJECT)-eks-cluster-creator --policy-arn
 	aws iam delete-role --role-name $(PROJECT)-eks-cluster-creator
 
 teardown-env:
 	cd terraform/environments/$(ENVIRONMENT) && \
+	terraform refresh && \
 	terraform destroy
 
 teardown-shared-env:
 	cd terraform/environments/shared && \
+	terraform refresh && \
 	terraform destroy
 
 teardown-k8s-utils:
 	cd kubernetes/terraform/environments/$(ENVIRONMENT) && \
+	terraform refresh && \
 	terraform destroy
 
 .PHONY: apply apply-remote-state apply-secrets apply-env apply-k8s-utils teardown-k8s-utils teardown-env teardown-shared-env teardown-secrets teardown-remote-state teardown-shared-remote-state
