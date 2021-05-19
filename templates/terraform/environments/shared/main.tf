@@ -131,7 +131,7 @@ module "cloudtrail" {
   source  = "commitdev/zero/aws//modules/cloudtrail"
   version = "0.1.10"
 
-  project = local.project
+  project = "${local.project}-${lower(local.random_seed)}"
 
   ## To specify whether to publish events from global services such as IAM and non-API events - https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/EventTypes.html. Note: as this may increase your cost, set it off by default.
   include_global_service_events = false

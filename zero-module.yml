@@ -31,6 +31,13 @@ parameters:
     - action: KeyMatchCondition
       whenValue: "yes"
       matchField: useExistingAwsProfile
+  - field: awsProfile
+    envVarName: "AWS_PROFILE"
+    label: Profile to use with terraform AWS provider
+    conditions:
+    - action: KeyMatchCondition
+      whenValue: "yes"
+      matchField: profilePicker
   - field: accessKeyId
     label: AWS AccessKeyId
     envVarName: "AWS_ACCESS_KEY_ID"
