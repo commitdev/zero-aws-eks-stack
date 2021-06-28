@@ -28,22 +28,15 @@ variable "eks_cluster_version" {
   description = "EKS cluster version number to use. Incrementing this will start a cluster upgrade"
 }
 
-variable "eks_worker_instance_types" {
-  description = "Instance types for the EKS workers. If using spot instances, you may provide multiple instance types and it will diversify across the cheapest pools"
-}
-
-variable "eks_use_spot_instances" {
-  description = "Enable use of spot instances instead of on-demand. This can lead to significant savings, and should be stable due to the use of the termination handler, but means that individuial nodes could be restarted at any time. May not be suitable for clusters with long-running workloads"
-  type        = bool
-  default     = false
-}
-
-variable "eks_worker_asg_min_size" {
-  description = "Minimum number of instances for the EKS ASG"
-}
-
-variable "eks_worker_asg_max_size" {
-  description = "Maximum number of instances for the EKS ASG"
+variable "eks_node_groups" {
+  type = map(object({
+    instance_types     = list(string)
+    asg_min_size       = string
+    asg_max_size       = string
+    use_spot_instances = bool
+    ami_type           = string
+  }))
+  description = "Map of maps of eks node group config where keys are node group names"
 }
 
 variable "hosted_domains" {

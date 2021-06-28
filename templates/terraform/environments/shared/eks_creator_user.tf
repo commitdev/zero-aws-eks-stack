@@ -56,6 +56,7 @@ data "aws_iam_policy_document" "eks_manage" {
       "iam:AddRoleToInstanceProfile",
       "iam:RemoveRoleFromInstanceProfile",
       "iam:ListInstanceProfilesForRole",
+      "iam:TagOpenIDConnectProvider",
     ]
     resources = ["*"]
   }
@@ -78,6 +79,7 @@ data "aws_iam_policy_document" "eks_manage" {
       "iam:DeletePolicy",
       "iam:GetPolicyVersion",
       "iam:ListPolicyVersions",
+      "iam:TagPolicy",
     ]
     resources = [
       "arn:aws:iam::${local.account_id}:role/${local.project}-*",
