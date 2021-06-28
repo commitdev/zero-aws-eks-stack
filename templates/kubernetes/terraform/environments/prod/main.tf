@@ -110,4 +110,7 @@ module "kubernetes" {
   # The Node Termination Handler should be enabled when using spot instances in your cluster, as it is responsible for gracefully draining a node that is due to be terminated.
   # It can also be used to cleanly handle scheduled maintenance events on On-Demand instances, though it runs as a daemonset, so will run 1 pod on each node in your cluster.
   enable_node_termination_handler = false
+
+  # For ease of use, create an "ExternalName" type service called "database" in the <% .Name %> namespace that points at the app db
+  create_database_service = <%if ne (index .Params `database`) "none" %>true<% else %>false<% end %>
 }

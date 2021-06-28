@@ -159,3 +159,9 @@ variable "enable_node_termination_handler" {
   type        = bool
   default     = false
 }
+
+variable "create_database_service" {
+  description = "For ease of use, create an 'ExternalName' type service called 'database' in the application's namespace that points at the app db. The db will be auto-discovered based on its name"
+  type        = bool
+  default     = true
+}
