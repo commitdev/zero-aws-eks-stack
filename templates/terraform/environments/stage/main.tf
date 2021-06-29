@@ -67,7 +67,7 @@ module "stage" {
   ecr_repositories = [ local.project ]
 
   # EKS configuration
-  eks_cluster_version       = "1.20"
+  eks_cluster_version = "1.20"
   eks_node_groups = {
     main = {
       instance_types     = ["t3.medium", "t2.medium", "t3.large"]
