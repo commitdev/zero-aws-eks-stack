@@ -1,6 +1,5 @@
 # Create VPN
 
-# generate VPN configuration
 locals {
   namespace = "vpn"
 
@@ -12,12 +11,9 @@ locals {
   client_endpoint_dns    = "vpn.${var.domain_name}"
 }
 
-## get destination database subnets
-data "aws_db_instance" "my_db" {
-  db_instance_identifier = local.db_identifier
-}
+## Get database subnet
 data "aws_db_subnet_group" "my_db_subnetgroup" {
-  name = data.aws_db_instance.my_db.db_subnet_group
+  name = "${var.project}-${var.environment}-vpc"
 }
 data "aws_subnet" "my_db_subnet" {
   for_each = data.aws_db_subnet_group.my_db_subnetgroup.subnet_ids

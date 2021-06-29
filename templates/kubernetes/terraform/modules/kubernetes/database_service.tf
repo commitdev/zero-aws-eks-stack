@@ -1,8 +1,10 @@
 data "aws_db_instance" "database" {
+  count                  = var.create_database_service ? 1 : 0
   db_instance_identifier = "${var.project}-${var.environment}"
 }
 
 resource "kubernetes_service" "app_db" {
+  count = var.create_database_service ? 1 : 0
   ## this should match the deployable backend's name/namespace
   ## it uses this service to connect and create application user
   ## https://github.com/commitdev/zero-deployable-backend/blob/b2cee21982b1e6a0ac9996e2a1bf214e5bf10ab5/db-ops/create-db-user.sh#L6
@@ -12,6 +14,6 @@ resource "kubernetes_service" "app_db" {
   }
   spec {
     type          = "ExternalName"
-    external_name = data.aws_db_instance.database.address
+    external_name = data.aws_db_instance.database[0].address
   }
 }

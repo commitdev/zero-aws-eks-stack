@@ -22,7 +22,7 @@ data "aws_iam_policy_document" "console_allowed" {
 }
 
 resource "aws_iam_group" "console_allowed" {
-  name = "console-allowed"
+  name = "${local.shared_resource_prefix}console-allowed"
 }
 
 resource "aws_iam_group_policy" "console_allowed" {

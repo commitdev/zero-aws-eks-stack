@@ -163,3 +163,6 @@ parameters:
     options:
       "yes": "Yes"
       "no": "No"
+  - field: sharedResourcePrefix
+    label: "Mostly for development - Allow shared resources to have a unique prefix. This is only necessary if many zero projects will be run in the same AWS account."
+    value: ""

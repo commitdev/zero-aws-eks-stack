@@ -79,7 +79,7 @@ data "aws_iam_policy_document" "mfa_required_policy" {
 }
 
 resource "aws_iam_group" "mfa_required" {
-  name = "mfa-required"
+  name = "${local.shared_resource_prefix}mfa-required"
 }
 
 resource "aws_iam_group_policy" "mfa_required" {

@@ -38,7 +38,7 @@ data "aws_iam_user" "ci_user" {
 
 module "vpc" {
   source  = "commitdev/zero/aws//modules/vpc"
-  version = "0.1.15"
+  version = "0.4.0"
 
   project                 = var.project
   environment             = var.environment
@@ -56,7 +56,7 @@ data "aws_caller_identity" "current" {}
 # Provision the EKS cluster
 module "eks" {
   source  = "commitdev/zero/aws//modules/eks"
-  version = "0.3.1"
+  version = "0.4.0"
   providers = {
     aws = aws.for_eks
   }
@@ -71,17 +71,14 @@ module "eks" {
   private_subnets = module.vpc.private_subnets
   vpc_id          = module.vpc.vpc_id
 
-  worker_instance_types = var.eks_worker_instance_types
-  worker_asg_min_size   = var.eks_worker_asg_min_size
-  worker_asg_max_size   = var.eks_worker_asg_max_size
-  use_spot_instances    = var.eks_use_spot_instances
+  eks_node_groups = var.eks_node_groups
 
   iam_role_mapping = local.eks_kubernetes_iam_role_mapping
 }
 
 module "assets_domains" {
   source  = "commitdev/zero/aws//modules/certificate"
-  version = "0.1.0"
+  version = "0.4.0"
   count   = length(var.hosted_domains)
   providers = {
     aws = aws.for_cloudfront
@@ -94,7 +91,7 @@ module "assets_domains" {
 
 module "s3_hosting" {
   source  = "commitdev/zero/aws//modules/s3_hosting"
-  version = "0.1.9"
+  version = "0.4.0"
   count   = length(var.hosted_domains)
 
   cf_signed_downloads    = var.hosted_domains[count.index].signed_urls
@@ -111,7 +108,7 @@ module "s3_hosting" {
 
 module "db" {
   source  = "commitdev/zero/aws//modules/database"
-  version = "0.1.18"
+  version = "0.4.0"
   count   = (var.database == "none") ? 0 : 1
 
   project                   = var.project
@@ -126,7 +123,7 @@ module "db" {
 
 module "ecr" {
   source  = "commitdev/zero/aws//modules/ecr"
-  version = "0.0.1"
+  version = "0.4.0"
 
   environment      = var.environment
   ecr_repositories = var.ecr_repositories
@@ -135,7 +132,7 @@ module "ecr" {
 
 module "logging" {
   source  = "commitdev/zero/aws//modules/logging"
-  version = "0.1.20"
+  version = "0.4.0"
 
   count = var.logging_type == "kibana" ? 1 : 0
 
@@ -153,7 +150,7 @@ module "logging" {
 
 module "sendgrid" {
   source  = "commitdev/zero/aws//modules/sendgrid"
-  version = "0.1.16"
+  version = "0.4.0"
   count   = var.sendgrid_enabled ? 1 : 0
 
   zone_name                    = var.sendgrid_zone_name
@@ -163,7 +160,7 @@ module "sendgrid" {
 
 module "user_access" {
   source  = "commitdev/zero/aws//modules/user_access"
-  version = "0.1.12"
+  version = "0.4.1"
 
   project     = var.project
   environment = var.environment
@@ -176,7 +173,7 @@ module "cache" {
   count = var.cache_store == "none" ? 0 : 1
 
   source  = "commitdev/zero/aws//modules/cache"
-  version = "0.1.16"
+  version = "0.4.0"
 
   project     = var.project
   environment = var.environment

@@ -67,11 +67,19 @@ module "stage" {
   ecr_repositories = [ local.project ]
 
   # EKS configuration
-  eks_cluster_version       = "1.19"
-  eks_worker_instance_types = ["t3.medium", "t2.medium", "t3.large"]
-  eks_worker_asg_min_size   = 1
-  eks_worker_asg_max_size   = 3
-  eks_use_spot_instances    = true
+  eks_cluster_version = "1.20"
+  eks_node_groups = {
+    main = {
+      instance_types     = ["t3.medium", "t2.medium", "t3.large"]
+      asg_min_size       = 1
+      asg_max_size       = 3
+      # Enable use of spot instances instead of on-demand.
+      # This can provide significant cost savings and should be stable due to the use of the termination handler, but means that individuial nodes could be restarted at any time. May not be suitable for clusters with long-running workloads
+      use_spot_instances = true
+      # This is the normal image. Other possibilities are AL2_x86_64_GPU for gpu instances or AL2_ARM_64 for ARM instances
+      ami_type           = "AL2_x86_64"
+    }
+  }
 
   # Hosting configuration. Each domain will have a bucket created for it, but may have mulitple aliases pointing to the same bucket.
   # Note that because of the way terraform handles lists, new records should be added to the end of the list.

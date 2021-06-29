@@ -10,10 +10,11 @@ terraform {
 }
 
 locals {
-  project     = "<% .Name %>"
-  region      = "<% index .Params `region` %>"
-  account_id  = "<% index .Params `accountId` %>"
-  random_seed = "<% index .Params `randomSeed` %>"
+  project                = "<% .Name %>"
+  region                 = "<% index .Params `region` %>"
+  account_id             = "<% index .Params `accountId` %>"
+  random_seed            = "<% index .Params `randomSeed` %>"
+  shared_resource_prefix = "<% index .Params `sharedResourcePrefix` %>"
 }
 
 provider "aws" {
@@ -77,10 +78,10 @@ resource "aws_iam_user" "access_user" {
 ## This is recommended to be enabled, ensuring that all users must use MFA
 ## https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-cis-controls.html#securityhub-cis-controls-1.2
 resource "aws_iam_group_membership" "mfa_required_group" {
-  name = "mfa-required"
+  name = "${local.shared_resource_prefix}mfa-required"
 
   users = [
-    for user in local.users : user.name if contains(user.global_roles, "mfa-required")
+    for user in local.users : user.name if contains(user.global_roles, "${local.shared_resource_prefix}mfa-required")
   ]
 
   group = aws_iam_group.mfa_required.name
@@ -89,10 +90,10 @@ resource "aws_iam_group_membership" "mfa_required_group" {
 }
 
 resource "aws_iam_group_membership" "console_allowed_group" {
-  name = "console-allowed"
+  name = "${local.shared_resource_prefix}console-allowed"
 
   users = [
-    for user in local.users : user.name if contains(user.global_roles, "console-allowed")
+    for user in local.users : user.name if contains(user.global_roles, "${local.shared_resource_prefix}console-allowed")
   ]
 
   group = aws_iam_group.console_allowed.name
