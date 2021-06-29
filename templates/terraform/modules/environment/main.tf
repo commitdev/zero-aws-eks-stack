@@ -160,7 +160,7 @@ module "sendgrid" {
 
 module "user_access" {
   source  = "commitdev/zero/aws//modules/user_access"
-  version = "0.4.0"
+  version = "0.4.1"
 
   project     = var.project
   environment = var.environment
