@@ -75,6 +75,7 @@ data "aws_iam_policy_document" "eks_manage" {
       "iam:ListAttachedRolePolicies",
       "iam:ListRolePolicies",
       "iam:CreatePolicy",
+      "iam:CreatePolicyVersion",
       "iam:GetPolicy",
       "iam:DeletePolicy",
       "iam:GetPolicyVersion",
