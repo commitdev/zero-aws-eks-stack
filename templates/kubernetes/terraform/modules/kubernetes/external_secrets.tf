@@ -30,7 +30,7 @@ resource "helm_release" "external_secrets" {
   name       = "external-secrets"
   repository = "https://external-secrets.github.io/kubernetes-external-secrets/"
   chart      = "kubernetes-external-secrets"
-  version    = "7.2.1"
+  version    = "8.1.3"
   namespace  = local.external_secrets_namespace
   values     = [jsonencode(local.external_secrets_helm_values)]
 }

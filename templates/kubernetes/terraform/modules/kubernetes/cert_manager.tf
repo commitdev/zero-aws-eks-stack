@@ -1,5 +1,5 @@
 locals {
-  cert_manager_version     = "1.1.0"
+  cert_manager_version     = "1.4.0"
   cluster_issuer_name      = var.cert_manager_use_production_acme_environment ? "clusterissuer-letsencrypt-production" : "clusterissuer-letsencrypt-staging"
   cert_manager_acme_server = var.cert_manager_use_production_acme_environment ? "https://acme-v02.api.letsencrypt.org/directory" : "https://acme-staging-v02.api.letsencrypt.org/directory"
 
