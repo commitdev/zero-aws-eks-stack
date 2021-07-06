@@ -148,7 +148,7 @@ script/setup-local-config.sh <user name> <role> <environment (stage/prod)>
 
 ## Upgrading an EKS Cluster
 
-Occasionally you may need to upgrade an EKS cluster. This is usually a pretty painless process, and there’s a ton of documentation online about it.
+Occasionally you may need to upgrade an EKS cluster. This is usually a pretty painless process and there’s a ton of documentation online about it.
 
 As part of this process you will need to upgrade the cluster itself, and some core components. Kubernetes has various applications that run as deployments or daemonsets in the `kube-system` namespace like `coredns`, `kube-proxy` and the AWS VPC CNI provider called `aws-node`.
 
@@ -156,25 +156,31 @@ This document has great instructions on upgrading all of the different pieces, i
 
 [https://docs.aws.amazon.com/eks/latest/userguide/update-cluster.html](https://docs.aws.amazon.com/eks/latest/userguide/update-cluster.html)
 
-When doing this from terraform you should be able to go into the tf and change the version of the cluster. It should start the upgrade process, rather than tearing down the cluster and rebuilding it. This will make the cluster inaccessible through the AWS console for about 20 minutes, ***though everything in the cluster should continue to work normally, serve traffic, etc.***
+When doing this from terraform you should be able to go into the tf and change the version of the cluster and addons and apply. It should start the upgrade process, rather than tearing down the cluster and rebuilding it. This will make the cluster inaccessible through the AWS console for about 20 minutes, ***though everything in the cluster should continue to work normally, serve traffic, etc. because the worker nodes and all your workloads are not affected at this point.***
 
 The process should be:
 
-- Update the API version number in terraform
-- Update the AMI for the ASG to the AMI for the corresponding version of EKS in eks.tf and apply terraform
-    - See this page: [https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html](https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html)
-    - This should update the worker group, but not affect any of the running nodes
-- Update any core components if necessary, as mentioned in the aws update-cluster documentation
-- Run terraform apply
-- Drain and remove the old nodes from the cluster. New ones will come up in their place with the new AMI
-    - `kubectl get nodes`
-    - `kubectl cordon <node name>`
-    - `kubectl drain <node name>`
-    - Then terminate the instance in AWS Console
-- (The cordon command stops new pods from being scheduled on a node, the drain command evicts all pods from a node and schedules them elsewhere.)
-- Do the drain/delete process with one node at a time. Wait for a new node to be available before running the process on a second one. This will prevent any traffic from being lost.
+- Update the addon versions versions in `<env>/main.tf` to match the correct versions for the new cluster version, [as detailed here](https://docs.aws.amazon.com/eks/latest/userguide/eks-add-ons.html)
+- Update the `eks_cluster_version` in terraform
+- Run `terraform apply`
+- Update your nodes to the new version
+    - `aws eks update-nodegroup-version --cluster-name <% .Name %>-<env>-<% index .Params `region` %> --nodegroup-name <% .Name %>-<env>-<% index .Params `region` %>-main` ( if you've made changes, specify the correct node group here)
+
+    - OR
+
+    - Go into the AWS EKS console and hit update under Configuration > Compute
+    - This will bring up new nodes, gracefully drain your workloads onto them while preventing new pods from being scheduled to the old ones, then take down the old nodes. If your workloads are set up with multiple replicas there should be no downtime during this process.
 
 Done!
+
+## Managing Node Groups
+
+You may also need to make adjustments to node groups - for example, changing the size of instances used for your cluster. Some properties of node groups are immutable, so in this case you would need to create a new one, move your nodes over, then remove the old one. This can done by changing the configuration in `terraform/environments/<env>/main.tf`. `eks_node_groups` is a map containing the configuration of multiple node groups.
+
+If you want to update the instance types, you would add a new node group with a unique name and a different set of instance types, then apply.
+After the new nodes come up, remove the old node group and apply again. This will gracefully drain your workloads onto the new node group and remove the old instances.
+
+If your workloads are set up with multiple replicas there should be no downtime during this process.
 
 <% if eq (index .Params `loggingType`) "kibana" %>
 ## Kibana and Elasticsearch index Management

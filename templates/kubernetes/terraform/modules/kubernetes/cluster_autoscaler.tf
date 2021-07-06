@@ -6,8 +6,8 @@ locals {
 resource "helm_release" "cluster_autoscaler" {
   name       = "cluster-autoscaler"
   repository = "https://kubernetes.github.io/autoscaler"
-  chart      = "cluster-autoscaler-chart"
-  version    = "1.1.1"
+  chart      = "cluster-autoscaler"
+  version    = "9.9.2"
   namespace  = local.cluster_autoscaler_namespace
 
   set {
@@ -42,7 +42,7 @@ module "iam_assumable_role_cluster_autoscaler" {
   role_name                     = "${var.project}-k8s-${var.environment}-cluster-autoscaler"
   provider_url                  = replace(data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer, "https://", "")
   role_policy_arns              = [aws_iam_policy.cluster_autoscaler.arn]
-  oidc_fully_qualified_subjects = ["system:serviceaccount:${local.cluster_autoscaler_namespace}:cluster-autoscaler-aws-cluster-autoscaler-chart"]
+  oidc_fully_qualified_subjects = ["system:serviceaccount:${local.cluster_autoscaler_namespace}:cluster-autoscaler-aws-cluster-autoscaler"]
 }
 
 resource "aws_iam_policy" "cluster_autoscaler" {

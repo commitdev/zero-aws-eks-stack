@@ -68,6 +68,12 @@ module "stage" {
 
   # EKS configuration
   eks_cluster_version = "1.20"
+  # Cluster addons. These often need to be updated when upgrading the cluster version.
+  # See: https://docs.aws.amazon.com/eks/latest/userguide/eks-add-ons.html
+  eks_addon_vpc_cni_version    = "v1.7.10-eksbuild.1"
+  eks_addon_kube_proxy_version = "v1.20.4-eksbuild.2"
+  eks_addon_coredns_version    = "v1.8.3-eksbuild.1"
+
   eks_node_groups = {
     main = {
       instance_types     = ["t3.medium", "t2.medium", "t3.large"]

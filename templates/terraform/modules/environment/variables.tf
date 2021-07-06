@@ -28,6 +28,24 @@ variable "eks_cluster_version" {
   description = "EKS cluster version number to use. Incrementing this will start a cluster upgrade"
 }
 
+variable "eks_addon_vpc_cni_version" {
+  description = "Version of the VPC CNI to install. If empty you will need to upgrade the CNI yourself during a cluster version upgrade"
+  type        = string
+  default     = ""
+}
+
+variable "eks_addon_kube_proxy_version" {
+  description = "Version of kube proxy to install. If empty you will need to upgrade kube proxy yourself during a cluster version upgrade"
+  type        = string
+  default     = ""
+}
+
+variable "eks_addon_coredns_version" {
+  description = "Version of CoreDNS to install. If empty you will need to upgrade CoreDNS yourself during a cluster version upgrade"
+  type        = string
+  default     = ""
+}
+
 variable "eks_node_groups" {
   type = map(object({
     instance_types     = list(string)
