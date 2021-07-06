@@ -56,7 +56,7 @@ data "aws_caller_identity" "current" {}
 # Provision the EKS cluster
 module "eks" {
   source  = "commitdev/zero/aws//modules/eks"
-  version = "0.4.3"
+  version = "0.4.4"
   providers = {
     aws = aws.for_eks
   }
@@ -65,6 +65,10 @@ module "eks" {
   environment     = var.environment
   cluster_name    = local.kubernetes_cluster_name
   cluster_version = var.eks_cluster_version
+
+  addon_vpc_cni_version    = var.eks_addon_vpc_cni_version
+  addon_kube_proxy_version = var.eks_addon_kube_proxy_version
+  addon_coredns_version    = var.eks_addon_coredns_version
 
   iam_account_id = data.aws_caller_identity.current.account_id
 
