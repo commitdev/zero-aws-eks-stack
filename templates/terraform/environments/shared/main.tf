@@ -14,7 +14,7 @@ locals {
   region                 = "<% index .Params `region` %>"
   account_id             = "<% index .Params `accountId` %>"
   random_seed            = "<% index .Params `randomSeed` %>"
-  shared_resource_prefix = "<% index .Params `sharedResourcePrefix` %>"
+  shared_resource_prefix = "<% if neq index .Params `sharedResourcePrefix` "none" %><% index .Params `sharedResourcePrefix` %><% endif %>"
 }
 
 provider "aws" {
