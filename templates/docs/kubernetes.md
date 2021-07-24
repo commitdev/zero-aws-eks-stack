@@ -138,34 +138,6 @@ This process can vary a bit depending on the amount of free resources you have a
 *In the case that you determine you don't want to terminate the instance but you have already drained it, the cluster won't schedule any new pods to that node until you uncordon it:*
 - `k uncordon <node name>`
 
-## How do I upgrade a cluster to a new version of EKS?
-
-Occasionally you may need to upgrade an EKS cluster. This is usually a pretty painless process, and there’s a ton of documentation online about it.
-
-As part of this process you will need to upgrade the cluster itself, and some core components. Kubernetes has various applications that run as deployments or daemonsets in the kube-system namespace like coredns, kube-proxy and the AWS VPC CNI provider called aws-node.
-
-This document has great instructions on upgrading all of the different pieces, including listing the appropriate versions of the core components for each version of Kubernetes.
-
-[https://docs.aws.amazon.com/eks/latest/userguide/update-cluster.html](https://docs.aws.amazon.com/eks/latest/userguide/update-cluster.html)
-
-When doing this from terraform you should be able to go into the tf and change the version of the cluster. It should start the upgrade process, rather than tearing down the cluster and rebuilding it. This will make the cluster inaccessible through the AWS console for about 20 minutes, ***though everything in the cluster should continue to work normally, serve traffic, etc.***
-
-The process should be:
-
-- Update the API version number in terraform
-- Update the AMI for the ASG to the AMI for the corresponding version of EKS in eks.tf and apply terraform
-    - See this page: [https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html](https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html)
-    - This should update the worker group, but not affect any of the running nodes
-- Update any core components if necessary, as mentioned in the aws update-cluster documentation
-- Run terraform apply
-- Drain and remove the old nodes from the cluster. New ones will come up in their place with the new AMI
-    - `k get nodes`
-    - `k drain --ignore-daemonsets <node name>`
-    - Then terminate the instance in AWS Console
-- Do the drain/delete process with one node at a time. Wait for a new node to be available before running the process on a second one. This will prevent any traffic from being lost.
-
-
-
 ## More resources
 
 [https://kubernetes.io/docs/reference/kubectl/cheatsheet/](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)

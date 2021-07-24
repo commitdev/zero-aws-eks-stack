@@ -1,3 +1,6 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 ---
 title: Operating your Kubernetes Cluster
 sidebar_label: Kubernetes Cluster operations
@@ -141,36 +144,84 @@ This process can vary a bit depending on the amount of free resources you have a
 - Re-enable the cluster autoscaler
     - `k scale deployments/cluster-autoscaler -n kube-system --replicas=1`
 
-*In the case that you determine you don't want to terminate the instance but you have already drained it, the cluster won't schedule any new pods to that node until you uncordon it:*
+:::note
+In the case that you determine you don't want to terminate the instance but you have already drained it, the cluster won't schedule any new pods to that node until you uncordon it:
 - `k uncordon <node name>`
+:::
 
 ## How do I upgrade a cluster to a new version of EKS?
 
-Occasionally you may need to upgrade an EKS cluster. This is usually a pretty painless process, and there’s a ton of documentation online about it.
+Occasionally you may need to upgrade an EKS cluster. This is usually a pretty painless process and there’s a ton of documentation online about it.
 
-As part of this process you will need to upgrade the cluster itself, and some core components. Kubernetes has various applications that run as deployments or daemonsets in the kube-system namespace like coredns, kube-proxy and the AWS VPC CNI provider called aws-node.
+As part of this process you will need to upgrade the cluster itself, and some core components. Kubernetes has various applications that run as deployments or daemonsets in the `kube-system` namespace like `coredns`, `kube-proxy` and the AWS VPC CNI provider called `aws-node`.
 
 This document has great instructions on upgrading all of the different pieces, including listing the appropriate versions of the core components for each version of Kubernetes.
 
 [https://docs.aws.amazon.com/eks/latest/userguide/update-cluster.html](https://docs.aws.amazon.com/eks/latest/userguide/update-cluster.html)
 
-When doing this from terraform you should be able to go into the tf and change the version of the cluster. It should start the upgrade process, rather than tearing down the cluster and rebuilding it. This will make the cluster inaccessible through the AWS console for about 20 minutes, ***though everything in the cluster should continue to work normally, serve traffic, etc.***
+When doing this from terraform you should be able to go into the tf and change the version of the cluster and addons and apply. It should start the upgrade process, rather than tearing down the cluster and rebuilding it. This will make the cluster inaccessible through the AWS console for about 20 minutes.
+:::tip
+Everything in the cluster should continue to work normally, serve traffic, etc. during this process because the worker nodes and all your workloads are not affected at this point.
+:::
 
+To get the latest version of the EKS addons, you can use these AWS CLI commands:
+<Tabs
+    values={[
+        {label: 'vpc-cni', value: 'vpc-cni'},
+        {label: 'kube-proxy', value: 'kube-proxy'},
+        {label: 'coredns', value: 'coredns'},
+    ]}
+>
+<TabItem value="vpc-cni">
+The item marked with `True` is the default for that version.
+
+```shell
+aws eks describe-addon-versions \
+--addon-name vpc-cni \
+--kubernetes-version <version, e.g. 1.21 > \
+--query "addons[].addonVersions[].[addonVersion, compatibilities[].defaultVersion]" \
+--output text
+```
+
+</TabItem>
+<TabItem value="kube-proxy">
+The item marked with `True` is the default for that version.
+
+```shell
+aws eks describe-addon-versions \
+--addon-name kube-proxy \
+--kubernetes-version <version, e.g. 1.21 > \
+--query "addons[].addonVersions[].[addonVersion, compatibilities[].defaultVersion]" \
+--output text
+```
+
+</TabItem>
+<TabItem value="coredns">
+The item marked with `True` is the default for that version.
+
+```shell
+aws eks describe-addon-versions \
+--addon-name coredns \
+--kubernetes-version <version, e.g. 1.21 > \
+--query "addons[].addonVersions[].[addonVersion, compatibilities[].defaultVersion]" \
+--output text
+```
+
+</TabItem>
+</Tabs>
 The process should be:
 
-- Update the API version number in terraform
-- Update the AMI for the ASG to the AMI for the corresponding version of EKS in eks.tf and apply terraform
-    - See this page: [https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html](https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html)
-    - This should update the worker group, but not affect any of the running nodes
-- Update any core components if necessary, as mentioned in the aws update-cluster documentation
-- Run terraform apply
-- Drain and remove the old nodes from the cluster. New ones will come up in their place with the new AMI
-    - `k get nodes`
-    - `k drain --ignore-daemonsets <node name>`
-    - Then terminate the instance in AWS Console
-- Do the drain/delete process with one node at a time. Wait for a new node to be available before running the process on a second one. This will prevent any traffic from being lost.
+- Update the addon versions versions in `<env>/main.tf` to match the correct versions for the new cluster version. See the tabs above or [read the AWS docs here](https://docs.aws.amazon.com/eks/latest/userguide/eks-add-ons.html)
+- Update the `eks_cluster_version` in terraform
+- Run `terraform apply`
+- Update your nodes to the new version
+    - `aws eks update-nodegroup-version --cluster-name <cluster name> --nodegroup-name <cluster name>-main` ( if you've made changes, specify the correct node group here)
 
+    OR
 
+    - Go into the AWS EKS console and hit update under Configuration > Compute
+
+This will bring up new nodes, gracefully drain your workloads onto them while preventing new pods from being scheduled to the old ones, then take down the old nodes. If your workloads are set up with multiple replicas there should be no downtime during this process.
 
 ## More resources
 
