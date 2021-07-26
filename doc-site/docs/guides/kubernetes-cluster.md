@@ -1,11 +1,10 @@
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
 ---
 title: Operating your Kubernetes Cluster
 sidebar_label: Kubernetes Cluster operations
 sidebar_position: 2
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # Kubernetes resources
 
@@ -173,7 +172,7 @@ To get the latest version of the EKS addons, you can use these AWS CLI commands:
     ]}
 >
 <TabItem value="vpc-cni">
-The item marked with `True` is the default for that version.
+The item marked with "True" is the default for that version.
 
 ```shell
 aws eks describe-addon-versions \
@@ -185,7 +184,7 @@ aws eks describe-addon-versions \
 
 </TabItem>
 <TabItem value="kube-proxy">
-The item marked with `True` is the default for that version.
+The item marked with "True" is the default for that version.
 
 ```shell
 aws eks describe-addon-versions \
@@ -197,7 +196,7 @@ aws eks describe-addon-versions \
 
 </TabItem>
 <TabItem value="coredns">
-The item marked with `True` is the default for that version.
+The item marked with "True" is the default for that version.
 
 ```shell
 aws eks describe-addon-versions \
