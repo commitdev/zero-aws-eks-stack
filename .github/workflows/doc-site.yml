@@ -23,6 +23,11 @@ jobs:
       - name: Install Dependencies
         working-directory: doc-site
         run: npm install
+        # This allows us to simply re-run a previous CI
+        # and get a newer set of common-elements
+      - name: Update doc-site common elements
+        working-directory: doc-site
+        run: npm up @commitdev/zero-doc-site-common-elements
       - name: Build website
         working-directory: doc-site
         run: |
