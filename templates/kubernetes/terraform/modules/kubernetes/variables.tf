@@ -145,6 +145,8 @@ variable "user_auth" {
     user_auth_mail_from_address = string
     whitelisted_return_urls     = list(string)
     cookie_signing_secret_key   = string
+    kratos_values_override      = map(any)
+    oathkeeper_values_override  = map(any)
   }))
 }
 
