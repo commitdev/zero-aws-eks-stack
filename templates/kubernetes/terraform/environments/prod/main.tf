@@ -90,8 +90,20 @@ module "kubernetes" {
       # This domain or address must be verified by the mail provider (Sendgrid, SES, etc.)
       user_auth_mail_from_address   = "noreply@${local.domain_name}"
       cookie_signing_secret_key    = "${local.project}-${local.environment}-${local.random_seed}"
+      kratos_values_override = {}
+      oathkeeper_values_override  = {}
     }
     ## User auth: Kratos requires database and a secret (as: `user_auth[0].name`)
+    ##  example overriding the smtp adress in kratos_values_override, this will merge with the config
+    ##  {
+    ##    kratos = {
+    ##      courier = {
+    ##        smtp = {
+    ##          from_address = var.user_auth_mail_from_address
+    ##        }
+    ##      }
+    ##    }
+    ##  }
     ## Oathkeeper requires a private key (as `user_auth[0].jwks_secret_name`)
     ## per environment one of each (database/database secret/private key) is created in the pre-k8s step
     ## If you need to add another user-auth instance you will have to create another set of these resources
