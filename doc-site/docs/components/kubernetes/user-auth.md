@@ -45,7 +45,46 @@ The default setup uses an Authenticator handler: [`cookie_session`][oathkeeper-c
 - Oathkeeper rules
 - jwks_private_key (Oathkeeper uses this key to sign session tokens)
 
-## Documentation
+## Configuring
+The default values can be overriden using the variable `kratos_values_override` and `oathkeeper_values_override`. You can pass in an object that is a subset of the Kratos or Oathkeeper config in the same nesting level and it will merge with the default values.
+
+### Overriding Kratos config
+For example if you want to change the Kratos error UI page you can override such as follow:
+```hcl
+kratos_values_override = {
+  kratos = {
+    config = {
+      selfservice = {
+        flows = {
+          error = {
+            ui_url = "https://<my-site.com>/custom-error-page"
+          }
+        }
+      }
+    }
+  }
+}
+```
+### Oathkeeper Proxy Rules
+Oathkeeper rules are the main decision controller in the proxy, requests coming into the proxy only do anything if they match a rule.
+Each rule must a **unique string pattern matching**(blob/regexp) and in each rule you can defined what the handlers it must go through (Authenticators, Authorizers, Mutators, Error handlers), then at the end it can have an upstream service - proxy destination.
+
+Note: Incoming must match exactly 1 rule or Oathkeeper will throw an error.
+
+#### Zero's Proxy Rules setup
+In our default setup there are 4 rules
+
+| Name/Upstream | Routes | Purpose |
+| ---- | ----- | ------- |
+| Public Kratos | `/.ory/kratos/public` | Self serve auth flows to facilitate forms and redirects |
+| Admin Kratos | `/.ory/kratos/` | Handling request life cycle, only allows GET from external, other calls can be made internally in your cluster |
+| Backend public | `<(public\|webhook)\/.*>` | Public endpoints with no auth requirements |
+| Authenticated public | `<(?!(public\|webhook\|\.ory\/kratos)).*>` | Authenticated endpoints |
+
+## Oathkeeper
+View the possible configurations for [Kratos Configuration Reference](https://www.ory.sh/kratos/docs/v0.5/reference/configuration) and [Oathkeeper Configuration Reference](https://www.ory.sh/oathkeeper/docs/reference/configuration).
+
+### Documentation
 - [Terraform implementation and Documentation][commit-zero-aws/user-auth]
 - [ORY Kratos's][kratos-docs] and [Oathkeeper's][oathkeeper-docs] documentation.
 
