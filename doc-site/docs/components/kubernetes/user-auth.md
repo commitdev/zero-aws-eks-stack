@@ -78,7 +78,7 @@ Oathkeeper rules are how you control auth decision making and routing through th
 Each rule must have a **unique pattern matching string** (glob/regexp) and you can define which [handlers it must go through](https://www.ory.sh/oathkeeper/docs/pipeline) (Authenticators, Authorizers, Mutators, Error handlers), then at the end it can have an upstream service which is the destination of the requests (most likely your service).
 
 :::caution
-Incoming must match exactly 1 rule or Oathkeeper will throw an error.
+Incoming requests must match exactly 1 rule or Oathkeeper will throw an error.
 :::
 
 #### Zero's Proxy Rules setup
