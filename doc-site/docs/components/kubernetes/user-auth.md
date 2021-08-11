@@ -45,11 +45,58 @@ The default setup uses an Authenticator handler: [`cookie_session`][oathkeeper-c
 - Oathkeeper rules
 - jwks_private_key (Oathkeeper uses this key to sign session tokens)
 
-## Documentation
+## Configuring
+The default values can be overriden using the variable `kratos_values_override` and `oathkeeper_values_override`. You can pass in an object that is a subset of the Kratos or Oathkeeper config in the same nesting level and it will merge with the default values.
+
+### Overriding Kratos config
+For example if you want to change the Kratos error UI page you can override it as follows:
+```hcl
+kratos_values_override = {
+  kratos = {
+    config = {
+      selfservice = {
+        flows = {
+          error = {
+            ui_url = "https://<my-site.com>/custom-error-page"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+#### Config references
+View the possible configurations for:
+- [Kratos Configuration Reference](https://www.ory.sh/kratos/docs/v0.5/reference/configuration)
+- [Oathkeeper Configuration Reference](https://www.ory.sh/oathkeeper/docs/reference/configuration)
+
+These config get mounted during deployment under `/etc/config` in the deployment from [Helm Charts][kratos-helm-deployment]
+
+### Oathkeeper Proxy Rules
+Oathkeeper rules are how you control auth decision making and routing through the proxy. Requests coming into the proxy only do something if they match a rule.
+Each rule must have a **unique pattern matching string** (glob/regexp) and you can define which [handlers it must go through](https://www.ory.sh/oathkeeper/docs/pipeline) (Authenticators, Authorizers, Mutators, Error handlers), then at the end it can have an upstream service which is the destination of the requests (most likely your service).
+
+:::caution
+Incoming requests must match exactly 1 rule or Oathkeeper will throw an error.
+:::
+
+#### Zero's Proxy Rules setup
+In our default setup there are 4 rules
+
+| Name/Upstream | Routes | Purpose |
+| ---- | ----- | ------- |
+| Public Kratos | `/.ory/kratos/public` | Self serve auth flows to facilitate forms and redirects |
+| Admin Kratos | `/.ory/kratos/` | Handling request life cycle, only allows GET from external, other calls can be made internally in your cluster |
+| Backend public | `<(public\|webhook)\/.*>` | Public endpoints with no auth requirements |
+| Authenticated public | `<(?!(public\|webhook\|\.ory\/kratos)).*>` | Authenticated endpoints |
+
+### Documentation
 - [Terraform implementation and Documentation][commit-zero-aws/user-auth]
 - [ORY Kratos's][kratos-docs] and [Oathkeeper's][oathkeeper-docs] documentation.
 
 [kratos-docs]: https://www.ory.sh/kratos/docs/
+[kratos-helm-deployment]: https://github.com/ory/k8s/blob/8b102605a03ba638192778f1de7dfe5e8dd651e8/helm/charts/kratos/templates/deployment.yaml#L106
 [oathkeeper-docs]: https://www.ory.sh/kratos/docs/
 [kratos]: https://github.com/ory/kratos
 [oathkeeper]: https://github.com/ory/oathkeeper

@@ -20,7 +20,12 @@ module.exports = {
   url: siteUrl,
   baseUrl: baseUrl,
   projectName: repositoryName,
-  themeConfig: themeConfig({ siteUrl, repositoryName }),
+  themeConfig: {
+    ...themeConfig({ siteUrl, repositoryName }),
+    prism: {
+      additionalLanguages: ['hcl'],
+    },
+  },
   presets: [
     [
       '@docusaurus/preset-classic',
