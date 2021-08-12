@@ -14,8 +14,8 @@ sidebar_position: 5
   - twillio
 
 ## REST API
-The API is defined using OpenAPI 3.0 and you explore the service details using
-- view the [API specs yaml file][notification-api-specs] or
+The API is defined using OpenAPI 3.0 and you explore the service details by
+- viewing the [API specs yaml file][notification-api-specs] or
 - with any compatible tools such as [Swagger Editor][browse-api-spec]
 
 ## Configuring
