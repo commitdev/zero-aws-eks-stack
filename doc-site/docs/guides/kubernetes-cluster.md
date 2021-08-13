@@ -222,6 +222,10 @@ The process should be:
 
 This will bring up new nodes, gracefully drain your workloads onto them while preventing new pods from being scheduled to the old ones, then take down the old nodes. If your workloads are set up with multiple replicas there should be no downtime during this process.
 
+:::tip
+Sometimes you may need to make changes to node groups that would be destructive to the nodes in your cluster, for example changing the type of instances in the group. In situations like this you can apply in stages where you would add a new node group with a unique name and the new instance types. You can apply to bring up this new group of instances, then remove the old group and apply again. This will make sure you always have sufficient nodes in your cluster to handle your workloads.
+:::
+
 ## More resources
 
 [https://kubernetes.io/docs/reference/kubectl/cheatsheet/](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)

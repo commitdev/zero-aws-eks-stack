@@ -71,8 +71,6 @@ module "prod" {
       # Enable use of spot instances instead of on-demand.
       # This can provide significant cost savings and should be stable due to the use of the termination handler, but means that individuial nodes could be restarted at any time. May not be suitable for clusters with long-running workloads
       use_spot_instances = false
-      # This is the normal image. Other possibilities are AL2_x86_64_GPU for gpu instances or AL2_ARM_64 for ARM instances
-      ami_type           = "AL2_x86_64"
     }
   }
 
