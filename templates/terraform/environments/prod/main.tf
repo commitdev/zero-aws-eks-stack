@@ -56,12 +56,12 @@ module "prod" {
   ecr_repositories = [] # Should be created by the staging environment
 
   # EKS configuration
-  eks_cluster_version = "1.20"
+  eks_cluster_version = "1.21"
   # Cluster addons. These often need to be updated when upgrading the cluster version.
   # See: https://docs.aws.amazon.com/eks/latest/userguide/eks-add-ons.html
-  eks_addon_vpc_cni_version    = "v1.7.10-eksbuild.1"
-  eks_addon_kube_proxy_version = "v1.20.4-eksbuild.2"
-  eks_addon_coredns_version    = "v1.8.3-eksbuild.1"
+  eks_addon_vpc_cni_version    = "v1.9.0-eksbuild.1"
+  eks_addon_kube_proxy_version = "v1.21.2-eksbuild.2"
+  eks_addon_coredns_version    = "v1.8.4-eksbuild.1"
 
   eks_node_groups = {
     main = {
@@ -71,8 +71,6 @@ module "prod" {
       # Enable use of spot instances instead of on-demand.
       # This can provide significant cost savings and should be stable due to the use of the termination handler, but means that individuial nodes could be restarted at any time. May not be suitable for clusters with long-running workloads
       use_spot_instances = false
-      # This is the normal image. Other possibilities are AL2_x86_64_GPU for gpu instances or AL2_ARM_64 for ARM instances
-      ami_type           = "AL2_x86_64"
     }
   }
 

@@ -9,7 +9,7 @@ resource "helm_release" "metrics_server" {
   # Switch away from this bitnami one when possible. https://github.com/kubernetes-sigs/metrics-server/issues/572
   repository = "https://charts.bitnami.com/bitnami"
   chart      = "metrics-server"
-  version    = "5.0.2"
+  version    = "5.9.2"
   namespace  = local.metrics_server_namespace
 
   set {
@@ -17,4 +17,3 @@ resource "helm_release" "metrics_server" {
     value = true
   }
 }
-
