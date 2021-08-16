@@ -1,16 +1,16 @@
 ---
-title: Explaining the Makefile in your repo
+title: Explaining the Makefile in your repository
 sidebar_label: Makefile Lifecycle
 sidebar_position: 2
 ---
 
 ## Overview
-The [Makefile] is the controller of your infrastructure, it defines the order of execution in the `apply` make target.
+The [Makefile] shipped with your repository is the controller of your infrastructure, it defines the order of execution during the `apply` make target.
 
-The [Makefile] is idempotent by design, meaning when `zero apply` runs it will attempt to bring to same final state no matter how many times you run it. Therefore if the script determines a resources have previously created it will skip the creation when ran again.
+The [Makefile] is idempotent by design, meaning when `zero apply` runs it will attempt to reach the same final state every time it is executed. Therefore if the script determines a resources have previously created it will skip the creation when ran again, and making if `zero apply` can be re-ran after initial setup.
 
 ## Targets Explained
-Some steps are used for initializing the infrastructure, and some steps can also be used for updating and maintaining the infrastructure.
+Some of the steps are used for initializing the infrastructure, and some steps can also be used for updating and maintaining the infrastructure.
 
 All the targets can be ran with `ENVIRONMENT=<prod|stage>` to target the corresponding environment, and defaults to `stage`
 
