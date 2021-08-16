@@ -210,7 +210,7 @@ aws eks describe-addon-versions \
 </Tabs>
 The process should be:
 
-- Update the addon versions versions in `<env>/main.tf` to match the correct versions for the new cluster version. See the tabs above or [read the AWS docs here](https://docs.aws.amazon.com/eks/latest/userguide/eks-add-ons.html)
+- Update the addons in `<env>/main.tf` to match the correct addon versions for the new cluster version. See the tabs above or [read the AWS docs here](https://docs.aws.amazon.com/eks/latest/userguide/eks-add-ons.html)
 - Update the `eks_cluster_version` in terraform
 - Run `terraform apply`
 - Update your nodes to the new version
