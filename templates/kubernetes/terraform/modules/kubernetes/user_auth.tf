@@ -17,7 +17,7 @@ data "aws_secretsmanager_secret_version" "jwks_content" {
 module "user_auth" {
   count   = length(var.user_auth)
   source  = "commitdev/zero/aws//modules/user_auth"
-  version = "0.3.6"
+  version = "0.4.8"
 
   name                        = var.user_auth[count.index].name
   auth_namespace              = var.user_auth[count.index].auth_namespace
@@ -31,6 +31,8 @@ module "user_auth" {
   cookie_signing_secret_key   = var.user_auth[count.index].cookie_signing_secret_key
   kubectl_extra_args          = local.k8s_exec_context
   external_secret_name        = local.secrets_manager_secret_name
+  kratos_values_override      = lookup(var.user_auth[count.index], "kratos_values_override", {})
+  oathkeeper_values_override  = lookup(var.user_auth[count.index], "oathkeeper_values_override", {})
 
   depends_on = [helm_release.external_secrets]
 }
