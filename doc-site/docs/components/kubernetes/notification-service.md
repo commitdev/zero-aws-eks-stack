@@ -14,14 +14,16 @@ sidebar_position: 5
   - twillio
 
 ## REST API
-The API is defined using OpenAPI 3.0 and you explore the service details by
+The API is defined using OpenAPI 3.0 and you can explore the service details by
 - viewing the [API specs yaml file][notification-api-specs] or
-- with any compatible tools such as [Swagger Editor][browse-api-spec]
+- with compatible tools such as [Swagger Editor][browse-api-spec]
 
 ## Configuring
-By default Zero uses helm to bundle the service, you just need to enable the service and provide necessary API keys and it will work out of the box.
+By default, Zero uses Helm to bundle the service, you just need to enable it and provide necessary API keys for any services you want to use for notifications and it will work out of the box.
+
 ### Available values
-[See helm chart][notification-available-values] for all the available values, under `application` you can set up your API keys and application related parameters.
+[See the Helm chart][notification-available-values] for all the available configuration options. In the `application` section you can set up your API keys and application-related parameters.
+
 ### Setting up API keys
 API keys will be created as a Kubernetes secret. It is recommended you use `set_sensitive` in terraform similar to [this example][eks-set-sensitive-example]
 
