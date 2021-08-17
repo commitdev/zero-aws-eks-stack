@@ -7,7 +7,9 @@ sidebar_position: 2
 ## Overview
 The [Makefile] shipped with your repository drives the creation of your infrastructure, it defines the order of execution in its `apply` make target.
 
-The [Makefile] is idempotent by design, meaning when it runs it will attempt to reach the same final state every time. Therefore if the script determines a resource has previously been created it will skip the creation when run again, meaning `make apply` can be re-run from inside your project after the initial setup when you ran `zero apply`. You may want to use one of the specific targets below though. For example, if you made a change to your staging infrastructure Terraform you could just run `make apply-env`
+The [Makefile] is idempotent by design, meaning when it runs it will attempt to reach the same final state every time. Therefore if the script determines a resource has previously been created it will skip the creation when run again, meaning `make apply` can be re-run from inside your project after the initial setup when you ran `zero apply`. You may want to use one of the specific targets below though. For example, if you made a change to your staging infrastructure Terraform you could just run `make apply-env`.
+
+See more about the [Terraform workflow guide][terraform-workflow] how to manage your infrastructure as code.
 
 ## Targets Explained
 Some of the steps are used for initializing the infrastructure, and some steps can also be used for updating and maintaining the infrastructure.
@@ -46,3 +48,4 @@ Mostly for development and testing, the teardown process follows a specific orde
 
 [makefile]: https://github.com/commitdev/zero-aws-eks-stack/blob/main/templates/Makefile
 [teardown]: https://github.com/commitdev/zero-aws-eks-stack/tree/main/templates#teardown
+[terraform-workflow]: ../guides/managing-terraform#managing-your-terraform
