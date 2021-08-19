@@ -56,7 +56,7 @@ data "aws_caller_identity" "current" {}
 # Provision the EKS cluster
 module "eks" {
   source  = "commitdev/zero/aws//modules/eks"
-  version = "0.5.0"
+  version = "0.5.1"
   providers = {
     aws = aws.for_eks
   }

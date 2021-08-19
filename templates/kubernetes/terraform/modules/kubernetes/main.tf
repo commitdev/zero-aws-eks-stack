@@ -39,3 +39,19 @@ resource "kubernetes_namespace" "app_namespace" {
     name = var.project
   }
 }
+
+
+# Enable prefix delegation - this will enable many more IPs to be allocated per-node.
+# See https://docs.aws.amazon.com/eks/latest/userguide/cni-increase-ip-addresses.html
+resource "null_resource" "enable_prefix_delegation" {
+
+  # This is a static value so it won't be run multiple times.
+  # If these env vars get removed somehow, this value can just be incremented.
+  triggers = {
+    "version" = "1"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl set env daemonset aws-node ${local.k8s_exec_context} -n kube-system ENABLE_PREFIX_DELEGATION=true WARM_PREFIX_TARGET=1"
+  }
+}
