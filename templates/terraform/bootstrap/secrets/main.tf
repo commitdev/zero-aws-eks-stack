@@ -44,13 +44,34 @@ module "sendgrid_api_key" {
   tags  = { sendgrid: local.project }
 }
 
-module "slack_api_key" {
-  count   = <%if eq (index .Params `notificationServiceSlackApiKey`) "" %>0<% else %>1<% end %>
+module "notification_service_secret_prod" {
+  count   = <%if eq (index .Params `notificationServiceEnabled`) "yes" %>1<% else %>0<% end %>
   source  = "commitdev/zero/aws//modules/secret"
   version = "0.0.2"
 
-  name  = "${local.project}-slack-<% index .Params `randomSeed` %>"
-  type  = "string"
-  value = var.slack_api_key
-  tags  = { slack: local.project }
+  name   = "${local.project}/kubernetes/prod/notification-service"
+  type   = "map"
+  values = {
+    SENDGRID_API_KEY  = var.sendgrid_api_key
+    SLACK_API_KEY     = var.slack_api_key,
+    TWILIO_ACCOUNT_ID = var.twilio_account_id
+    TWILIO_AUTH_TOKEN = var.twilio_auth_token
+  }
+  tags   = { notification_svc : local.project }
+}
+
+module "notification_service_secret_stage" {
+  count   = <%if eq (index .Params `notificationServiceEnabled`) "yes" %>1<% else %>0<% end %>
+  source  = "commitdev/zero/aws//modules/secret"
+  version = "0.0.2"
+
+  name   = "${local.project}/kubernetes/stage/notification-service"
+  type   = "map"
+  values = {
+    SENDGRID_API_KEY  = var.sendgrid_api_key
+    SLACK_API_KEY     = var.slack_api_key,
+    TWILIO_ACCOUNT_ID = var.twilio_account_id
+    TWILIO_AUTH_TOKEN = var.twilio_auth_token
+  }
+  tags   = { notification_svc : local.project }
 }

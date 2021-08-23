@@ -125,6 +125,12 @@ variable "notification_service_highly_available" {
   default     = true
 }
 
+variable "notification_service_twilio_phone_number" {
+  description = "Twilio Phone Number is the Send from number for your SMS messages for the notification service"
+  type        = string
+  default     = ""
+}
+
 variable "cache_store" {
   description = "Cache store - redis or memcached"
   type        = string
