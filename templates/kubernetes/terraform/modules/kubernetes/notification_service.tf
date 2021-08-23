@@ -53,5 +53,10 @@ resource "helm_release" "notification_service" {
     value = local.notification_service_secret_name
   }
 
+  set {
+    name  = "application.twilioPhoneNumber"
+    value = var.notification_service_twilio_phone_number
+  }
+
   depends_on = [data.aws_secretsmanager_secret.notification_service_secret]
 }

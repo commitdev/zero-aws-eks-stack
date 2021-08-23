@@ -25,7 +25,7 @@ By default, Zero uses Helm to bundle the service, you just need to enable it and
 [See the Helm chart][notification-available-values] for all the available configuration options. In the `application` section you can set up your API keys and application-related parameters.
 
 ### Setting up API keys
-Zero will create a Kubernetes secret containing the API keys and mounted the secret to the deployment using values from `zero-project.yml`.
+Zero will create a secret in AWS SecretsManager, and external-secret is created to poll the values then mounted as a secret to the deployment using values from `zero-project.yml`.
 
 [See Documentation][notification-service-config] on how to configure service with environment variables
 
