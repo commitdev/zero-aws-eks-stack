@@ -53,7 +53,7 @@ module "notification_service_secret_prod" {
   type   = "map"
   values = {
     SENDGRID_API_KEY  = var.sendgrid_api_key
-    SLACK_API_KEY     = var.slack_api_key,
+    SLACK_API_KEY     = var.slack_api_key
     TWILIO_ACCOUNT_ID = var.twilio_account_id
     TWILIO_AUTH_TOKEN = var.twilio_auth_token
   }
@@ -69,7 +69,7 @@ module "notification_service_secret_stage" {
   type   = "map"
   values = {
     SENDGRID_API_KEY  = var.sendgrid_api_key
-    SLACK_API_KEY     = var.slack_api_key,
+    SLACK_API_KEY     = var.slack_api_key
     TWILIO_ACCOUNT_ID = var.twilio_account_id
     TWILIO_AUTH_TOKEN = var.twilio_auth_token
   }
