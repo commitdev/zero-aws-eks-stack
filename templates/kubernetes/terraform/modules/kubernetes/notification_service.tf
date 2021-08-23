@@ -3,11 +3,6 @@ locals {
   notification_service_secret_name = "${var.project}/kubernetes/${var.environment}/notification-service"
 }
 
-data "aws_secretsmanager_secret" "notification_service_secret" {
-  count = var.notification_service_enabled ? 1 : 0
-  name  = local.notification_service_secret_name
-}
-
 resource "kubernetes_namespace" "notification_service" {
   count = var.notification_service_enabled ? 1 : 0
   metadata {
@@ -57,6 +52,4 @@ resource "helm_release" "notification_service" {
     name  = "application.twilioPhoneNumber"
     value = var.notification_service_twilio_phone_number
   }
-
-  depends_on = [data.aws_secretsmanager_secret.notification_service_secret]
 }
