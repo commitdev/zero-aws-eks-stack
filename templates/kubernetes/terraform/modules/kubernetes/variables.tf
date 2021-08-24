@@ -107,22 +107,16 @@ variable "notification_service_enabled" {
   default     = false
 }
 
-variable "notification_service_slack_enabled" {
-  description = "If enabled, will inject slack_api_key env-vars from secret manager to notification service"
-  type        = bool
-  default     = false
-}
-
-variable "notification_service_sendgrid_enabled" {
-  description = "If enabled, will inject sendgrid_api_key env-vars from secret manager to notification service"
-  type        = bool
-  default     = false
-}
-
 variable "notification_service_highly_available" {
   description = "If enabled, will make sure a minimum of 2 pods are running and use a horizontal pod autoscaler to make scale the number of pods based on CPU. Recommended for Production."
   type        = bool
   default     = true
+}
+
+variable "notification_service_twilio_phone_number" {
+  description = "Twilio Phone Number is the Send from number for your SMS messages for the notification service"
+  type        = string
+  default     = ""
 }
 
 variable "cache_store" {

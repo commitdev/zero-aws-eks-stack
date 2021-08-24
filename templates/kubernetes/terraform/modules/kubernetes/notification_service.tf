@@ -1,25 +1,6 @@
 locals {
   # Created in terraform/bootstrap/secrets
-  sendgrid_api_key_secret_name = "${var.project}-sendgrid-${var.random_seed}"
-  slack_api_key_secret_name    = "${var.project}-slack-${var.random_seed}"
-}
-
-data "aws_secretsmanager_secret" "sendgrid_api_key" {
-  count = var.notification_service_enabled && var.notification_service_sendgrid_enabled ? 1 : 0
-  name  = local.sendgrid_api_key_secret_name
-}
-data "aws_secretsmanager_secret_version" "sendgrid_api_key" {
-  count = var.notification_service_enabled && var.notification_service_sendgrid_enabled ? 1 : 0
-  secret_id = data.aws_secretsmanager_secret.sendgrid_api_key[0].id
-}
-
-data "aws_secretsmanager_secret" "slack_api_key" {
-  count = var.notification_service_enabled && var.notification_service_slack_enabled ? 1 : 0
-  name  = local.slack_api_key_secret_name
-}
-data "aws_secretsmanager_secret_version" "slack_api_key" {
-  count     = var.notification_service_enabled && var.notification_service_slack_enabled ? 1 : 0
-  secret_id = data.aws_secretsmanager_secret.slack_api_key[0].id
+  notification_service_secret_name = "${var.project}/kubernetes/${var.environment}/notification-service"
 }
 
 resource "kubernetes_namespace" "notification_service" {
@@ -35,7 +16,7 @@ resource "helm_release" "notification_service" {
   name       = "zero-notification-service"
   repository = "https://commitdev.github.io/zero-notification-service/"
   chart      = "zero-notification-service"
-  version    = "0.0.5"
+  version    = "0.1.0"
   namespace  = kubernetes_namespace.notification_service[0].metadata[0].name
 
   set {
@@ -62,14 +43,13 @@ resource "helm_release" "notification_service" {
     value = var.notification_service_highly_available ? "4" : "2"
   }
 
-  # These will become secrets provided as env vars
-  set_sensitive {
-    name  = "application.sendgridApiKey"
-    value = var.notification_service_enabled && var.notification_service_sendgrid_enabled ? data.aws_secretsmanager_secret_version.sendgrid_api_key[0].secret_string : ""
+  set {
+    name  = "externalSecret.dataFrom[0]"
+    value = local.notification_service_secret_name
   }
 
-  set_sensitive {
-    name  = "application.slackApiKey"
-    value = var.notification_service_enabled && var.notification_service_slack_enabled ? data.aws_secretsmanager_secret_version.slack_api_key[0].secret_string : ""
+  set {
+    name  = "application.twilioPhoneNumber"
+    value = var.notification_service_twilio_phone_number
   }
 }

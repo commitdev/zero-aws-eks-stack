@@ -109,9 +109,8 @@ module "kubernetes" {
     ## If you need to add another user-auth instance you will have to create another set of these resources
   ]<% end %>
   notification_service_enabled          = <%if eq (index .Params `notificationServiceEnabled`) "yes" %>true<% else %>false<% end %>
-  notification_service_sendgrid_enabled = <%if ne (index .Params `sendgridApiKey`) "" %>true<% else %>false<% end %>
-  notification_service_slack_enabled    = <%if ne (index .Params `notificationServiceSlackApiKey`) "" %>true<% else %>false<% end %>
   notification_service_highly_available = true
+  notification_service_twilio_phone_number = "<% index .Params `notificationServiceTwilioPhoneNumber` %>"
 
   cache_store =  "<% index .Params `cacheStore` %>"
 

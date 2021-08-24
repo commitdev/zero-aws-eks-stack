@@ -165,6 +165,27 @@ parameters:
     - action: KeyMatchCondition
       whenValue: "yes"
       matchField: notificationServiceEnabled
+  - field: notificationServiceTwilioAccountId
+    label: "Twilio Account ID if you want to send SMS with the Zero Notification Service."
+    info: "Leave blank if you don't intend to use the Twilio SMS functionality.\nSee https://www.twilio.com/"
+    conditions:
+    - action: KeyMatchCondition
+      whenValue: "yes"
+      matchField: notificationServiceEnabled
+  - field: notificationServiceTwilioAuthToken
+    label: "Twilio Auth Token if you want to send SMS with the Zero Notification Service."
+    info: "Leave blank if you don't intend to use the Twilio SMS functionality.\nSee https://www.twilio.com/"
+    conditions:
+    - action: KeyMatchCondition
+      whenValue: "yes"
+      matchField: notificationServiceEnabled
+  - field: notificationServiceTwilioPhoneNumber
+    label: "Twilio Phone Number if you want to send SMS with the Zero Notification Service."
+    info: "This is the Send From number of the SMS messages sent, Leave blank if you don't intend to use the Twilio SMS functionality."
+    conditions:
+    - action: KeyMatchCondition
+      whenValue: "yes"
+      matchField: notificationServiceEnabled
   - field: accountId
     label: AWS Account ID
     execute: aws sts get-caller-identity --query "Account" | tr -d '"'
