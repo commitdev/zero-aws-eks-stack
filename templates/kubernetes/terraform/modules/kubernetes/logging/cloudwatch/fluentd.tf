@@ -183,10 +183,10 @@ resource "kubernetes_daemonset" "fluentd_cloudwatch" {
             value = "-q"
           }
           resources {
-            limits {
+            limits = {
               memory = "200Mi"
             }
-            requests {
+            requests = {
               cpu    = "100m"
               memory = "200Mi"
             }

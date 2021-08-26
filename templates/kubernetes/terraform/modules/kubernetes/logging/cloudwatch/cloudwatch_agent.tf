@@ -170,11 +170,11 @@ resource "kubernetes_daemonset" "cloudwatch_agent" {
             value = "k8s/1.0.0"
           }
           resources {
-            limits {
+            limits = {
               cpu    = "200m"
               memory = "200Mi"
             }
-            requests {
+            requests = {
               memory = "200Mi"
               cpu    = "200m"
             }
