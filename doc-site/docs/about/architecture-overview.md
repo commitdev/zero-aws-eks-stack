@@ -8,10 +8,13 @@ sidebar_position: 2
 
 
 This diagram is a high-level overview of components that are setup in the default scenario as a reference.
-![Architecture diagram](./architecture-overview.svg)
+![Architecture diagram][architecture-diagram]
+[Open diagram in a new tab][architecture-diagram]
 
 :::note Updating the diagram
-The diagram is generated using [draw.io] and the source file is committed to the docs, to make updates to the diagram please create pull-request with **both the Svg and the source file**.
+The diagram is generated using [diagrams.net] and the [source file][diagram-source] is committed to the repository, to updates the diagram please create a pull-request with **both the SVG and the source file**.
 :::
 
-[draw.io]: https://www.diagrams.net/
+[architecture-diagram]: https://raw.githubusercontent.com/commitdev/zero-aws-eks-stack/main/docs/architecture-overview.svg
+[diagram-source]: https://github.com/commitdev/zero-aws-eks-stack/blob/main/docs/architecture-overview.drawio
+[diagrams.net]: https://www.diagrams.net/
