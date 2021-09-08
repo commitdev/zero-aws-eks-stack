@@ -144,6 +144,18 @@ variable "user_auth" {
   }))
 }
 
+variable "user_auth_dev_env_enabled" {
+  description = "When enabled will provision Kratos and Oathkeeper Rules for dev environment"
+  type        = bool
+  default     = false
+}
+
+variable "dev_user_auth_frontend_domain" {
+  description = "Frontend domain used for local development with dev env"
+  type        = string
+  default     = "127.0.0.1:3000"
+}
+
 variable "nginx_ingress_replicas" {
   description = "The number of ingress controller pods to run in the cluster. Production environments should not have less than 2"
   type        = number
