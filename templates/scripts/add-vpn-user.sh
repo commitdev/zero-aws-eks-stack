@@ -7,6 +7,12 @@ CLUSTER=$(kubectl config current-context | cut -d"/" -f2)
 NAMESPACE=<% .Name %>
 REGION=<% index .Params `region` %>
 
+if [[ "$CLUSTER" = *"-stage-"* ]]; then
+  DEFAULT_IP="10.10.199.200"
+else
+  DEFAULT_IP="10.10.99.200"
+fi
+
 # get pod id for execution
 POD=$(kubectl -n vpn get pods --selector=app=wireguard -o jsonpath='{.items[0].metadata.name}')
 
@@ -16,7 +22,7 @@ if [ -z "$POD" ]; then
 fi
 
 function k8s_exec() {
-  kubectl -n vpn exec -it $POD -- /bin/bash -c "$1"
+  kubectl -n vpn exec $POD wireguard --container wireguard -- /bin/bash -c "$1"
 }
 
 # get name
@@ -32,6 +38,8 @@ client_public_key=$(k8s_exec "echo -n $client_private_key | wg pubkey | tr -d \"
 
 # get next available IP
 existing_ips=$(k8s_exec "cat /etc/wireguard/wg0.conf | grep AllowedIPs| cut -d\" \" -f3 | cut -d\"/\" -f1 | sort")
+# Default start at 201 if no existing IPs are found
+existing_ips=${existing_ips:-$DEFAULT_IP}
 last_ip=$(echo "$existing_ips" | tr -cd "[:alnum:].\n" | tail -1)
 next_ip=$last_ip
 while [[ "$existing_ips" =~ "$next_ip" ]]; do
