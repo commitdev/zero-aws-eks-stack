@@ -17,7 +17,7 @@ locals {
 resource "kubernetes_service" "app_cache" {
   count = local.endpoint_address == "" ? 0 : 1
 
-  ## this should match the deployable backend's name/namespace
+  ## this should match the backend service's name/namespace
   metadata {
     namespace = kubernetes_namespace.app_namespace.metadata[0].name
     name      = "cache-${var.cache_store}"
