@@ -19,10 +19,6 @@ variable "random_seed" {
   description = "A randomly generated string to prevent collisions of resource names - should be unique within an AWS account"
 }
 
-variable "ecr_repositories" {
-  description = "List of ECR repository names to create"
-  type        = list(string)
-}
 
 variable "eks_cluster_version" {
   description = "EKS cluster version number to use. Incrementing this will start a cluster upgrade"
@@ -47,7 +43,7 @@ variable "eks_addon_coredns_version" {
 }
 
 variable "eks_node_groups" {
-  type = any
+  type        = any
   description = "Map of maps of eks node group config where keys are node group names. See the EKS module documentation for details"
 }
 

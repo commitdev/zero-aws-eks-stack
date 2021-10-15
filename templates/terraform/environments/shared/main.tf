@@ -110,6 +110,20 @@ resource "aws_iam_access_key" "access_user" {
   depends_on = [aws_iam_user.access_user]
 }
 
+data "aws_iam_user" "ci_user" {
+  user_name = local.ci_user_name
+}
+
+module "ecr" {
+  source  = "commitdev/zero/aws//modules/ecr"
+  version = "0.4.0"
+
+  environment      = "stage"
+  ecr_repositories = [local.project]
+  ecr_principals   = [data.aws_iam_user.ci_user.arn]
+}
+
+
 module "secret_keys" {
   source  = "commitdev/zero/aws//modules/secret"
   version = "0.0.2"

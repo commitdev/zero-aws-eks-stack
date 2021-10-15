@@ -29,7 +29,7 @@ provider "aws" {
   allowed_account_ids = [local.account_id]
 }
 
-# remote state of "shared" - contains mostly IAM users that will be shared between environments
+# remote state of "shared" - contains IAM users that will be shared between environments and ecr repository for docker images
 data "terraform_remote_state" "shared" {
   backend = "s3"
   config = {
@@ -51,9 +51,6 @@ module "prod" {
   region              = local.region
   allowed_account_ids = [local.account_id]
   random_seed         = local.random_seed
-
-  # ECR configuration
-  ecr_repositories = [] # Should be created by the staging environment
 
   # EKS configuration
   eks_cluster_version = "1.21"
