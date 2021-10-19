@@ -32,9 +32,6 @@ locals {
   ]
 }
 
-data "aws_iam_user" "ci_user" {
-  user_name = var.ci_user_name
-}
 
 module "vpc" {
   source  = "commitdev/zero/aws//modules/vpc"
@@ -123,15 +120,6 @@ module "db" {
   instance_class            = var.db_instance_class
   storage_gb                = var.db_storage_gb
   database_engine           = var.database
-}
-
-module "ecr" {
-  source  = "commitdev/zero/aws//modules/ecr"
-  version = "0.4.0"
-
-  environment      = var.environment
-  ecr_repositories = var.ecr_repositories
-  ecr_principals   = [data.aws_iam_user.ci_user.arn]
 }
 
 module "logging" {
