@@ -112,6 +112,7 @@ resource "aws_iam_access_key" "access_user" {
 
 data "aws_iam_user" "ci_user" {
   user_name = local.ci_user_name
+  depends_on = [aws_iam_user.access_user]
 }
 
 module "ecr" {
