@@ -82,8 +82,9 @@ echo "When it is running you should be able to access internal resources, eg. my
 echo "You will be able to connect to resources within both the VPC and the Kubernetes cluster."
 echo
 
-# generate client conf
-cat <<-EOF > ${CONFIG_FILE}
+function generate_wireguard_conf() {
+  # generate client conf
+  cat <<-EOF > ${CONFIG_FILE}
 #
 # This is a generated VPN(wireguard) client configuration
 #
@@ -104,4 +105,11 @@ AllowedIPs = $vpc_cidr, $k8s_cidr, $dns_server/32
 Endpoint = $EXTERNAL_DNS:51820
 
 EOF
+}
 
+if [ -f "$CONFIG_FILE" ]; then
+  read -e -p "Wireguard config exists, override? (Y/N)" choice
+  [[ "$choice" == [Yy]* ]] && generate_wireguard_conf || echo cat ${CONFIG_FILE}
+else
+  generate_wireguard_conf
+fi
