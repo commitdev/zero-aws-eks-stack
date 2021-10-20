@@ -73,7 +73,7 @@ module "stage" {
 
   eks_node_groups = {
     main = {
-      instance_types     = ["t3.medium", "t2.medium", "t3.large"]
+      instance_types     = ["t3.medium", "t3.large"]
       asg_min_size       = 1
       asg_max_size       = 3
       # Enable use of spot instances instead of on-demand.
