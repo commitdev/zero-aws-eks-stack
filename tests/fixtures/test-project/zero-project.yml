@@ -10,6 +10,7 @@ modules:
       accountId: "123456781234"
       database: mysql
       fileUploads: "no"
+      cloudtrailEnable: "yes"
       loggingType: kibana
       metricsType: prometheus
       productionBackendSubdomain: api.

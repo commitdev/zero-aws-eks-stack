@@ -87,12 +87,12 @@ data "aws_iam_policy_document" "operator_access" {
   statement {
     effect    = "Allow"
     actions   = ["s3:ListBucket"]
-    resources = ["arn:aws:s3:::${data.terraform_remote_state.shared.outputs.cloudtrail_bucket_id}"]
+    resources = ["arn:aws:s3:::*-cloudtrail"]
   }
   statement {
     effect    = "Allow"
     actions   = ["s3:GetObject", "s3:PutObject"]
-    resources = ["arn:aws:s3:::${data.terraform_remote_state.shared.outputs.cloudtrail_bucket_id}/*"]
+    resources = ["arn:aws:s3:::*-cloudtrail/*"]
   }
 
   # Application secret management - this role can view and edit application secrets in the production environment

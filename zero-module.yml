@@ -209,3 +209,10 @@ parameters:
   - field: sharedResourcePrefix
     label: "Mostly for development - Allow shared resources to have a unique prefix. This is only necessary if many zero projects will be run in the same AWS account."
     value: "none"
+  - field: cloudtrailEnable
+    label: Enable cloudtrail?
+    info: "CloudTrail monitors and records account activity across your AWS infrastructure, giving you control over storage, analysis, and remediation actions. It can add $5-10 per month and may not provide much value to a smaller company"
+    default: no
+    options:
+      "yes": "Yes"
+      "no": "No"

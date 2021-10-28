@@ -15,6 +15,7 @@ locals {
   account_id             = "<% index .Params `accountId` %>"
   random_seed            = "<% index .Params `randomSeed` %>"
   shared_resource_prefix = "<% if ne (index .Params `sharedResourcePrefix`) "none" %><% index .Params `sharedResourcePrefix` %><% end %>"
+  enable_cloudtrail       = <%if eq (index .Params `cloudtrailEnable`) "yes" %>1<% else %>0<% end %>
 }
 
 provider "aws" {
@@ -144,6 +145,7 @@ module "secret_keys" {
 
 # Enable AWS CloudTrail to help you audit governance, compliance, and operational risk of your AWS account, with logs stored in S3 bucket.
 module "cloudtrail" {
+  count   = local.enable_cloudtrail
   source  = "commitdev/zero/aws//modules/cloudtrail"
   version = "0.1.10"
 
