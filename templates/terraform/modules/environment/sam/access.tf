@@ -1,3 +1,4 @@
+# CI user by default in this group for both stage/prod
 data "aws_iam_group" "deployers" {
   group_name = "${var.project}-deployer-${var.environment}"
 }
@@ -10,7 +11,7 @@ locals {
 
 resource "aws_iam_policy" "sam_access_policy" {
   name        = "${data.aws_iam_group.deployers.group_name}-serverless"
-  description = "Sam Group policy"
+  description = "Sam deployers group policy"
   policy      = data.aws_iam_policy_document.sam_access_policies.json
 }
 
@@ -44,7 +45,7 @@ data "aws_iam_policy_document" "sam_access" {
     ]
 
     resources = [
-      "arn:aws:ecr:${var.region}:${local.account_id}:repository/*"
+      "arn:aws:ecr:${var.region}:${local.account_id}:repository/${var.project}-serverless"
     ]
   }
 
@@ -68,6 +69,7 @@ data "aws_iam_policy_document" "sam_access" {
     ]
 
     resources = [
+      # invoke-authorizer-role is created by the SAM deployment
       "arn:aws:iam::${local.account_id}:role/${var.project}-${var.environment}-invoke-authorizer-role",
       "arn:aws:iam::${local.account_id}:role/${var.project}-*",
     ]

@@ -39,6 +39,6 @@ module "ecr" {
   version = "0.4.0"
 
   environment      = var.environment
-  ecr_repositories = [var.project]
-  ecr_principals   = [data.aws_iam_user.ci_user.arn]
+  ecr_repositories = ["${var.project}-serverless"]
+  ecr_principals   = [data.aws_caller_identity.current.arn]
 }
