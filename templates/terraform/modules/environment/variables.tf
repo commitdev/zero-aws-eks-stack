@@ -214,3 +214,16 @@ variable "cache_redis_transit_encryption_enabled" {
   type        = bool
   default     = true
 }
+
+variable "frontend_domain_prefix" {
+  type = string
+}
+variable "backend_domain_prefix" {
+  type = string
+}
+
+variable "serverless_enabled" {
+  description = "Using Serverless infrastructure instead of EKS"
+  type        = bool
+  default     = false
+}
