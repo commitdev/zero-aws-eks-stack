@@ -35,16 +35,6 @@ data "aws_iam_policy_document" "sam_access" {
       "arn:aws:cloudformation:${var.region}:aws:transform/Serverless-*"
     ]
   }
-  /* statement {
-    actions = [
-      "s3:*Object",
-      "s3:GetBucketLocation",
-    ]
-
-    resources = [
-      "arn:aws:s3:::aws-sam-cli-managed-default-samclisourcebucket-*"
-    ]
-  } */
 
   statement {
     actions = [
@@ -119,9 +109,9 @@ data "aws_iam_policy_document" "sam_access" {
     ]
 
     resources = [
-      "arn:aws:secretsmanager:*:*:secret:${var.project}-stage-auth-oidc*",
-      "arn:aws:secretsmanager:*:*:secret:${var.project}-stage-*"
-
+      "arn:aws:secretsmanager:*:*:secret:${local.secret_manager_name_prefix}*",
+      /// temp for DB
+      "arn:aws:secretsmanager:*:*:secret:${var.project}/kubernetes/stage/*",
     ]
   }
 
@@ -133,21 +123,7 @@ data "aws_iam_policy_document" "sam_access" {
     ]
 
     resources = [
-      "arn:aws:ssm:${var.region}:${local.account_id}:parameter/${var.project}/sam/stage/*",
-    ]
-  }
-
-
-  statement {
-    actions = [
-      "secretsmanager:GetSecretValue",
-    ]
-
-    resources = [
-      "arn:aws:secretsmanager:*:*:secret:${var.project}-stage-auth-oidc*",
-      /// temp
-      "arn:aws:secretsmanager:*:*:secret:${var.project}/kubernetes/stage/*",
-
+      "arn:aws:ssm:${var.region}:${local.account_id}:${local.ssm_parameter_name_prefix}*",
     ]
   }
 
@@ -165,14 +141,3 @@ data "aws_iam_policy_document" "sam_access" {
   }
 }
 
-resource "aws_s3_bucket" "serverless_artifacts" {
-    bucket = "${var.project}-serverless-${lower(var.random_seed)}"  ## would need random-seed in template (s3 names are global)
-    acl    = "private" // The contents will be available through cloudfront, they should not be accessible publicly
-    server_side_encryption_configuration {
-      rule {
-        apply_server_side_encryption_by_default {
-          sse_algorithm = "AES256"
-        }
-      }
-    }
-}

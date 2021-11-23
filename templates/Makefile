@@ -8,7 +8,12 @@ KUBE_CONTEXT := $(PROJECT)-$(ENVIRONMENT)-$(AWS_DEFAULT_REGION)
 
 .EXPORT_ALL_VARIABLES:
 
+<% if eq (index .Params `serverless`) "yes" -%>
+apply: apply-remote-state apply-shared-remote-state apply-secrets apply-shared-env apply-env
+# # Comment above apply targets and uncomment below make target for EKS setup
+# <% end -%>
 apply: apply-remote-state apply-shared-remote-state apply-secrets apply-shared-env apply-env update-k8s-conf pre-k8s apply-k8s-utils post-apply-setup
+
 
 apply-remote-state:
 	aws s3 ls $(PROJECT)-$(ENVIRONMENT)-terraform-state > /dev/null 2>&1 || ( \

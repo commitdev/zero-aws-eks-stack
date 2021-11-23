@@ -1,6 +1,7 @@
+// TODO : move to terrform-aws-zero
 resource "auth0_client" "oidc" {
   name = "${var.project} - ${var.environment}"
-  description = "Test Applications Long Description"
+  description = "${var.project} - ${var.environment} OIDC Authentication API"
   app_type = "regular_web"
   oidc_conformant = true
   is_first_party = true
@@ -25,7 +26,7 @@ resource "auth0_client" "oidc" {
   source  = "commitdev/zero/aws//modules/secret"
   version = "0.0.2"
 
-  name   = "${var.project}-${var.environment}-auth-oidc"
+  name   = "/${var.project}/sam/${var.environment}/auth-oidc"
   type   = "map"
   values = {
     DOMAIN  = local.auth0_api_keys_json["AUTH0_DOMAIN"]
@@ -37,5 +38,5 @@ resource "auth0_client" "oidc" {
 
 output "secret_name" {
   description = "Secret containing the OIDC credentials"
-  value       = "${var.project}-${var.environment}-auth-oidc"
+  value       = "/${var.project}/sam/${var.environment}/auth-oidc"
 }

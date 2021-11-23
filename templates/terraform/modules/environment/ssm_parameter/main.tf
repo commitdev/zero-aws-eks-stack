@@ -1,3 +1,5 @@
+// TODO : move to terrform-aws-zero
+
 variable "name" {
   description = "The name of the paramter, for retrieving the value"
   type = string
