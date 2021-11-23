@@ -52,6 +52,7 @@ data "aws_caller_identity" "current" {}
 #
 # Provision the EKS cluster
 module "eks" {
+  count = var.serverless_enabled ? 0 : 1
   source  = "commitdev/zero/aws//modules/eks"
   version = "0.5.1"
   providers = {
@@ -181,6 +182,29 @@ module "cache" {
   security_groups    = [module.eks.worker_security_group_id]
 
   redis_transit_encryption_enabled = var.cache_redis_transit_encryption_enabled
+}
+
+module "sam" {
+  count = var.serverless_enabled ? 1 : 0
+  source = "./sam"
+
+  project = var.project
+  environment = var.environment
+  region = var.region
+  random_seed = var.random_seed
+  backend_domain_prefix = var.backend_domain_prefix
+  frontend_domain_prefix = var.frontend_domain_prefix
+  domain_name = var.hosted_domains[0].hosted_zone
+}
+
+module "auth0" {
+  source = "./auth0"
+
+  project = var.project
+  environment = var.environment
+  frontend_domain = "${var.frontend_domain_prefix}${var.hosted_domains[0].hosted_zone}"
+  backend_domain = "${var.backend_domain_prefix}${var.hosted_domains[0].hosted_zone}"
+  secret_name = "${var.project}-auth0-api-${var.environment}"
 }
 
 output "s3_hosting" {

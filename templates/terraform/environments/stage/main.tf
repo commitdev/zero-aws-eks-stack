@@ -173,4 +173,8 @@ module "stage" {
 
   user_role_mapping = data.terraform_remote_state.shared.outputs.user_role_mapping
   ci_user_name      = data.terraform_remote_state.shared.outputs.ci_user_name
+
+  frontend_domain_prefix = "<% index .Params `stagingFrontendSubdomain` %>"
+  backend_domain_prefix = "<% index .Params `stagingBackendSubdomain` %>"
+  serverless_enabled = <% if eq (index .Params `serverless`) "yes" %>true<% else %>false<% end %>
 }
