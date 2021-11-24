@@ -1,9 +1,10 @@
 name: zero-aws-eks-stack
-description: 'zero module for an AWS kubernetes stack on EKS'
+description: 'Zero module to configure AWS infrastructure for hosting SaaS applications either using Kubernetes with EKS or serverless with SAM/Lambda'
 author: 'Commit'
-zeroVersion: '>= 0.1.1'
+zeroVersion: '>= 0.2.1'
 commands:
   check: sh scripts/check.sh
+
 
 template:
   strictMode: true
@@ -18,6 +19,13 @@ requiredCredentials:
   - github
 
 parameters:
+  - field: backendApplicationHosting
+    label: How do you want to host the backend of your application?
+    info: "Kubernetes is more complex and expensive, but significantly more feature-rich. The serverless approach can be cheaper but is limited in tooling.\nWe recommend Kubernetes for all but the most simple applications. See why: https://whyk8s.getzero.dev"
+    default: "kubernetes"
+    options:
+      "kubernetes": "Kubernetes using AWS EKS"
+      "serverless": "Serverless using AWS SAM/Lambda"
   - field: useExistingAwsProfile
     label: "Use credentials from an existing AWS profile?"
     info: "You can choose either a currently existing profile if you've already configured your AWS CLI, or manually enter a pair of AWS access keys."
@@ -138,16 +146,26 @@ parameters:
       "memcached": "Memcached"
   - field: loggingType
     label: Which application logging to configure.
-    info: "Cloudwatch is usually cheaper and simpler but with a limited feature set.\nElasticsearch + Kibana will set up more infrastructure but enable a much richer logging search and visualization experience."
+    info: "Cloudwatch is usually cheaper and simpler but with a limited feature set.\nElasticsearch + Kibana will set up more infrastructure but enable a much richer logging search and visualization experience. Only available with EKS."
     options:
       "cloudwatch": "AWS CloudWatch"
       "kibana": "Kibana"
+    conditions:
+    - action: KeyMatchCondition
+      matchField: backendApplicationHosting
+      whenValue: "kubernetes"
+      elseValue: "cloudwatch"
   - field: metricsType
     label: Additional application metrics method to configure.
-    info: "Metrics are available through CloudWatch, but choosing prometheus will install Prometheus and Grafana, for a richer metrics experience.\nNo additional infrastructure is required, but a number of prometheus pods will need to exist in the cluster, utilizing some resources."
+    info: "Metrics are available through CloudWatch, but choosing prometheus will install Prometheus and Grafana, for a richer metrics experience.\nNo additional infrastructure is required, but a number of prometheus pods will need to exist in the cluster, utilizing some resources. Only Available with EKS."
     options:
       "none": "none"
       "prometheus": "Prometheus"
+    conditions:
+    - action: KeyMatchCondition
+      matchField: backendApplicationHosting
+      whenValue: "kubernetes"
+      elseValue: "none"
   - field: notificationServiceEnabled
     label: "Install the Zero Notification Service in your cluster?"
     info: "Provides easy notification capability through email, slack, SMS, etc.\nhttps://github.com/commitdev/zero-notification-service"
@@ -155,6 +173,11 @@ parameters:
     options:
       "yes": "Yes"
       "no": "No"
+    conditions:
+    - action: KeyMatchCondition
+      matchField: backendApplicationHosting
+      whenValue: "kubernetes"
+      elseValue: "no"
   - field: sendgridApiKey
     label: "API key to setup email integration (optional: leave blank to opt-out of Sendgrid setup)"
     info: "Signup at https://signup.sendgrid.com or create an API key at https://app.sendgrid.com/settings/api_keys\nSendgrid is an email delivery service enabling transactional email sending and more."
@@ -206,6 +229,11 @@ parameters:
     options:
       "yes": "Yes"
       "no": "No"
+    conditions:
+    - action: KeyMatchCondition
+      matchField: backendApplicationHosting
+      whenValue: "kubernetes"
+      elseValue: "no"
   - field: sharedResourcePrefix
     label: "Mostly for development - Allow shared resources to have a unique prefix. This is only necessary if many zero projects will be run in the same AWS account."
     value: "none"

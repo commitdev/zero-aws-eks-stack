@@ -67,6 +67,16 @@ variable "db_storage_gb" {
   description = "The amount of storage to allocate for the db, in GB"
 }
 
+variable "enable_kubernetes_application_infra" {
+  description = "Enable Kubernetes infrastructure - EKS and related roles"
+  type        = bool
+}
+
+variable "enable_serverless_application_infra" {
+  description = "Enable Serverless infrastructure - Lambda, SAM, Cloudformation and related roles"
+  type        = bool
+}
+
 variable "vpc_enable_nat_gateway" {
   description = "Enable nat-gateway"
   type        = bool
