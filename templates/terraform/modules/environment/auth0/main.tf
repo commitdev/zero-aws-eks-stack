@@ -22,6 +22,14 @@ resource "auth0_client" "oidc" {
   }
 }
 
+resource "random_id" "cookie_signing_secret" {
+  keepers = {
+    # Generate a new id each time we switch to a new auth0_client_id
+    client_id = local.auth0_api_keys_json["AUTH0_DOMAIN"]
+  }
+  byte_length = 16
+}
+
  module "auth_oidc_configs" {
   source  = "commitdev/zero/aws//modules/secret"
   version = "0.0.2"
@@ -32,6 +40,7 @@ resource "auth0_client" "oidc" {
     DOMAIN  = local.auth0_api_keys_json["AUTH0_DOMAIN"]
     CLIENT_ID     = auth0_client.oidc.client_id
     CLIENT_SECRET = auth0_client.oidc.client_secret
+    COOKIE_SIGNING_SECRET = random_id.cookie_signing_secret.b64_std
   }
   tags   = {  auth : var.project, env : var.environment }
 }

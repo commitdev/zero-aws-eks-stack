@@ -2,14 +2,6 @@ locals {
   ssm_parameter_name_prefix = "/${var.project}/sam/${var.environment}/"
   secret_manager_name_prefix = "/${var.project}/sam/${var.environment}/"
 }
-resource "random_id" "cookie_signing_secret" {
-  keepers = {
-    # Generate a new id each time we switch to a new auth0_client_id
-    project = "${var.project}-${var.environment}"
-  }
-  byte_length = 16
-}
-
 
 module "serverless_application_secrets" {
   source  = "commitdev/zero/aws//modules/secret"
@@ -19,12 +11,11 @@ module "serverless_application_secrets" {
   type   = "map"
   values = {
     STRIPE_API_SECRET_KEY  = ""
-    COOKIE_SIGNING_SECRET = random_id.cookie_signing_secret.b64_std
   }
   tags   = {  app : var.project, env : var.environment }
 }
 
-module "parameter_hostedzoneid" {
+module "parameter_hosted_zone_id" {
   source  = "../ssm_parameter"
 
   name   = "${local.ssm_parameter_name_prefix}hosted-zone-id"
@@ -33,7 +24,7 @@ module "parameter_hostedzoneid" {
   tags   = {  auth : var.project, env : var.environment }
 }
 
-module "parameter_gatewaycertarn" {
+module "parameter_gateway_cert_arn" {
   source  = "../ssm_parameter"
 
   name   = "${local.ssm_parameter_name_prefix}gateway-cert-arn"
