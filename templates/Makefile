@@ -10,6 +10,8 @@ KUBE_CONTEXT := $(PROJECT)-$(ENVIRONMENT)-$(AWS_DEFAULT_REGION)
 
 apply: apply-remote-state apply-shared-remote-state apply-secrets apply-shared-env apply-env update-k8s-conf pre-k8s apply-k8s-utils post-apply-setup
 
+apply-without-eks: apply-remote-state apply-shared-remote-state apply-secrets apply-shared-env apply-env post-apply-setup
+
 apply-remote-state:
 	aws s3 ls $(PROJECT)-$(ENVIRONMENT)-terraform-state > /dev/null 2>&1 || ( \
 	cd terraform/bootstrap/remote-state && \

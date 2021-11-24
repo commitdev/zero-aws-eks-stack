@@ -5,7 +5,7 @@ SHELL := /bin/bash
 run: make-apply
 
 make-apply:
-	cd $(PROJECT_DIR) && AUTO_APPROVE="-auto-approve" make
+	@export AUTO_APPROVE="-auto-approve" && cd $(PROJECT_DIR) && (if [[ "${backendApplicationHosting}" =~ "kubernetes" ]]; then make apply; else make apply-without-eks; fi)
 
 summary:
 	@echo "zero-aws-eks-stack:"

@@ -28,10 +28,10 @@ The root folder is used for declaring parameters required by the templates, and 
 ```
 
 ## AWS EKS Stack
-The Zero-awk-eks stack is designed with scalability and maintainability in mind, this repo is a series of templates indented to be filled in with modules parameters, and executed by zero 
+The Zero-aws-eks stack is designed with scalability and maintainability in mind, this repo is a series of templates indented to be filled in with modules parameters, and executed by zero
 This is a [Zero][zero] module which sets up a
 hosting environment on AWS running Kubernetes. It will generate terraform output
-which describes the environment mapped in this [architecture diagram][arch-diagram]. 
+which describes the environment mapped in this [architecture diagram][arch-diagram].
 
 **Resource List**: [Link][resource-list]
 
