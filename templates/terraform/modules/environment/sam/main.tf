@@ -15,7 +15,7 @@ module "sam_gateway_cert" {
 ## Bucket used for storing SAM deployment templates and artifacts
 resource "aws_s3_bucket" "serverless_artifacts" {
     bucket = "${var.project}-serverless-${lower(var.random_seed)}"  ## would need random-seed in template (s3 names are global)
-    acl    = "private" // The contents will be available through cloudfront, they should not be accessible publicly
+    acl    = "private" // The contents should be private
     server_side_encryption_configuration {
       rule {
         apply_server_side_encryption_by_default {
