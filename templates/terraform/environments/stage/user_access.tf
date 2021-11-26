@@ -156,9 +156,9 @@ locals {
 # Combine multiple policy documents into one
 data "aws_iam_policy_document" "deployer_access" {
   source_policy_documents = [
-    data.aws_iam_policy_document.deployer_frontend_assets_access.json
-    data.aws_iam_policy_document.deployer_ecr_access.json
-    data.aws_iam_policy_document.deployer_sam_access.json
+    data.aws_iam_policy_document.deployer_frontend_assets_access.json,
+    data.aws_iam_policy_document.deployer_ecr_access.json,
+    data.aws_iam_policy_document.deployer_sam_access.json,
   ]
 }
 
@@ -166,9 +166,7 @@ data "aws_iam_policy_document" "deployer_access" {
 data "aws_iam_policy_document" "deployer_frontend_assets_access" {
   # deploy_assets_policy - Allow the deployers read/write access to the frontend assets bucket and CF invalidations
   statement {
-    actions = [
-      "s3:ListBucket",
-    ]
+    actions = ["s3:ListBucket"]
 
     resources = module.stage.s3_hosting[*].bucket_arn
   }
@@ -390,7 +388,7 @@ data "aws_iam_policy_document" "deployer_sam_access" {
     effect  = "Allow"
     actions = [
       "ssm:GetParameters",
-      "ssm:GetParameter"
+      "ssm:GetParameter",
     ]
 
     resources = [
