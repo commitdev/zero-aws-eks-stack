@@ -22,6 +22,7 @@ locals {
   account_id  = "<% index .Params `accountId` %>"
   domain_name = "<% index .Params `productionHostRoot` %>"
   random_seed = "<% index .Params `randomSeed` %>"
+  environment = "prod"
 }
 
 provider "aws" {
@@ -44,7 +45,7 @@ data "terraform_remote_state" "shared" {
 # Instantiate the production environment
 module "prod" {
   source      = "../../modules/environment"
-  environment = "prod"
+  environment = local.environment
 
   # Project configuration
   project             = local.project

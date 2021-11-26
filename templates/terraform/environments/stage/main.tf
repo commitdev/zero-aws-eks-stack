@@ -22,6 +22,7 @@ locals {
   account_id  = "<% index .Params `accountId` %>"
   domain_name = "<% index .Params `stagingHostRoot` %>"
   random_seed = "<% index .Params `randomSeed` %>"
+  environment = "stage"
 }
 
 provider "aws" {
@@ -55,7 +56,7 @@ module "rds_dev_secret" {
 # Instantiate the staging environment
 module "stage" {
   source      = "../../modules/environment"
-  environment = "stage"
+  environment = local.environment
 
   # Project configuration
   project             = local.project
