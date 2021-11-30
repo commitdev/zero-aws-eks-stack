@@ -117,7 +117,7 @@ module "db" {
   environment               = var.environment
   vpc_id                    = module.vpc.vpc_id
   password_secret_suffix    = var.random_seed
-  allowed_security_group_id = module.eks.worker_security_group_id
+  allowed_security_group_id = !var.serverless_enabled ? module.eks[0].worker_security_group_id : module.serverless_security_group[0].this_security_group_id
   instance_class            = var.db_instance_class
   storage_gb                = var.db_storage_gb
   database_engine           = var.database
@@ -133,7 +133,7 @@ module "logging" {
   environment           = var.environment
   vpc_id                = module.vpc.vpc_id
   elasticsearch_version = var.logging_es_version
-  security_groups       = [module.eks.worker_security_group_id]
+  security_groups       = !var.serverless_enabled ? [module.eks[0].worker_security_group_id] : [module.serverless_security_group[0].this_security_group_id]
   subnet_ids            = slice(module.vpc.private_subnets, 0, var.logging_az_count)
   instance_type         = var.logging_es_instance_type
   instance_count        = var.logging_es_instance_count
@@ -179,9 +179,25 @@ module "cache" {
   cluster_size       = var.cache_cluster_size
   instance_type      = var.cache_instance_type
   availability_zones = module.vpc.azs
-  security_groups    = [module.eks.worker_security_group_id]
+  security_groups    = !var.serverless_enabled ? [module.eks[0].worker_security_group_id] : [module.serverless_security_group[0].this_security_group_id]
 
   redis_transit_encryption_enabled = var.cache_redis_transit_encryption_enabled
+}
+
+module "serverless_security_group" {
+  count = var.serverless_enabled ? 1 : 0
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "3.18.0"
+
+  name        = "${var.project}-${var.environment}-serverless-sg"
+  description = "Security group for serverless application"
+  vpc_id      = module.vpc.vpc_id
+
+  egress_rules = ["all-all"]
+
+  tags = {
+    Env = var.environment
+  }
 }
 
 module "sam" {
@@ -192,9 +208,12 @@ module "sam" {
   environment = var.environment
   region = var.region
   random_seed = var.random_seed
-  backend_domain_prefix = var.backend_domain_prefix
-  frontend_domain_prefix = var.frontend_domain_prefix
+  backend_domain = "${var.backend_domain_prefix}${var.hosted_domains[0].hosted_zone}"
   domain_name = var.hosted_domains[0].hosted_zone
+  vpc_subnets = module.vpc.private_subnets
+  security_group_id = module.serverless_security_group[0].this_security_group_id
+
+  depends_on = [ module.user_access ]
 }
 
 module "auth0" {

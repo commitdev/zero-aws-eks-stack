@@ -18,3 +18,15 @@ variable "random_seed" {
 variable "domain_name" {
   description = "Domain name for getting hosted zone and constructing endpoints"
 }
+
+variable "backend_domain" {
+  description = "Backend domain"
+}
+
+variable "vpc_subnets" {
+  description = "VPC subnets for Lambda functions to be deployed in"
+  type = list(string)
+}
+variable "security_group_id" {
+  description = "Security group that is allowed for RDS connection"
+}

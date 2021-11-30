@@ -54,7 +54,7 @@ data "aws_iam_policy_document" "developer_access" {
   statement {
     sid       = "ManageApplicationSecrets"
     effect    = "Allow"
-    resources = ["arn:aws:secretsmanager:${local.account_id}:${local.account_id}:secret:${local.project}/kubernetes/${local.environment}/*"]
+    resources = ["arn:aws:secretsmanager:${local.region}:${local.account_id}:secret:${local.project}/kubernetes/${local.environment}/*"]
 
     actions = [
       "secretsmanager:GetSecretValue",
@@ -271,7 +271,7 @@ data "aws_iam_policy_document" "deployer_sam_access" {
   statement {
     sid       = "S3"
     effect    = "Allow"
-    resources = ["arn:aws:s3:::${local.project}-serverless-${local.random_seed}/*"]
+    resources = ["arn:aws:s3:::${local.project}-serverless-${lower(local.random_seed)}/*"]
 
     actions = [
       "s3:GetObject",
@@ -282,9 +282,12 @@ data "aws_iam_policy_document" "deployer_sam_access" {
   statement {
     sid       = "S3List"
     effect    = "Allow"
-    resources = ["arn:aws:s3:::${local.project}-serverless-${local.random_seed}"]
+    resources = ["arn:aws:s3:::${local.project}-serverless-${lower(local.random_seed)}"]
 
-    actions = ["s3:ListBucket""s3:PutObject"]
+    actions = [
+      "s3:ListBucket",
+      "s3:PutObject",
+    ]
   }
 
   statement {
@@ -292,6 +295,17 @@ data "aws_iam_policy_document" "deployer_sam_access" {
     effect    = "Allow"
     resources = ["*"]
     actions   = ["ecr:GetAuthorizationToken"]
+  }
+
+  statement {
+    sid       = "ECRRepo"
+    effect    = "Allow"
+    resources = ["arn:aws:ecr:${local.region}:${local.account_id}:repository/${local.project}-serverless"]
+    actions = [
+      "ecr:CreateRepository",
+      "ecr:SetRepositoryPolicy",
+      "ecr:PutImage",
+    ]
   }
 
   statement {
@@ -328,6 +342,31 @@ data "aws_iam_policy_document" "deployer_sam_access" {
       "iam:DetachRolePolicy",
       "iam:GetRole",
       "iam:TagRole",
+      "iam:CreateRole",
+      "iam:DeleteRolePolicy"
+    ]
+  }
+  statement {
+    sid       = "IAMManageGatewayInvokeRole"
+    effect    = "Allow"
+    resources = ["arn:aws:iam::${local.account_id}:role/${local.project}-${local.environment}-invoke-authorizer-role"]
+
+    actions = [
+      "iam:CreateRole",
+      "iam:GetRole",
+      "iam:DetachRolePolicy",
+      "iam:AttachRolePolicy",
+      "iam:DeleteRolePolicy",
+      "iam:DeleteRole",
+      "iam:ListUserTags",
+      "iam:ListRoleTags",
+      "iam:PutRolePolicy",
+      "iam:GetRolePolicy",
+      "iam:TagUser",
+      "iam:TagRole",
+      "iam:UntagUser",
+      "iam:UntagRole",
+      "iam:PassRole"
     ]
   }
 
@@ -355,6 +394,7 @@ data "aws_iam_policy_document" "deployer_sam_access" {
       "apigateway:PATCH",
       "apigateway:POST",
       "apigateway:PUT",
+      "apigateway:TagResource"
     ]
   }
 
@@ -392,8 +432,20 @@ data "aws_iam_policy_document" "deployer_sam_access" {
     ]
 
     resources = [
-      "arn:aws:ssm:${local.region}:${local.account_id}:/${local.project}/sam/${local.environment}/*",
+      "arn:aws:ssm:${local.region}:${local.account_id}:parameter/${local.project}/sam/${local.environment}/*",
     ]
+  }
+
+  statement {
+    sid     = "VPCDescribeResources"
+    effect  = "Allow"
+    actions = [
+      "ec2:DescribeSubnets",
+      "ec2:DescribeVpcs",
+      "ec2:DescribeSecurityGroups",
+    ]
+
+    resources = ["*"]
   }
 }
 

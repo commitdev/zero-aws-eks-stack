@@ -31,17 +31,19 @@ provider "aws" {
 }
 
 data "aws_eks_cluster" "cluster" {
+  count = var.serverless_enabled ? 0 : 1
   provider = aws.for_eks
-  name     = module.eks.cluster_id
+  name     = module.eks[0].cluster_id
 }
 
 data "aws_eks_cluster_auth" "cluster" {
+  count = var.serverless_enabled ? 0 : 1
   provider = aws.for_eks
-  name     = module.eks.cluster_id
+  name     = module.eks[0].cluster_id
 }
 
 provider "kubernetes" {
-  host                   = data.aws_eks_cluster.cluster.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
-  token                  = data.aws_eks_cluster_auth.cluster.token
+  host                   = !var.serverless_enabled ? data.aws_eks_cluster.cluster[0].endpoint : ""
+  cluster_ca_certificate = !var.serverless_enabled ? base64decode(data.aws_eks_cluster.cluster[0].certificate_authority.0.data) : ""
+  token                  = !var.serverless_enabled ? data.aws_eks_cluster_auth.cluster[0].token : ""
 }
