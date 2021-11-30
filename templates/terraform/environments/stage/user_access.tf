@@ -392,7 +392,7 @@ data "aws_iam_policy_document" "deployer_sam_access" {
     ]
 
     resources = [
-      "arn:aws:ssm:${local.region}:${local.account_id}:/${local.project}/sam/${local.environment}/*",
+      "arn:aws:ssm:${local.region}:${local.account_id}:parameter/${local.project}/sam/${local.environment}/*",
     ]
   }
 }

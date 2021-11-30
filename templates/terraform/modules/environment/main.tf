@@ -184,6 +184,22 @@ module "cache" {
   redis_transit_encryption_enabled = var.cache_redis_transit_encryption_enabled
 }
 
+module "serverless_security_group" {
+  count = var.serverless_enabled ? 1 : 0
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "3.18.0"
+
+  name        = "${var.project}-${var.environment}-serverless-sg"
+  description = "Security group for serverless application"
+  vpc_id      = module.vpc.vpc_id
+
+  egress_rules = ["all-all"]
+
+  tags = {
+    Env = var.environment
+  }
+}
+
 module "sam" {
   count = var.serverless_enabled ? 1 : 0
   source = "./sam"
@@ -192,9 +208,12 @@ module "sam" {
   environment = var.environment
   region = var.region
   random_seed = var.random_seed
-  backend_domain_prefix = var.backend_domain_prefix
-  frontend_domain_prefix = var.frontend_domain_prefix
+  backend_domain = "${var.backend_domain_prefix}${var.hosted_domains[0].hosted_zone}"
   domain_name = var.hosted_domains[0].hosted_zone
+  vpc_subnets = module.vpc.private_subnets
+  security_group_id = module.serverless_security_group[0].this_security_group_id
+
+  depends_on = [ module.user_access ]
 }
 
 module "auth0" {
