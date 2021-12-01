@@ -271,7 +271,7 @@ data "aws_iam_policy_document" "deployer_sam_access" {
   statement {
     sid       = "S3"
     effect    = "Allow"
-    resources = ["arn:aws:s3:::${local.project}-serverless-${local.random_seed}/*"]
+    resources = ["arn:aws:s3:::${local.project}-serverless-${lower(local.random_seed)}/*"]
 
     actions = [
       "s3:GetObject",
@@ -282,7 +282,7 @@ data "aws_iam_policy_document" "deployer_sam_access" {
   statement {
     sid       = "S3List"
     effect    = "Allow"
-    resources = ["arn:aws:s3:::${local.project}-serverless-${local.random_seed}"]
+    resources = ["arn:aws:s3:::${local.project}-serverless-${lower(local.random_seed)}"]
 
     actions = [
       "s3:ListBucket",
