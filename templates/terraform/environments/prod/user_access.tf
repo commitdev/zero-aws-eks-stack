@@ -99,7 +99,7 @@ data "aws_iam_policy_document" "operator_access" {
   statement {
     sid       = "ManageApplicationSecrets"
     effect    = "Allow"
-    resources = ["arn:aws:secretsmanager:${local.account_id}:${local.account_id}:secret:${local.project}/kubernetes/${local.environment}/*"]
+    resources = ["arn:aws:secretsmanager:${local.region}:${local.account_id}:secret:${local.project}/kubernetes/${local.environment}/*"]
 
     actions = [
       "secretsmanager:GetSecretValue",
