@@ -331,6 +331,31 @@ data "aws_iam_policy_document" "deployer_sam_access" {
       "iam:DetachRolePolicy",
       "iam:GetRole",
       "iam:TagRole",
+      "iam:CreateRole",
+      "iam:DeleteRolePolicy"
+    ]
+  }
+  statement {
+    sid       = "IAMManageGatewayInvokeRole"
+    effect    = "Allow"
+    resources = ["arn:aws:iam::${local.account_id}:role/${local.project}-${local.environment}-invoke-authorizer-role "]
+
+    actions = [
+      "iam:CreateRole",
+      "iam:GetRole",
+      "iam:DetachRolePolicy",
+      "iam:AttachRolePolicy",
+      "iam:DeleteRolePolicy",
+      "iam:DeleteRole",
+      "iam:ListUserTags",
+      "iam:ListRoleTags",
+      "iam:PutRolePolicy",
+      "iam:GetRolePolicy",
+      "iam:TagUser",
+      "iam:TagRole",
+      "iam:UntagUser",
+      "iam:UntagRole",
+      "iam:PassRole"
     ]
   }
 
@@ -398,6 +423,25 @@ data "aws_iam_policy_document" "deployer_sam_access" {
       "arn:aws:ssm:${local.region}:${local.account_id}:parameter/${local.project}/sam/${local.environment}/*",
     ]
   }
+
+  statement {
+    sid     = "VPCAccess"
+    effect  = "Allow"
+    actions = [
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeVpcs",
+    ]
+
+    resources = concat(
+      [
+        "arn:aws:ec2:${local.region}:${local.account_id}:vpc/${module.stage.vpc.vpc_id}",
+        "arn:aws:ec2:${local.region}:${local.account_id}:security-group/${module.stage.vpc.security_group_id}",
+      ],
+      formatlist("arn:aws:ec2:${local.region}:${local.account_id}:subnet/%s", module.stage.vpc.private_subnets)
+    )
+  }
+}
 }
 
 locals {
