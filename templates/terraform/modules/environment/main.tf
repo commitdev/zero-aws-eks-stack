@@ -236,12 +236,3 @@ output "s3_hosting" {
     }
   ]
 }
-
-output "vpc" {
-  description = "used by access policy for s3 hosting bucket"
-  value = {
-    vpc_id            = module.vpc.vpc_id
-    private_subnets   = module.vpc.private_subnets
-    security_group_id = !var.serverless_enabled ? module.eks[0].worker_security_group_id : module.serverless_security_group[0].this_security_group_id
-  }
-}

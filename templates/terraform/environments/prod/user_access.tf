@@ -264,6 +264,17 @@ data "aws_iam_policy_document" "deployer_sam_access" {
   }
 
   statement {
+    sid       = "ECRRepo"
+    effect    = "Allow"
+    resources = ["arn:aws:ecr:${local.region}:${local.account_id}:repository/${local.project}-serverless"]
+    actions = [
+      "ecr:CreateRepository",
+      "ecr:SetRepositoryPolicy",
+      "ecr:PutImage",
+    ]
+  }
+
+  statement {
     sid       = "Lambda"
     effect    = "Allow"
     resources = ["arn:aws:lambda:${local.region}:${local.account_id}:function:${local.project}-*"]
@@ -297,6 +308,32 @@ data "aws_iam_policy_document" "deployer_sam_access" {
       "iam:DetachRolePolicy",
       "iam:GetRole",
       "iam:TagRole",
+      "iam:CreateRole",
+      "iam:DeleteRolePolicy"
+    ]
+  }
+
+    statement {
+    sid       = "IAMManageGatewayInvokeRole"
+    effect    = "Allow"
+    resources = ["arn:aws:iam::${local.account_id}:role/${local.project}-${local.environment}-invoke-authorizer-role"]
+
+    actions = [
+      "iam:CreateRole",
+      "iam:GetRole",
+      "iam:DetachRolePolicy",
+      "iam:AttachRolePolicy",
+      "iam:DeleteRolePolicy",
+      "iam:DeleteRole",
+      "iam:ListUserTags",
+      "iam:ListRoleTags",
+      "iam:PutRolePolicy",
+      "iam:GetRolePolicy",
+      "iam:TagUser",
+      "iam:TagRole",
+      "iam:UntagUser",
+      "iam:UntagRole",
+      "iam:PassRole"
     ]
   }
 
@@ -324,6 +361,7 @@ data "aws_iam_policy_document" "deployer_sam_access" {
       "apigateway:PATCH",
       "apigateway:POST",
       "apigateway:PUT",
+      "apigateway:TagResource"
     ]
   }
 
@@ -363,6 +401,18 @@ data "aws_iam_policy_document" "deployer_sam_access" {
     resources = [
       "arn:aws:ssm:${local.region}:${local.account_id}:parameter/${local.project}/sam/${local.environment}/*",
     ]
+  }
+
+    statement {
+    sid     = "VPCDescribeResources"
+    effect  = "Allow"
+    actions = [
+      "ec2:DescribeSubnets",
+      "ec2:DescribeVpcs",
+      "ec2:DescribeSecurityGroups",
+    ]
+
+    resources = ["*"]
   }
 }
 

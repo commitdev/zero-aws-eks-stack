@@ -298,6 +298,17 @@ data "aws_iam_policy_document" "deployer_sam_access" {
   }
 
   statement {
+    sid       = "ECRRepo"
+    effect    = "Allow"
+    resources = ["arn:aws:ecr:${local.region}:${local.account_id}:repository/${local.project}-serverless"]
+    actions = [
+      "ecr:CreateRepository",
+      "ecr:SetRepositoryPolicy",
+      "ecr:PutImage",
+    ]
+  }
+
+  statement {
     sid       = "Lambda"
     effect    = "Allow"
     resources = ["arn:aws:lambda:${local.region}:${local.account_id}:function:${local.project}-*"]
@@ -338,7 +349,7 @@ data "aws_iam_policy_document" "deployer_sam_access" {
   statement {
     sid       = "IAMManageGatewayInvokeRole"
     effect    = "Allow"
-    resources = ["arn:aws:iam::${local.account_id}:role/${local.project}-${local.environment}-invoke-authorizer-role "]
+    resources = ["arn:aws:iam::${local.account_id}:role/${local.project}-${local.environment}-invoke-authorizer-role"]
 
     actions = [
       "iam:CreateRole",
@@ -383,6 +394,7 @@ data "aws_iam_policy_document" "deployer_sam_access" {
       "apigateway:PATCH",
       "apigateway:POST",
       "apigateway:PUT",
+      "apigateway:TagResource"
     ]
   }
 
@@ -425,23 +437,16 @@ data "aws_iam_policy_document" "deployer_sam_access" {
   }
 
   statement {
-    sid     = "VPCAccess"
+    sid     = "VPCDescribeResources"
     effect  = "Allow"
     actions = [
-      "ec2:DescribeSecurityGroups",
       "ec2:DescribeSubnets",
       "ec2:DescribeVpcs",
+      "ec2:DescribeSecurityGroups",
     ]
 
-    resources = concat(
-      [
-        "arn:aws:ec2:${local.region}:${local.account_id}:vpc/${module.stage.vpc.vpc_id}",
-        "arn:aws:ec2:${local.region}:${local.account_id}:security-group/${module.stage.vpc.security_group_id}",
-      ],
-      formatlist("arn:aws:ec2:${local.region}:${local.account_id}:subnet/%s", module.stage.vpc.private_subnets)
-    )
+    resources = ["*"]
   }
-}
 }
 
 locals {
