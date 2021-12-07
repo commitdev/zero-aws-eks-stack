@@ -17,7 +17,6 @@ locals {
     for r in var.roles : {
       name         = r.name
       aws_policy   = r.aws_policy
-      k8s_policies = r.k8s_policies
     }
   ]
 }
