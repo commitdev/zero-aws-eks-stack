@@ -124,4 +124,23 @@ module "kubernetes" {
 
   # For ease of use, create an "ExternalName" type service called "database" in the <% .Name %> namespace that points at the app db
   create_database_service = <%if ne (index .Params `database`) "none" %>true<% else %>false<% end %>
+
+  # Roles configuration
+  k8s_role_mapping = [
+    {
+      name         = "developer"
+      k8s_policies = local.k8s_developer_access
+      k8s_groups   = ["vpn-users"]
+    },
+    {
+      name         = "operator"
+      k8s_policies = local.k8s_operator_access
+      k8s_groups   = ["vpn-users"]
+    },
+    {
+      name         = "deployer"
+      k8s_policies = local.k8s_deployer_access
+      k8s_groups   = []
+    }
+  ]
 }
