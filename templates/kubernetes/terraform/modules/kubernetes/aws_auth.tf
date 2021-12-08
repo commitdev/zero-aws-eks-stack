@@ -3,7 +3,7 @@ locals {
     role_name_format = "%s-kubernetes-%s-%s" # <project_name>-kubernetes-<role_name>-<environment>
 
     # Roles for each defined user, plus an admin user
-    map_roles = concat(
+    comfigmap_roles = concat(
     # Always create this admin user, as we use it by default in some of the scripts
     [{
       rolearn  = "arn:aws:iam::${var.allowed_account_ids[0]}:role/${format(local.role_name_format, var.project_name, "admin", var.environment)}"
@@ -69,7 +69,7 @@ resource "kubernetes_config_map" "aws_auth" {
 
 # Create assumeable roles for each user type
 resource "aws_iam_role" "access_assumerole" {
-  for_each = local.map_roles
+  for_each = local.configmap_roles
 
   name               = each.value.username
   assume_role_policy = data.aws_iam_policy_document.access_assumerole_root_policy.json

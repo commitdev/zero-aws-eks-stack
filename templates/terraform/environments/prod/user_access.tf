@@ -235,7 +235,7 @@ data "aws_iam_policy_document" "deployer_sam_access" {
     effect    = "Allow"
     resources = ["arn:aws:s3:::${local.project}-serverless-${lower(local.random_seed)}"]
 
-    actions = ["s3:ListBucket""s3:PutObject"]
+    actions = ["s3:ListBucket","s3:PutObject"]
   }
 
   statement {
