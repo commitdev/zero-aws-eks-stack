@@ -1,19 +1,19 @@
 locals {
-    # Standardize the role names
-    role_name_format = "%s-kubernetes-%s-%s" # <project_name>-kubernetes-<role_name>-<environment>
+    # Standardize the kubernetes role name
+    k8s_role_name_format = "%s-kubernetes-%s-%s" # <project_name>-kubernetes-<role_name>-<environment>
 
     # Roles for each defined user, plus an admin user
     comfigmap_roles = concat(
     # Always create this admin user, as we use it by default in some of the scripts
     [{
-      rolearn  = "arn:aws:iam::${var.allowed_account_ids[0]}:role/${format(local.role_name_format, var.project_name, "admin", var.environment)}"
-      username = format(local.role_name_format, var.project_name, "admin", var.environment)
+      rolearn  = "arn:aws:iam::${var.allowed_account_ids[0]}:role/${format(local.k8s_role_name_format, var.project_name, "admin", var.environment)}"
+      username = format(local.k8s_role_name_format, var.project_name, "admin", var.environment)
       groups   = ["system:masters"]
     }],
     [
       for r in var.k8s_role_mapping : {
-        rolearn  = "arn:aws:iam::${var.allowed_account_ids[0]}:role/${format(local.role_name_format, var.project_name, r.name, var.environment)}"
-        username = format(local.role_name_format, var.project_name, r.name, var.environment)
+        rolearn  = "arn:aws:iam::${var.allowed_account_ids[0]}:role/${format(local.k8s_role_name_format, var.project_name, r.name, var.environment)}"
+        username = format(local.k8s_role_name_format, var.project_name, r.name, var.environment)
         groups   = r.k8s_groups
       }
     ]
@@ -93,7 +93,7 @@ resource "kubernetes_cluster_role" "access_role" {
   for_each = var.k8s_role_mapping
 
   metadata {
-    name = format(local.role_name_format, var.project_name, each.value.name, var.environment)
+    name = format(local.k8s_role_name_format, var.project_name, each.value.name, var.environment)
   }
 
   dynamic "rule" {
