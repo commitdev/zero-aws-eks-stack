@@ -29,9 +29,6 @@ usage () {
  [[ -z "${USER_NAME}" ]] )  && \
 echo "Some environment variables (REGION, SEED, PROJECT_NAME, ENVIRONMENT, NAMESPACE, SECRET_NAME, DATABASE_TYPE, DATABASE_NAME, USER_NAME) are not set properly." && usage
 
-# docker image with postgres + mysql clients
-DOCKER_IMAGE_TAG=commitdev/zero-k8s-utilities:0.0.3
-
 # database info preparation
 # this script will run both before and after make-apply-k8s, therefore the database service is not always available
 DB_ENDPOINT=$(aws rds describe-db-instances --region=$REGION  --db-instance-identifier "${PROJECT_NAME}-${ENVIRONMENT}" --query "DBInstances[0].Endpoint.Address" | jq -r '.')
@@ -54,24 +51,28 @@ elif [[ "${DB_TYPE}" == "mysql" ]]; then
   DB_ENDPOINT_FOR_DSN="tcp(${DB_ENDPOINT})"
 fi
 
-# the manifest creates these things
-# 1. Namespaces: db-ops, $NAMESPACE
-# 2. Secret in db-ops: db-create-users (with master password, and a .sql file
-# 3. Job in db-ops: db-create-users (runs the .sql file against the RDS given master_password from env)
 
-# Run the job in the kubernetes cluster that will create the database user
-eval "echo \"$(cat ./db-ops/job-create-db-${DATABASE_TYPE}.yml.tpl)\"" | kubectl apply -f -
+JSON=$(cat <<EOF
+{
+  "MASTER_RDS_USERNAME": "$MASTER_RDS_USERNAME",
+  "MASTER_RDS_PASSWORD": "$MASTER_RDS_PASSWORD",
+  "DB_ENDPOINT": "$DB_ENDPOINT",
+  "DATABASE": "$DB_NAME",
+  "DB_APP_USERNAME": "$DB_APP_USERNAME",
+  "DB_APP_PASSWORD": "$DB_APP_PASSWORD"
+}
+EOF
+)
+
+# Created from modules/environment/main.tf
+LAMBDA_FUNCTION_NAME="$PROJECT_NAME-$ENVIRONMENT-db-ops"
+
+# Invoking lambda with inputs, this will spin up a lambda container in your VPC to make connection to DB
+# and run the database user creation
+aws lambda invoke --function-name $LAMBDA_FUNCTION_NAME \
+  --cli-binary-format raw-in-base64-out \
+  --payload "$(echo "$JSON" | jq -c)" \
+  /dev/stdout
 
 # Create a secret in AWS Secrets Manager. The contents of this secret will be automatically pulled into a kubernetes secret by external-secrets
 [[ -z "${CREATE_SECRET}" ]] || aws secretsmanager create-secret --name "${PROJECT_NAME}/kubernetes/${ENVIRONMENT}/${SECRET_NAME}" --description "Application secrets" --tags "[{\"Key\":\"application-secret\",\"Value\":\"${PROJECT}-${ENVIRONMENT}-${SECRET_NAME}\"}]" --secret-string "$(eval "echo \"$(cat ./db-ops/${CREATE_SECRET})\"")"
-
-## Delete the entire db-ops namespace
-kubectl -n db-ops wait --for=condition=complete --timeout=10s job db-create-users-$NAMESPACE-${JOB_ID}
-if [ $? -eq 0 ]
-then
-    kubectl delete namespace db-ops
-else
-    echo "Failed to create application database user, please see 'kubectl logs -n db-ops -l job-name=db-create-users-$NAMESPACE-${JOB_ID}'"
-    kubectl delete secret -n db-ops db-create-users
-fi
-

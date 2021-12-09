@@ -216,6 +216,7 @@ module "sam" {
   depends_on = [ module.user_access ]
 }
 
+# Auth0 has a provider declared inside the module so it cannot use `count` from terraform
 module "auth0" {
   source = "./auth0"
 
@@ -224,6 +225,15 @@ module "auth0" {
   frontend_domain = "${var.frontend_domain_prefix}${var.hosted_domains[0].hosted_zone}"
   backend_domain = "${var.backend_domain_prefix}${var.hosted_domains[0].hosted_zone}"
   secret_name = "${var.project}-auth0-api-${var.environment}"
+}
+
+module "lambda_db_ops" {
+  source = "./lambda-db-ops"
+
+  project = var.project
+  environment = var.environment
+  subnet_ids = module.vpc.private_subnets
+  security_group_ids = !var.serverless_enabled ? [module.eks[0].worker_security_group_id] : [module.serverless_security_group[0].this_security_group_id]
 }
 
 output "s3_hosting" {

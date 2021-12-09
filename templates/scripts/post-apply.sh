@@ -1,11 +1,10 @@
 #!/bin/sh
 
-KUBE_CONTEXT=${PROJECT}-${ENVIRONMENT}-${AWS_DEFAULT_REGION}
 RANDOM_SEED="<% index .Params `randomSeed` %>"
 
 <% if ne (index .Params `loggingType`) "kibana" %># <% end %>source elasticsearch-logging.sh
 
-kubectl --context ${KUBE_CONTEXT} -n ${PROJECT} get secrets ${PROJECT} > /dev/null 2>&1
+aws secretsmanager --region "$AWS_DEFAULT_REGION" describe-secret --secret-id "${PROJECT}/kubernetes/${ENVIRONMENT}/${PROJECT}" > /dev/null 2>&1
 if [[ $? -ne 0 ]]; then
     REGION=${AWS_DEFAULT_REGION} \
     SEED=${RANDOM_SEED} \
