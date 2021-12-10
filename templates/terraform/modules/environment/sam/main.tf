@@ -69,7 +69,7 @@ data "aws_iam_policy_document" "api_gateway_monitoring" {
 }
 
 resource "aws_iam_role" "lambda_execution_role" {
-  name               = "${var.project}-lambda-execution-role"
+  name               = "${var.project}-${var.environment}-lambda-execution-role"
   description        = "Globally allow lambda to use VPC"
   assume_role_policy = data.aws_iam_policy_document.lambda_execution_role.json
 }

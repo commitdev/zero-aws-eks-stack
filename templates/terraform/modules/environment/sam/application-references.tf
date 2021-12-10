@@ -3,18 +3,6 @@ locals {
   secret_manager_name_prefix = "/${var.project}/sam/${var.environment}/"
 }
 
-module "serverless_application_secrets" {
-  source  = "commitdev/zero/aws//modules/secret"
-  version = "0.0.2"
-
-  name   = "${local.secret_manager_name_prefix}application"
-  type   = "map"
-  values = {
-    STRIPE_API_SECRET_KEY  = ""
-  }
-  tags   = {  app : var.project, env : var.environment }
-}
-
 module "parameter_hosted_zone_id" {
   source  = "../ssm_parameter"
 

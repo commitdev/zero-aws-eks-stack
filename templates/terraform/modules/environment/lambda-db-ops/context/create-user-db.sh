@@ -25,10 +25,23 @@ for s in $(echo "$body" | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|
   export $s
 done
 
-eval "echo \"$(cat ./create-user.sql)\"" | \
-sed "s/{{ VAR_DB }}/$DATABASE/g" | \
-
-PGPASSWORD=$MASTER_RDS_PASSWORD psql -U$MASTER_RDS_USERNAME -h$DB_ENDPOINT cheung1125
+if [[ "$DB_TYPE" == "postgres" ]]; then
+  for db in $DB_NAME_LIST; do
+    echo "Initiating Database($db) creation"
+    (echo '\l' | PGPASSWORD="$MASTER_RDS_PASSWORD" psql -U$MASTER_RDS_USERNAME -h $DB_ENDPOINT postgres | grep -q $db && echo "Database($db) already exist")|| \
+    eval "echo \"$(cat ./postgres-create-user.sql)\"" | \
+    sed "s/{{ VAR_DB }}/$db/g" | \
+    PGPASSWORD="$MASTER_RDS_PASSWORD" psql -U$MASTER_RDS_USERNAME -h $DB_ENDPOINT postgres -v ON_ERROR_STOP=1 > /dev/null
+  done
+elif [[ "$DB_TYPE" == "mysql" ]]; then
+  for db in $DB_NAME_LIST; do
+    echo "Initiating Database($db) creation"
+    (echo "show databases;" | MYSQL_PWD="$RDS_MASTER_PASSWORD" mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT | grep -q $db && echo "Database($db) already exist") || \
+    eval "echo \"$(cat ./mysql-create-user.sql)\"" | \
+    sed \"s/{{ VAR_DB }}/\$db/g\" | \
+    MYSQL_PWD="$RDS_MASTER_PASSWORD" mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT
+  done
+fi
 
 echo "FINISHED EXECUTING QUERY"
 ## Respond to Lambda upon finish

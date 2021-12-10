@@ -47,8 +47,10 @@ JOB_ID=$(LC_ALL=C tr -dc 'a-z0-9' < /dev/urandom | head -c 8)
 # get correct dsn string for db type
 if [[ "${DB_TYPE}" == "postgres" ]]; then
   DB_ENDPOINT_FOR_DSN="${DB_ENDPOINT}"
+  CONNECTION_SRING=$(printf "postgresql://%s:%s@%s:%s/%s" "$DB_APP_USERNAME" "$DB_APP_PASSWORD" "$DB_ENDPOINT" "5432" "$DB_NAME")
 elif [[ "${DB_TYPE}" == "mysql" ]]; then
   DB_ENDPOINT_FOR_DSN="tcp(${DB_ENDPOINT})"
+  CONNECTION_SRING=$(printf "mysql://%s:%s@%s:%s/%s" "$DB_APP_USERNAME" "$DB_APP_PASSWORD" "$DB_ENDPOINT" "3306" "$DB_NAME")
 fi
 
 
@@ -57,7 +59,8 @@ JSON=$(cat <<EOF
   "MASTER_RDS_USERNAME": "$MASTER_RDS_USERNAME",
   "MASTER_RDS_PASSWORD": "$MASTER_RDS_PASSWORD",
   "DB_ENDPOINT": "$DB_ENDPOINT",
-  "DATABASE": "$DB_NAME",
+  "DB_TYPE" : "$DB_TYPE",
+  "DB_NAME_LIST": $DB_NAME_LIST,
   "DB_APP_USERNAME": "$DB_APP_USERNAME",
   "DB_APP_PASSWORD": "$DB_APP_PASSWORD"
 }

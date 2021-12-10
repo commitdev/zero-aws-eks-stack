@@ -6,6 +6,5 @@ RUN apk add jq
 WORKDIR /app
 copy . .
 
-RUN chmod 755 /app/create-user-db.sh
-RUN chmod 755 /app/create-user.sql
+RUN chmod -R 755 /app
 
