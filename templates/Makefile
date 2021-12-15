@@ -47,8 +47,10 @@ pre-k8s:
 	cd scripts && sh pre-k8s.sh
 
 apply-k8s-utils:
+	# Import the aws-auth configmap into the state if it doesn't yet exist. EKS creates this automatically
 	cd kubernetes/terraform/environments/$(ENVIRONMENT) && \
 	terraform init && \
+	(terraform state show module.kubernetes.kubernetes_config_map.aws_auth > /dev/null || (terraform plan && terraform refresh && terraform import module.kubernetes.kubernetes_config_map.aws_auth kube-system/aws-auth)) && \
 	terraform apply $(AUTO_APPROVE)
 
 update-k8s-conf:

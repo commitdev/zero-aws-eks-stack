@@ -54,4 +54,11 @@ resource "null_resource" "enable_prefix_delegation" {
   provisioner "local-exec" {
     command = "kubectl set env daemonset aws-node ${local.k8s_exec_context} -n kube-system ENABLE_PREFIX_DELEGATION=true WARM_PREFIX_TARGET=1"
   }
+
+  depends_on = [
+    kubernetes_config_map.aws_auth,
+    aws_iam_role.access_assumerole,
+    kubernetes_cluster_role_binding.access_role,
+    null_resource.cert_manager_http_issuer, # This is to prevent a race condition when trying to use an IAM role that was just created
+  ]
 }

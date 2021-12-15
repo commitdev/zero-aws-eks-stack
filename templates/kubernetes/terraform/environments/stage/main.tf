@@ -131,18 +131,18 @@ module "kubernetes" {
   k8s_role_mapping = [
     {
       name         = "developer"
-      k8s_policies = local.k8s_developer_access
-      k8s_groups   = ["vpn-users"]
+      policies = local.k8s_developer_access
+      groups   = ["vpn-users"]
     },
     {
       name         = "operator"
-      k8s_policies = local.k8s_operator_access
-      k8s_groups   = ["vpn-users"]
+      policies = local.k8s_operator_access
+      groups   = ["vpn-users"]
     },
     {
       name         = "deployer"
-      k8s_policies = local.k8s_deployer_access
-      k8s_groups   = []
+      policies = local.k8s_deployer_access
+      groups   = []
     }
   ]
 }
