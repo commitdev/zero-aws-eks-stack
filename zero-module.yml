@@ -233,7 +233,15 @@ parameters:
     - action: KeyMatchCondition
       matchField: backendApplicationHosting
       whenValue: "kubernetes"
-      elseValue: "no"
+      elseValue: "yes"
+  - field: enableAuth0
+    label: Using Auth0 as the managed identity solution
+    info: "Auth0 is free to start but cost scales linearly with user number, currently Auth0 is the default authentication mechanism for our Serverless solution"
+    value: yes
+    conditions:
+    - action: KeyMatchCondition
+      matchField: backendApplicationHosting
+      whenValue: "serverless"
   - field: sharedResourcePrefix
     label: "Mostly for development - Allow shared resources to have a unique prefix. This is only necessary if many zero projects will be run in the same AWS account."
     value: "none"

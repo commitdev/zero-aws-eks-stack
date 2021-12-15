@@ -54,7 +54,7 @@ data "aws_iam_policy_document" "developer_access" {
   statement {
     sid       = "ManageApplicationSecrets"
     effect    = "Allow"
-    resources = ["arn:aws:secretsmanager:${local.region}:${local.account_id}:secret:${local.project}/kubernetes/${local.environment}/*"]
+    resources = ["arn:aws:secretsmanager:${local.region}:${local.account_id}:secret:${local.project}/application/${local.environment}/*"]
 
     actions = [
       "secretsmanager:GetSecretValue",
@@ -128,7 +128,7 @@ data "aws_iam_policy_document" "operator_access" {
   statement {
     sid       = "ManageApplicationSecrets"
     effect    = "Allow"
-    resources = ["arn:aws:secretsmanager:${local.account_id}:${local.account_id}:secret:${local.project}/kubernetes/${local.environment}/*"]
+    resources = ["arn:aws:secretsmanager:${local.account_id}:${local.account_id}:secret:${local.project}/application/${local.environment}/*"]
 
     actions = [
       "secretsmanager:GetSecretValue",
@@ -349,7 +349,10 @@ data "aws_iam_policy_document" "deployer_sam_access" {
   statement {
     sid       = "IAMManageGatewayInvokeRole"
     effect    = "Allow"
-    resources = ["arn:aws:iam::${local.account_id}:role/${local.project}-${local.environment}-invoke-authorizer-role"]
+    resources = [
+      "arn:aws:iam::${local.account_id}:role/${local.project}-${local.environment}-invoke-authorizer-role",
+      "arn:aws:iam::${local.account_id}:role/${local.project}-${local.environment}-ApiGatewayLoggingRole*",
+    ]
 
     actions = [
       "iam:CreateRole",
@@ -419,7 +422,7 @@ data "aws_iam_policy_document" "deployer_sam_access" {
     resources = [
       "arn:aws:secretsmanager:*:*:secret:/${local.project}/sam/${local.environment}/*",
       /// temp for DB
-      "arn:aws:secretsmanager:*:*:secret:${local.project}/kubernetes/${local.environment}/*",
+      "arn:aws:secretsmanager:*:*:secret:${local.project}/application/${local.environment}/*",
     ]
   }
 

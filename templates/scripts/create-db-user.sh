@@ -60,7 +60,7 @@ JSON=$(cat <<EOF
   "MASTER_RDS_PASSWORD": "$MASTER_RDS_PASSWORD",
   "DB_ENDPOINT": "$DB_ENDPOINT",
   "DB_TYPE" : "$DB_TYPE",
-  "DB_NAME_LIST": $DB_NAME_LIST,
+  "DB_NAME_LIST": "$DB_NAME_LIST",
   "DB_APP_USERNAME": "$DB_APP_USERNAME",
   "DB_APP_PASSWORD": "$DB_APP_PASSWORD"
 }
@@ -78,4 +78,4 @@ aws lambda invoke --function-name $LAMBDA_FUNCTION_NAME \
   /dev/stdout
 
 # Create a secret in AWS Secrets Manager. The contents of this secret will be automatically pulled into a kubernetes secret by external-secrets
-[[ -z "${CREATE_SECRET}" ]] || aws secretsmanager create-secret --name "${PROJECT_NAME}/kubernetes/${ENVIRONMENT}/${SECRET_NAME}" --description "Application secrets" --tags "[{\"Key\":\"application-secret\",\"Value\":\"${PROJECT}-${ENVIRONMENT}-${SECRET_NAME}\"}]" --secret-string "$(eval "echo \"$(cat ./db-ops/${CREATE_SECRET})\"")"
+[[ -z "${CREATE_SECRET}" ]] || aws secretsmanager create-secret --name "${PROJECT_NAME}/application/${ENVIRONMENT}/${SECRET_NAME}" --description "Application secrets" --tags "[{\"Key\":\"application-secret\",\"Value\":\"${PROJECT}-${ENVIRONMENT}-${SECRET_NAME}\"}]" --secret-string "$(eval "echo \"$(cat ./db-ops/${CREATE_SECRET})\"")"

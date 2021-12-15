@@ -99,7 +99,7 @@ data "aws_iam_policy_document" "operator_access" {
   statement {
     sid       = "ManageApplicationSecrets"
     effect    = "Allow"
-    resources = ["arn:aws:secretsmanager:${local.region}:${local.account_id}:secret:${local.project}/kubernetes/${local.environment}/*"]
+    resources = ["arn:aws:secretsmanager:${local.region}:${local.account_id}:secret:${local.project}/application/${local.environment}/*"]
 
     actions = [
       "secretsmanager:GetSecretValue",
@@ -386,7 +386,7 @@ data "aws_iam_policy_document" "deployer_sam_access" {
     resources = [
       "arn:aws:secretsmanager:*:*:secret:/${local.project}/sam/${local.environment}/*",
       /// temp for DB
-      "arn:aws:secretsmanager:*:*:secret:${local.project}/kubernetes/stage/*",
+      "arn:aws:secretsmanager:*:*:secret:${local.project}/application/stage/*",
     ]
   }
 

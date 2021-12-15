@@ -43,31 +43,6 @@ resource "aws_cloudwatch_log_group" "sam_api_gateway_logs" {
   }
 }
 
-resource "aws_iam_role" "api_gateway_monitoring" {
-  name               = "${var.project}-api-gateway-monitoring"
-  description        = "Globally allow API gateway to push logs to cloudwatch"
-  assume_role_policy = data.aws_iam_policy_document.api_gateway_monitoring.json
-}
-
-resource "aws_iam_role_policy_attachment" "api_gateway_monitoring" {
-  role       = aws_iam_role.api_gateway_monitoring.id
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
-}
-
-data "aws_iam_policy_document" "api_gateway_monitoring" {
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = [
-        "ops.apigateway.amazonaws.com",
-        "apigateway.amazonaws.com"
-      ]
-    }
-  }
-}
-
 resource "aws_iam_role" "lambda_execution_role" {
   name               = "${var.project}-${var.environment}-lambda-execution-role"
   description        = "Globally allow lambda to use VPC"

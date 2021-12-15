@@ -20,10 +20,10 @@ You can see the `external-secrets` configuration in [kubernetes/overlays/staging
 
 To work with the secret in AWS you can use the web interface or the cli tool:
 ```
- aws secretsmanager get-secret-value --secret=<project-name>/kubernetes/stage/<project-name>
+ aws secretsmanager get-secret-value --secret=<project-name>/application/stage/<project-name>
 ```
 
-The intent is that the last part of the secret name is the component of your application this secret is for. For example: if you were adding a new billing service, the secret might be called `<project-name>/kubernetes/stage/billing`
+The intent is that the last part of the secret name is the component of your application this secret is for. For example: if you were adding a new billing service, the secret might be called `<project-name>/application/stage/billing`
 
 ## Documentation
 Checkout [External secrets's documentation][docs] for more information.
