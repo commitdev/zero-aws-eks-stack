@@ -401,16 +401,43 @@ data "aws_iam_policy_document" "deployer_sam_access" {
     ]
   }
 
-  statement {
-    sid     = "R53AndLogs"
+statement {
+    sid     = "R53"
     actions = [
       "route53:GetHostedZone",
       "route53:ChangeResourceRecordSets",
       "route53:GetChange",
-      "logs:CreateLogDelivery",
     ]
 
     resources = ["*"]
+  }
+
+  statement {
+    sid     = "Cloudwatch"
+    actions = [
+      "logs:CreateLogDelivery",
+      "logs:PutResourcePolicy",
+      "logs:UpdateLogDelivery",
+      "logs:DeleteLogDelivery",
+      "logs:CreateLogGroup",
+      "logs:DescribeResourcePolicies",
+      "logs:GetLogDelivery",
+      "logs:ListLogDeliveries",
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    sid     = "CloudwatchLogGroup"
+    actions = [
+      "logs:DescribeLogGroups",
+      "logs:DescribeLogStreams",
+      "logs:GetLogEvents",
+      "logs:FilterLogEvents"
+    ]
+
+    resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:*"]
   }
 
     statement {
