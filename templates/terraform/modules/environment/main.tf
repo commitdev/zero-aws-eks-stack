@@ -17,17 +17,6 @@ locals {
     for r in var.roles : {
       name         = r.name
       aws_policy   = r.aws_policy
-      k8s_policies = r.k8s_policies
-    }
-  ]
-
-  eks_kubernetes_iam_role_mapping = [
-    for r in module.user_access.eks_iam_role_mapping : {
-      iam_role_arn  = r.arn
-      k8s_role_name = r.name
-      k8s_groups = flatten(concat([r.name], [
-        for o in var.roles : o.k8s_groups if r.name == "${var.project}-kubernetes-${o.name}-${var.environment}"
-      ]))
     }
   ]
 }
@@ -54,7 +43,7 @@ data "aws_caller_identity" "current" {}
 module "eks" {
   count = var.serverless_enabled ? 0 : 1
   source  = "commitdev/zero/aws//modules/eks"
-  version = "0.5.1"
+  version = "0.6.0"
   providers = {
     aws = aws.for_eks
   }
@@ -74,8 +63,6 @@ module "eks" {
   vpc_id          = module.vpc.vpc_id
 
   eks_node_groups = var.eks_node_groups
-
-  iam_role_mapping = local.eks_kubernetes_iam_role_mapping
 }
 
 module "assets_domains" {
@@ -153,7 +140,7 @@ module "sendgrid" {
 
 module "user_access" {
   source  = "commitdev/zero/aws//modules/user_access"
-  version = "0.4.1"
+  version = "0.6.0"
 
   project     = var.project
   environment = var.environment

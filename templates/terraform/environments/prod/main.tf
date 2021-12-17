@@ -143,24 +143,19 @@ module "prod" {
 <% end %>
 
   # Roles configuration
+  # These roles will be map by name to the roles created in the kubernetes terraform if applicable
   roles = [
     {
       name         = "developer"
       aws_policy   = data.aws_iam_policy_document.developer_access.json
-      k8s_policies = local.k8s_developer_access
-      k8s_groups   = ["vpn-users"]
     },
     {
       name         = "operator"
       aws_policy   = data.aws_iam_policy_document.operator_access.json
-      k8s_policies = local.k8s_operator_access
-      k8s_groups   = ["vpn-users"]
     },
     {
       name         = "deployer"
       aws_policy   = data.aws_iam_policy_document.deployer_access.json
-      k8s_policies = local.k8s_deployer_access
-      k8s_groups   = []
     }
   ]
 

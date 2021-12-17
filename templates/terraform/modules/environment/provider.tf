@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 2.4"
-    }
-  }
-}
-
 # Created by bootstrap/secrets
 data "aws_iam_role" "eks_cluster_creator" {
   name = "${var.project}-eks-cluster-creator"
@@ -40,10 +31,4 @@ data "aws_eks_cluster_auth" "cluster" {
   count = var.serverless_enabled ? 0 : 1
   provider = aws.for_eks
   name     = module.eks[0].cluster_id
-}
-
-provider "kubernetes" {
-  host                   = !var.serverless_enabled ? data.aws_eks_cluster.cluster[0].endpoint : ""
-  cluster_ca_certificate = !var.serverless_enabled ? base64decode(data.aws_eks_cluster.cluster[0].certificate_authority.0.data) : ""
-  token                  = !var.serverless_enabled ? data.aws_eks_cluster_auth.cluster[0].token : ""
 }
