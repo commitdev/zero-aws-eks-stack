@@ -43,7 +43,7 @@ data "aws_caller_identity" "current" {}
 module "eks" {
   count = var.serverless_enabled ? 0 : 1
   source  = "commitdev/zero/aws//modules/eks"
-  version = "0.5.1"
+  version = "0.6.0"
   providers = {
     aws = aws.for_eks
   }
@@ -140,7 +140,7 @@ module "sendgrid" {
 
 module "user_access" {
   source  = "commitdev/zero/aws//modules/user_access"
-  version = "0.4.1"
+  version = "0.6.0"
 
   project     = var.project
   environment = var.environment
