@@ -211,7 +211,7 @@ module "auth0" {
   environment = var.environment
   frontend_domain = "${var.frontend_domain_prefix}${var.hosted_domains[0].hosted_zone}"
   backend_domain = "${var.backend_domain_prefix}${var.hosted_domains[0].hosted_zone}"
-  secret_name = "${var.project}-auth0-api-${var.environment}"
+  secret_name = "${var.project}-${var.environment}-auth0-api"
 }
 
 module "lambda_db_ops" {

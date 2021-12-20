@@ -30,7 +30,8 @@ apply-secrets:
 	aws secretsmanager describe-secret --secret-id "$(PROJECT)-$(ENVIRONMENT)-rds-<% index .Params `randomSeed` %>" > /dev/null 2>&1 || ( \
 	cd terraform/bootstrap/secrets && \
 	terraform init && \
-	terraform apply $(AUTO_APPROVE) --var "sendgrid_api_key=${sendgridApiKey}" --var "slack_api_key=${notificationServiceSlackApiKey}" --var "twilio_account_id=${notificationServiceTwilioAccountId}"  --var "twilio_auth_token=${notificationServiceTwilioAuthToken}"&& \
+	terraform apply $(AUTO_APPROVE) --var "sendgrid_api_key=${sendgridApiKey}" --var "slack_api_key=${notificationServiceSlackApiKey}" --var "twilio_account_id=${notificationServiceTwilioAccountId}"  --var "twilio_auth_token=${notificationServiceTwilioAuthToken}" \
+	--var "productionAuth0TenantDoamin=${productionAuth0TenantDoamin}" --var "productionAuth0TenantClientId=${productionAuth0TenantClientId}" --var "productionAuth0TenantClientSecret=${productionAuth0TenantClientSecret}"  --var "stagingAuth0TenantDoamin=${stagingAuth0TenantDoamin}" --var "stagingAuth0TenantClientId=${stagingAuth0TenantClientId}" --var "stagingAuth0TenantClientSecret=${stagingAuth0TenantClientSecret}"&& \
 	rm ./terraform.tfstate )
 
 apply-shared-env:

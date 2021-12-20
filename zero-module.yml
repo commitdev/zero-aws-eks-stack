@@ -242,6 +242,48 @@ parameters:
     - action: KeyMatchCondition
       matchField: backendApplicationHosting
       whenValue: "serverless"
+  - field: productionAuth0TenantDoamin
+    label: "Production Auth0 Tenant Domain"
+    info: "Production Auth0 Tenant Domain, the credentials must have machine-to-machine access and permissions to create and manage clients. See guide at https://getzero.dev/docs/modules/aws-eks-stack/guides/serverless-auth0-setup"
+    conditions:
+    - action: KeyMatchCondition
+      matchField: backendApplicationHosting
+      whenValue: serverless
+  - field: productionAuth0TenantClientId
+    label: "Production Auth0 Tenant Client ID"
+    info: "Production Auth0 Tenant Client ID, the credentials must have machine-to-machine access and permissions to create and manage clients. See guide at https://getzero.dev/docs/modules/aws-eks-stack/guides/serverless-auth0-setup"
+    conditions:
+    - action: KeyMatchCondition
+      matchField: backendApplicationHosting
+      whenValue: serverless
+  - field: productionAuth0TenantClientSecret
+    label: "Production Auth0 Tenant Client Secret"
+    info: "Production Auth0 Tenant Client Secret, the credentials must have machine-to-machine access and permissions to create and manage clients. See guide at https://getzero.dev/docs/modules/aws-eks-stack/guides/serverless-auth0-setup"
+    conditions:
+    - action: KeyMatchCondition
+      matchField: backendApplicationHosting
+      whenValue: serverless
+  - field: stagingAuth0TenantDoamin
+    label: "Staging Auth0 Tenant Domain"
+    info: "Staging Auth0 Tenant Domain, the credentials must have machine-to-machine access and permissions to create and manage clients. See guide at https://getzero.dev/docs/modules/aws-eks-stack/guides/serverless-auth0-setup"
+    conditions:
+    - action: KeyMatchCondition
+      matchField: backendApplicationHosting
+      whenValue: serverless
+  - field: stagingAuth0TenantClientId
+    label: "staging Auth0 Tenant Client ID"
+    info: "staging Auth0 Tenant Client ID, the credentials must have machine-to-machine access and permissions to create and manage clients. See guide at https://getzero.dev/docs/modules/aws-eks-stack/guides/serverless-auth0-setup"
+    conditions:
+    - action: KeyMatchCondition
+      matchField: backendApplicationHosting
+      whenValue: serverless
+  - field: stagingAuth0TenantClientSecret
+    label: "staging Auth0 Tenant Client Secret"
+    info: "staging Auth0 Tenant Client Secret, the credentials must have machine-to-machine access and permissions to create and manage clients. See guide at https://getzero.dev/docs/modules/aws-eks-stack/guides/serverless-auth0-setup"
+    conditions:
+    - action: KeyMatchCondition
+      matchField: backendApplicationHosting
+      whenValue: serverless
   - field: sharedResourcePrefix
     label: "Mostly for development - Allow shared resources to have a unique prefix. This is only necessary if many zero projects will be run in the same AWS account."
     value: "none"
