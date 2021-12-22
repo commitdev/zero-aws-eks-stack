@@ -203,7 +203,10 @@ module "sam" {
   depends_on = [ module.user_access ]
 }
 
-# Auth0 has a provider declared inside the module so it cannot use `count` from terraform
+<%if eq (index .Params `backendApplicationHosting`) "kubernetes" %>/* <% end %>
+# Auth0 has to be enabled via templating due to the provider declared inside
+# so it cannot use `count/depends_on/for_each` from terraform
+# and even when all the resource counts are 0 it will attempt to use the credentials
 module "auth0" {
   source = "./auth0"
 
@@ -213,6 +216,7 @@ module "auth0" {
   backend_domain = "${var.backend_domain_prefix}${var.hosted_domains[0].hosted_zone}"
   secret_name = "${var.project}-${var.environment}-auth0-api"
 }
+<%if eq (index .Params `backendApplicationHosting`) "kubernetes" %>*/<% end %>
 
 module "lambda_db_ops" {
   source = "./lambda-db-ops"

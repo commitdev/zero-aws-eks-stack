@@ -53,6 +53,10 @@ elif [[ "${DB_TYPE}" == "mysql" ]]; then
   CONNECTION_SRING=$(printf "mysql://%s:%s@%s:%s/%s" "$DB_APP_USERNAME" "$DB_APP_PASSWORD" "$DB_ENDPOINT" "3306" "$DB_NAME")
 fi
 
+# This script only runs when the secret doesnt exist
+# When creating DB from terraform a database exist under the same name,
+# So it should create the DB App User regardless of DB exist
+FORCE_CREATE_USER=${FORCE_CREATE_USER:-"false"}
 
 JSON=$(cat <<EOF
 {
@@ -62,7 +66,8 @@ JSON=$(cat <<EOF
   "DB_TYPE" : "$DB_TYPE",
   "DB_NAME_LIST": "$DB_NAME_LIST",
   "DB_APP_USERNAME": "$DB_APP_USERNAME",
-  "DB_APP_PASSWORD": "$DB_APP_PASSWORD"
+  "DB_APP_PASSWORD": "$DB_APP_PASSWORD",
+  "FORCE_CREATE_USER": "$FORCE_CREATE_USER",
 }
 EOF
 )

@@ -25,10 +25,18 @@ for s in $(echo "$body" | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|
   export $s
 done
 
+# Parsing lambda json input into boolean values
+if [[ "$FORCE_CREATE_USER" == "true" ]]; then
+  CHECK_DB_EXIST=false
+else
+  CHECK_DB_EXIST=true
+fi
+$CHECK_DB_EXIST && echo "CHECKING DB EXISTENCE" || echo "BYPASSING DB EXISTENCE CHECK"
+
 if [[ "$DB_TYPE" == "postgres" ]]; then
   for db in $DB_NAME_LIST; do
     echo "Initiating Database($db) creation"
-    (echo '\l' | PGPASSWORD="$MASTER_RDS_PASSWORD" psql -U$MASTER_RDS_USERNAME -h $DB_ENDPOINT postgres | grep -q $db && echo "Database($db) already exist")|| \
+    ($CHECK_DB_EXIST && (echo '\l' | PGPASSWORD="$MASTER_RDS_PASSWORD" psql -U$MASTER_RDS_USERNAME -h $DB_ENDPOINT postgres | grep -q $db && echo "Database($db) already exist"))|| \
     eval "echo \"$(cat ./postgres-create-user.sql)\"" | \
     sed "s/{{ VAR_DB }}/$db/g" | \
     PGPASSWORD="$MASTER_RDS_PASSWORD" psql -U$MASTER_RDS_USERNAME -h $DB_ENDPOINT postgres -v ON_ERROR_STOP=1 > /dev/null
@@ -36,7 +44,7 @@ if [[ "$DB_TYPE" == "postgres" ]]; then
 elif [[ "$DB_TYPE" == "mysql" ]]; then
   for db in $DB_NAME_LIST; do
     echo "Initiating Database($db) creation"
-    (echo "show databases;" | MYSQL_PWD="$MASTER_RDS_PASSWORD" mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT | grep -q $db && echo "Database($db) already exist") || \
+    ($CHECK_DB_EXIST && ((echo "show databases;" | MYSQL_PWD="$MASTER_RDS_PASSWORD" mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT | grep -q $db && echo "Database($db) already exist")) || \
     eval "echo \"$(cat ./mysql-create-user.sql)\"" | \
     sed "s/{{ VAR_DB }}/$db/g" | \
     MYSQL_PWD="$MASTER_RDS_PASSWORD" mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT
