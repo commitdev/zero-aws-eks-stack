@@ -70,7 +70,7 @@ infrastructure:
  - RDS (db.t3.small): $0.034 USD / hr
  - EC2 (t2.small): $0.023 USD / hr
 
-EC2 instance sizing can be configured in [terraform/environments/stage/main.tf](terraform/environments/stage/main.tf)
+EC2 instance sizing can be configured in [templates/terraform/environments/stage/main.tf](templates/terraform/environments/stage/main.tf)
 
 ## Other links
 Project board: [zenhub][zenhub-board]
