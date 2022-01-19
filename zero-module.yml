@@ -25,7 +25,7 @@ parameters:
     default: "kubernetes"
     options:
       "kubernetes": "Kubernetes using AWS EKS"
-      "serverless": "Serverless using AWS SAM/Lambda"
+      "serverless": "(BETA) Serverless using AWS SAM/Lambda"
   - field: useExistingAwsProfile
     label: "Use credentials from an existing AWS profile?"
     info: "You can choose either a currently existing profile if you've already configured your AWS CLI, or manually enter a pair of AWS access keys."
