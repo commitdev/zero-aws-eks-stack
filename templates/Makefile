@@ -53,7 +53,7 @@ update-k8s-conf:
 	aws eks --region $(AWS_DEFAULT_REGION) update-kubeconfig --role "arn:aws:iam::<% index .Params `accountId` %>:role/$(PROJECT)-kubernetes-$(ROLE)-$(ENVIRONMENT)" --name $(KUBE_CONTEXT) --alias $(KUBE_CONTEXT)
 
 post-apply-setup:
-	cd scripts && sh post-apply.sh
+	cd scripts && bash post-apply.sh
 
 teardown: teardown-k8s-utils teardown-env teardown-shared-env teardown-secrets teardown-remote-state teardown-shared-remote-state
 
