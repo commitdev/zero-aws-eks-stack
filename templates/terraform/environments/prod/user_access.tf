@@ -347,7 +347,7 @@ data "aws_iam_policy_document" "deployer_sam_access" {
     ]
   }
 
-statement {
+  statement {
     sid     = "R53"
     actions = [
       "route53:GetHostedZone",
@@ -384,8 +384,8 @@ statement {
     ]
 
     resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:*"]
-
-    statement {
+  }
+  statement {
     sid     = "SecretsManager"
     actions = [
       "secretsmanager:GetSecretValue",
@@ -411,7 +411,7 @@ statement {
     ]
   }
 
-    statement {
+  statement {
     sid     = "VPCDescribeResources"
     effect  = "Allow"
     actions = [

@@ -216,8 +216,6 @@ data "aws_iam_policy_document" "deployer_ecr_access" {
 }
 
 # Allow the deployer to manage resources created with SAM - most of this policy is from AWS SAM docs
-
-# Allow the deployer to manage resources created with SAM - most of this policy is from AWS SAM docs
 data "aws_iam_policy_document" "deployer_sam_access" {
   statement {
     sid       = "CloudFormationTemplate"
@@ -381,7 +379,7 @@ data "aws_iam_policy_document" "deployer_sam_access" {
     ]
   }
 
-statement {
+  statement {
     sid     = "R53"
     actions = [
       "route53:GetHostedZone",
@@ -420,7 +418,7 @@ statement {
     resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:*"]
   }
 
-    statement {
+  statement {
     sid     = "SecretsManager"
     actions = [
       "secretsmanager:GetSecretValue",
