@@ -28,5 +28,7 @@ Supports OpenID Connect compliant solutions with Oauth2 based authentication flo
 ## Auth Middleware
 Authenticator is invoked by API Gateway and the context is passed down via `requestContext.authorizer.lambda`, all the JWT claims will also be available in this context, to change or modify the context you can update the authorizer lambda function.
 
+## Application
+By default all endpoints except for `GET /status*` will go through authentication, this is configured in `template.yaml` in the backend application.
 
 [lambda-authorizer-flow]: https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html#api-gateway-lambda-authorizer-flow 

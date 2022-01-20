@@ -218,6 +218,11 @@ module "auth0" {
 }
 <%if eq (index .Params `backendApplicationHosting`) "kubernetes" %>*/<% end %>
 
+## This lambda function is used to create your database's application user
+## The function cannot be shared across repositories because it must be created in the
+## same subnet and security group as your database, the terraform module
+## creates an image in a private ECR repo `${var.project}-${var.environment}-lambda-db-ops`
+## and the function gets invoked by scripts/create-db-user.sh during `make post-apply`
 module "lambda_db_ops" {
   source = "./lambda-db-ops"
 

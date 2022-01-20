@@ -76,7 +76,7 @@ EOF
 LAMBDA_FUNCTION_NAME="$PROJECT_NAME-$ENVIRONMENT-db-ops"
 
 # Invoking lambda with inputs, this will spin up a lambda container in your VPC to make connection to DB
-# and run the database user creation
+# and run the database user creation, this lambda function is created in terraform to have the correct security groups to connect to your database
 aws lambda invoke --function-name $LAMBDA_FUNCTION_NAME \
   --cli-binary-format raw-in-base64-out \
   --payload "$(echo "$JSON" | jq -c)" \

@@ -34,7 +34,7 @@ resource "random_id" "cookie_signing_secret" {
   source  = "commitdev/zero/aws//modules/secret"
   version = "0.0.2"
 
-  name   = "/${var.project}/sam/${var.environment}/auth-oidc"
+  name   = "${var.project}/sam/${var.environment}/auth-oidc"
   type   = "map"
   values = {
     DOMAIN  = local.auth0_api_keys_json["AUTH0_DOMAIN"]
@@ -47,5 +47,5 @@ resource "random_id" "cookie_signing_secret" {
 
 output "secret_name" {
   description = "Secret containing the OIDC credentials"
-  value       = "/${var.project}/sam/${var.environment}/auth-oidc"
+  value       = "${var.project}/sam/${var.environment}/auth-oidc"
 }
