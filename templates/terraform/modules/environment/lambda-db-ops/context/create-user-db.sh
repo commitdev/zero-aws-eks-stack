@@ -37,7 +37,7 @@ if [[ "$DB_TYPE" == "postgres" ]]; then
   for db in $DB_NAME_LIST; do
     echo "Initiating Database($db) creation"
     ($CHECK_DB_EXIST && (echo '\l' | PGPASSWORD="$MASTER_RDS_PASSWORD" psql -U$MASTER_RDS_USERNAME -h $DB_ENDPOINT postgres | grep -q $db && echo "Database($db) already exist"))|| \
-    eval "echo \"$(cat ./postgres-create-user.sql)\"" | \
+    eval "echo \"$(cat ./postgres-create-user.sql.tpl)\"" | \
     sed "s/{{ VAR_DB }}/$db/g" | \
     PGPASSWORD="$MASTER_RDS_PASSWORD" psql -U$MASTER_RDS_USERNAME -h $DB_ENDPOINT postgres -v ON_ERROR_STOP=1 > /dev/null
   done
@@ -45,7 +45,7 @@ elif [[ "$DB_TYPE" == "mysql" ]]; then
   for db in $DB_NAME_LIST; do
     echo "Initiating Database($db) creation"
     ($CHECK_DB_EXIST && ((echo "show databases;" | MYSQL_PWD="$MASTER_RDS_PASSWORD" mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT | grep -q $db && echo "Database($db) already exist")) || \
-    eval "echo \"$(cat ./mysql-create-user.sql)\"" | \
+    eval "echo \"$(cat ./mysql-create-user.sql.tpl)\"" | \
     sed "s/{{ VAR_DB }}/$db/g" | \
     MYSQL_PWD="$MASTER_RDS_PASSWORD" mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT
   done

@@ -1,4 +1,7 @@
-# Even though these functions would be the same on stage/prod, but they need to be associated to VPCs
+# This module provides a way to interact with the RDS Database via direct queries,
+# used for one-time initiations or database user creations
+# it runs the context/create-user-db.sh script depending on the database type then executes one of the SQL templates
+# Even though these functions would be the same on stage/prod, but the lambda functions need to be in the VPCs(subnet/security-groups)
 # from the resource level, so they must be created in each env
 module "lambda_function_container_image" {
   source = "terraform-aws-modules/lambda/aws"

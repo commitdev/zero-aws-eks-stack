@@ -7,10 +7,12 @@ variable "environment" {
 }
 
 variable "subnet_ids" {
-  default = []
-  type     = list(string)
+  description = "Subnet IDs the lambda function is able to connect to inside the VPC"
+  default     = []
+  type        = list(string)
 }
 variable "security_group_ids" {
-  default = []
-  type     = list(string)
+  description = "Security groups the lambda function is able to connect to inside the VPC"
+  default     = []
+  type        = list(string)
 }

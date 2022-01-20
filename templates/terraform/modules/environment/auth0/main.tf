@@ -1,4 +1,6 @@
-// TODO : move to terrform-aws-zero
+# This module requires you to have already setup a tenant with
+# with an API allowing terraform to create and manage clients
+# And results in client(and credentials in secret-manager) that backend/frontends can build authetication against
 resource "auth0_client" "oidc" {
   name = "${var.project} - ${var.environment}"
   description = "${var.project} - ${var.environment} OIDC Authentication API"

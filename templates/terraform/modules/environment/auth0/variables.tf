@@ -3,17 +3,17 @@ variable "project" {
 }
 
 variable "environment" {
-  description = "The environment (dev/staging/prod)"
+  description = "The environment (staging/prod)"
 }
 
 variable "frontend_domain" {
-  description = "Frontend domain"
+  description = "Backend domain to whitelist in Auth0 for CORS and Allowed Logout URLs"
 }
 
 variable "backend_domain" {
-  description = "Backend domain"
+  description = "Backend domain to whitelist in Auth0 for callbacks"
 }
 
 variable "secret_name" {
-  description = "For terraform to use auth0 tenant api"
+  description = "For terraform to use Auth0 tenant api to create clients, these credentials should have API create/manage clients permissions "
 }
