@@ -174,5 +174,5 @@ output "ci_user_name" {
 }
 
 output "cloudtrail_bucket_id" {
-  value = local.enable_cloudtrail > 0 ? module.cloudtrail[0].cloudtrail_bucket_id : ""
+  value = local.enable_cloudtrail > 0 ? module.cloudtrail[0].cloudtrail_bucket_id : "not-applicable"
 }
