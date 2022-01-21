@@ -426,7 +426,6 @@ data "aws_iam_policy_document" "deployer_sam_access" {
 
     resources = [
       "arn:aws:secretsmanager:*:*:secret:${local.project}/sam/${local.environment}/*",
-      /// temp for DB
       "arn:aws:secretsmanager:*:*:secret:${local.project}/application/${local.environment}/*",
     ]
   }
