@@ -162,7 +162,7 @@ module "prod" {
   user_role_mapping = data.terraform_remote_state.shared.outputs.user_role_mapping
   ci_user_name      = data.terraform_remote_state.shared.outputs.ci_user_name
 
-  frontend_domain_prefix = "<% index .Params `stagingFrontendSubdomain` %>"
-  backend_domain_prefix = "<% index .Params `stagingBackendSubdomain` %>"
+  frontend_domain_prefix = "<% index .Params `productionFrontendSubdomain` %>"
+  backend_domain_prefix = "<% index .Params `productionBackendSubdomain` %>"
   serverless_enabled = <% if eq (index .Params `backendApplicationHosting`) "serverless" %>true<% else %>false<% end %>
 }
