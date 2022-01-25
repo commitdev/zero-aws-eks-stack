@@ -44,7 +44,7 @@ if [[ "$DB_TYPE" == "postgres" ]]; then
 elif [[ "$DB_TYPE" == "mysql" ]]; then
   for db in $DB_NAME_LIST; do
     echo "Initiating Database($db) creation"
-    ($CHECK_DB_EXIST && ((echo "show databases;" | MYSQL_PWD="$MASTER_RDS_PASSWORD" mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT | grep -q $db && echo "Database($db) already exist")) || \
+    ($CHECK_DB_EXIST && (echo "show databases;" | MYSQL_PWD="$MASTER_RDS_PASSWORD" mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT | grep -q $db && echo "Database($db) already exist")) || \
     eval "echo \"$(cat ./mysql-create-user.sql.tpl)\"" | \
     sed "s/{{ VAR_DB }}/$db/g" | \
     MYSQL_PWD="$MASTER_RDS_PASSWORD" mysql -u$MASTER_RDS_USERNAME -h $DB_ENDPOINT

@@ -45,7 +45,7 @@ module "dev_user_auth" {
 
   name                        = "development"
   auth_namespace              = "user-auth"
-  create_namespace            = false
+  create_namespace            = true
   kratos_secret_name          = var.project
   frontend_use_https          = false
   frontend_service_domain     = var.dev_user_auth_frontend_domain
@@ -55,7 +55,7 @@ module "dev_user_auth" {
   jwks_content                = "none"
   cookie_signing_secret_key   = "${var.project}-${var.environment}-${var.random_seed}"
   kubectl_extra_args          = local.k8s_exec_context
-  external_secret_name        = "${var.project}/kubernetes/stage/user-auth"
+  external_secret_name        = "${var.project}/application/stage/user-auth"
   kratos_values_override      = {
     kratos = {
       config = {

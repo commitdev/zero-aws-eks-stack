@@ -4,7 +4,7 @@ RANDOM_SEED="<% index .Params `randomSeed` %>"
 
 <% if ne (index .Params `loggingType`) "kibana" %># <% end %>source elasticsearch-logging.sh
 
-aws secretsmanager --region "$AWS_DEFAULT_REGION" describe-secret --secret-id "${PROJECT}/kubernetes/${ENVIRONMENT}/${PROJECT}" > /dev/null 2>&1
+aws secretsmanager --region "$AWS_DEFAULT_REGION" describe-secret --secret-id "${PROJECT}/application/${ENVIRONMENT}/${PROJECT}" > /dev/null 2>&1
 if [[ $? -ne 0 ]]; then
     REGION=${AWS_DEFAULT_REGION} \
     SEED=${RANDOM_SEED} \

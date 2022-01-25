@@ -8,7 +8,7 @@ KUBE_CONTEXT := $(PROJECT)-$(ENVIRONMENT)-$(AWS_DEFAULT_REGION)
 
 .EXPORT_ALL_VARIABLES:
 
-apply: apply-remote-state apply-shared-remote-state apply-secrets apply-shared-env apply-env update-k8s-conf pre-k8s apply-k8s-utils post-apply-setup
+apply: apply-remote-state apply-shared-remote-state apply-secrets apply-shared-env apply-env update-k8s-conf-creator pre-k8s apply-k8s-utils post-apply-setup
 
 apply-without-eks: apply-remote-state apply-shared-remote-state apply-secrets apply-shared-env apply-env post-apply-setup
 
@@ -56,6 +56,9 @@ apply-k8s-utils:
 
 update-k8s-conf:
 	aws eks --region $(AWS_DEFAULT_REGION) update-kubeconfig --role "arn:aws:iam::<% index .Params `accountId` %>:role/$(PROJECT)-kubernetes-$(ROLE)-$(ENVIRONMENT)" --name $(KUBE_CONTEXT) --alias $(KUBE_CONTEXT)
+
+update-k8s-conf-creator:
+	aws eks --region $(AWS_DEFAULT_REGION) update-kubeconfig --role "arn:aws:iam::<% index .Params `accountId` %>:role/$(PROJECT)-eks-cluster-creator" --name $(KUBE_CONTEXT) --alias $(KUBE_CONTEXT)-creator
 
 post-apply-setup:
 	cd scripts && bash post-apply.sh
