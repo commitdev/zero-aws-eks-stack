@@ -1,6 +1,6 @@
 locals {
   # This secret is created by the /scripts/create-db-user.sh script and contains environment variables that will be pulled into a k8s secret automatically by external-secrets
-  secrets_manager_secret_name = "${var.project}/kubernetes/${var.environment}/user-auth"
+  secrets_manager_secret_name = "${var.project}/application/${var.environment}/user-auth"
 }
 
 

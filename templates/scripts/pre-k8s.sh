@@ -31,7 +31,7 @@ if [[ $? -ne 0 ]]; then
     fi
 fi
 
-kubectl --context ${KUBE_CONTEXT} -n user-auth get secrets ${PROJECT} > /dev/null 2>&1
+aws secretsmanager --region "$AWS_DEFAULT_REGION" describe-secret --secret-id "${PROJECT}/application/${ENVIRONMENT}/user-auth" > /dev/null 2>&1
 if [[ $? -ne 0 ]]; then
     REGION=${AWS_DEFAULT_REGION} \
     SEED=${RANDOM_SEED} \

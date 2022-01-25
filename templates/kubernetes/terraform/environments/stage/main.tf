@@ -81,7 +81,7 @@ module "kubernetes" {
     {
       name                          = local.project
       auth_namespace                = "user-auth"
-      kratos_secret_name            = local.project
+      kratos_secret_name            = "kratos-${local.project}"
       frontend_service_domain       = "<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}"
       backend_service_domain        = "<% index .Params `stagingBackendSubdomain` %>${local.domain_name}"
       whitelisted_return_urls       = ["https://<% index .Params `stagingFrontendSubdomain` %>${local.domain_name}"]

@@ -14,7 +14,7 @@ locals {
       for r in var.k8s_role_mapping : {
         rolearn  = "arn:aws:iam::${var.allowed_account_ids[0]}:role/${format(local.k8s_role_name_format, var.project, r.name, var.environment)}"
         username = format(local.k8s_role_name_format, var.project, r.name, var.environment)
-        groups   = r.groups
+        groups   = concat(r.groups, [format(local.k8s_role_name_format, var.project, r.name, var.environment)])
       }
     ]
   )
