@@ -65,6 +65,8 @@ post-apply-setup:
 
 teardown: teardown-k8s-utils teardown-env teardown-shared-env teardown-secrets teardown-remote-state teardown-shared-remote-state
 
+teardown-without-eks: teardown-env teardown-shared-env teardown-secrets teardown-remote-state teardown-shared-remote-state
+
 teardown-remote-state:
 	@echo "Deleting remote state is not reversible, are you sure you want to delete the resources? [y/N]:" ; read ans ; [ $${ans:-N} == "y" ] || exit 1
 	aws dynamodb delete-table --region $(AWS_DEFAULT_REGION) --table-name $(PROJECT)-$(ENVIRONMENT)-terraform-state-locks

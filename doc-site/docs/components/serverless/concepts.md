@@ -15,5 +15,5 @@ Managed by `config.toml` in the backend repository.
 This is the deploy step's configuration, determines where the artifacts are saved and allows configuration of parameters of each environment, such as image repositories and S3 to store build configurations.
 
 ## CloudFormation template
-Managed by `tempalte.yaml` in the backend repository.
+Managed by `template.yaml` in the backend repository.
 This is the configuration of your infrastructure and application setup, this configures how the Gateway, authenticator, application, logging and routes are setup.
