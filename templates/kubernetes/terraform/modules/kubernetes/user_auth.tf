@@ -17,7 +17,7 @@ data "aws_secretsmanager_secret_version" "jwks_content" {
 module "user_auth" {
   count   = length(var.user_auth)
   source  = "commitdev/zero/aws//modules/user_auth"
-  version = "0.5.3"
+  version = "0.6.1"
 
   name                        = var.user_auth[count.index].name
   auth_namespace              = var.user_auth[count.index].auth_namespace
@@ -41,7 +41,7 @@ module "dev_user_auth" {
   count = var.user_auth_dev_env_enabled ? 1 : 0
 
   source  = "commitdev/zero/aws//modules/user_auth"
-  version = "0.5.3"
+  version = "0.6.1"
 
   name                        = "development"
   auth_namespace              = "user-auth"
