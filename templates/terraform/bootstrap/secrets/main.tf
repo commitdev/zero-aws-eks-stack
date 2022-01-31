@@ -75,3 +75,39 @@ module "notification_service_secret_stage" {
   }
   tags   = { notification_svc : local.project }
 }
+
+module "auth0_api_secret_prod" {
+  count   = <%if eq (index .Params `backendApplicationHosting`) "serverless" %>1<% else %>0<% end %>
+  source  = "commitdev/zero/aws//modules/secret"
+  version = "0.0.2"
+
+  name   = "${local.project}-prod-auth0-api"
+  type   = "map"
+  values = {
+    AUTH0_DOMAIN        = var.productionAuth0TenantDoamin
+    AUTH0_CLIENT_ID     = var.productionAuth0TenantClientId
+    AUTH0_CLIENT_SECRET = var.productionAuth0TenantClientSecret
+  }
+  tags   = {
+    auth0_api_key : local.project,
+    environment   : "prod"
+  }
+}
+
+module "auth0_api_secret_stage" {
+  count   = <%if eq (index .Params `backendApplicationHosting`) "serverless" %>1<% else %>0<% end %>
+  source  = "commitdev/zero/aws//modules/secret"
+  version = "0.0.2"
+
+  name   = "${local.project}-stage-auth0-api"
+  type   = "map"
+  values = {
+    AUTH0_DOMAIN        = var.stagingAuth0TenantDoamin
+    AUTH0_CLIENT_ID     = var.stagingAuth0TenantClientId
+    AUTH0_CLIENT_SECRET = var.stagingAuth0TenantClientSecret
+  }
+  tags   = {
+    auth0_api_key : local.project,
+    environment   : "stage"
+  }
+}

@@ -125,7 +125,7 @@ resource "null_resource" "cert_manager_http_issuer" {
   provisioner "local-exec" {
     command = "kubectl apply ${local.k8s_exec_context} -f - <<EOF\n${local.cluster_issuer_http}\nEOF"
   }
-  depends_on = [helm_release.cert_manager]
+  depends_on = [helm_release.cert_manager, kubernetes_config_map.aws_auth, aws_iam_role.access_assumerole, kubernetes_cluster_role_binding.access_role]
 }
 
 resource "null_resource" "cert_manager_dns_issuer" {
@@ -136,7 +136,7 @@ resource "null_resource" "cert_manager_dns_issuer" {
   provisioner "local-exec" {
     command = "kubectl apply ${local.k8s_exec_context} -f - <<EOF\n${local.cluster_issuer_dns}\nEOF"
   }
-  depends_on = [helm_release.cert_manager]
+  depends_on = [helm_release.cert_manager, kubernetes_config_map.aws_auth, aws_iam_role.access_assumerole, kubernetes_cluster_role_binding.access_role]
 }
 
 # Create a role using oidc to map service accounts

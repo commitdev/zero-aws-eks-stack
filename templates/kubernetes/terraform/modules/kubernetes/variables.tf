@@ -173,3 +173,18 @@ variable "create_database_service" {
   type        = bool
   default     = true
 }
+
+variable "k8s_role_mapping" {
+  type = list(object({
+    name = string
+    policies  = list(map(list(string)))
+    groups    = list(string)
+  }))
+  description = "List of Kubernetes Policies and Groups to create and map to IAM roles"
+}
+
+variable "assumerole_account_ids" {
+  description = "AWS account IDs that will be allowed to assume the roles we are creating. If left blank, the 'allowed_account_ids' will be used"
+  type        = list(string)
+  default     = []
+}

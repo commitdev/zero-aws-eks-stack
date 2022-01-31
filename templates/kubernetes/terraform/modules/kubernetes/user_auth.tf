@@ -1,6 +1,6 @@
 locals {
   # This secret is created by the /scripts/create-db-user.sh script and contains environment variables that will be pulled into a k8s secret automatically by external-secrets
-  secrets_manager_secret_name = "${var.project}/kubernetes/${var.environment}/user-auth"
+  secrets_manager_secret_name = "${var.project}/application/${var.environment}/user-auth"
 }
 
 
@@ -17,7 +17,7 @@ data "aws_secretsmanager_secret_version" "jwks_content" {
 module "user_auth" {
   count   = length(var.user_auth)
   source  = "commitdev/zero/aws//modules/user_auth"
-  version = "0.5.3"
+  version = "0.6.1"
 
   name                        = var.user_auth[count.index].name
   auth_namespace              = var.user_auth[count.index].auth_namespace
@@ -41,11 +41,11 @@ module "dev_user_auth" {
   count = var.user_auth_dev_env_enabled ? 1 : 0
 
   source  = "commitdev/zero/aws//modules/user_auth"
-  version = "0.5.3"
+  version = "0.6.1"
 
   name                        = "development"
   auth_namespace              = "user-auth"
-  create_namespace            = false
+  create_namespace            = true
   kratos_secret_name          = var.project
   frontend_use_https          = false
   frontend_service_domain     = var.dev_user_auth_frontend_domain
@@ -55,7 +55,7 @@ module "dev_user_auth" {
   jwks_content                = "none"
   cookie_signing_secret_key   = "${var.project}-${var.environment}-${var.random_seed}"
   kubectl_extra_args          = local.k8s_exec_context
-  external_secret_name        = "${var.project}/kubernetes/stage/user-auth"
+  external_secret_name        = "${var.project}/application/stage/user-auth"
   kratos_values_override      = {
     kratos = {
       config = {

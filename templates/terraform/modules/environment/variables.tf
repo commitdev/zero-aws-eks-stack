@@ -67,6 +67,16 @@ variable "db_storage_gb" {
   description = "The amount of storage to allocate for the db, in GB"
 }
 
+variable "enable_kubernetes_application_infra" {
+  description = "Enable Kubernetes infrastructure - EKS and related roles"
+  type        = bool
+}
+
+variable "enable_serverless_application_infra" {
+  description = "Enable Serverless infrastructure - Lambda, SAM, Cloudformation and related roles"
+  type        = bool
+}
+
 variable "vpc_enable_nat_gateway" {
   description = "Enable nat-gateway"
   type        = bool
@@ -169,8 +179,6 @@ variable "roles" {
   type = list(object({
     name         = string
     aws_policy   = string
-    k8s_policies = list(map(list(string)))
-    k8s_groups   = list(string)
   }))
   description = "Role list with policies"
 }
@@ -213,4 +221,17 @@ variable "cache_redis_transit_encryption_enabled" {
   description = "Enable TLS for redis traffic. When this is enabled, your application needs to handle TLS connection. Note: redis-cli can not handle TLS."
   type        = bool
   default     = true
+}
+
+variable "frontend_domain_prefix" {
+  type = string
+}
+variable "backend_domain_prefix" {
+  type = string
+}
+
+variable "serverless_enabled" {
+  description = "Using Serverless infrastructure instead of EKS"
+  type        = bool
+  default     = false
 }

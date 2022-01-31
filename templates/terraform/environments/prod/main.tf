@@ -22,6 +22,7 @@ locals {
   account_id  = "<% index .Params `accountId` %>"
   domain_name = "<% index .Params `productionHostRoot` %>"
   random_seed = "<% index .Params `randomSeed` %>"
+  environment = "prod"
 }
 
 provider "aws" {
@@ -44,7 +45,7 @@ data "terraform_remote_state" "shared" {
 # Instantiate the production environment
 module "prod" {
   source      = "../../modules/environment"
-  environment = "prod"
+  environment = local.environment
 
   # Project configuration
   project             = local.project
@@ -60,6 +61,8 @@ module "prod" {
   eks_addon_kube_proxy_version = "v1.21.2-eksbuild.2"
   eks_addon_coredns_version    = "v1.8.4-eksbuild.1"
 
+  # Be careful changing these values, as it could be destructive to the cluster. If you need to change the instance_types, for example,
+  # you can create a new group with a new name, apply the changes, then delete the old group and apply that.
   eks_node_groups = {
     main = {
       instance_types     = ["t3.medium"]
@@ -105,14 +108,23 @@ module "prod" {
   db_instance_class = "db.t3.small"
   db_storage_gb = 100
 
+  # Enable infrastructure to support hosting backend applications in either serverless using SAM and Lambda or kubernetes using EKS
+  # Both can be enabled at the same time, enabling the ability to deploy using either method.
+  # Kubernetes is recommended for more complex applications as it has more flexibility and tooling, but SAM is suitable for simple applications and is cheaper.
+  # See more here: https://whyk8s.getzero.dev
+  # To upgrade from Serverless to Kubernetes, see these instructions: https://getzero.dev/docs/modules/aws-eks-stack/guides/upgrading-from-serverless-to-kubernetes
+  enable_kubernetes_application_infra = <%if eq (index .Params `backendApplicationHosting`) "kubernetes" %>true<% else %>false<% end %>
+  enable_serverless_application_infra = <%if eq (index .Params `backendApplicationHosting`) "serverless" %>true<% else %>false<% end %>
+
   # Logging configuration
   logging_type = "<% index .Params `loggingType` %>"
-  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_version          = "7.9"
-  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_az_count            = "2"
-  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_instance_type    = "t2.medium.elasticsearch" # The next larger instance type is "m5.large.elasticsearch" - upgrading an existing cluster may require fully recreating though, as m5.large is the first instance size which supports disk encryption
-  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_es_instance_count   = "2" # Must be a mulitple of the az count
-  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_volume_size_in_gb   = "35" # Maximum value is limited by the instance type
-  <% if ne (index .Params `loggingType`) "kibana" %># <% end %>logging_create_service_role = false # If in the same AWS account, this would have already been created by the staging env
+  # The following parameters are only used if logging_type is "kibana"
+  logging_es_version          = "7.9"
+  logging_az_count            = "2"
+  logging_es_instance_type    = "t2.medium.elasticsearch" # The next larger instance type is "m5.large.elasticsearch" - upgrading an existing cluster may require fully recreating though, as m5.large is the first instance size which supports disk encryption
+  logging_es_instance_count   = "2" # Must be a mulitple of the az count
+  logging_volume_size_in_gb   = "35" # Maximum value is limited by the instance type
+  logging_create_service_role = false # If in the same AWS account, this would have already been created by the staging env
   # See https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-limits.html
 
   sendgrid_enabled = <%if eq (index .Params `sendgridApiKey`) "" %>false<% else %>true<% end %>
@@ -131,27 +143,26 @@ module "prod" {
 <% end %>
 
   # Roles configuration
+  # These roles will be map by name to the roles created in the kubernetes terraform if applicable
   roles = [
     {
       name         = "developer"
       aws_policy   = data.aws_iam_policy_document.developer_access.json
-      k8s_policies = local.k8s_developer_access
-      k8s_groups   = ["vpn-users"]
     },
     {
       name         = "operator"
       aws_policy   = data.aws_iam_policy_document.operator_access.json
-      k8s_policies = local.k8s_operator_access
-      k8s_groups   = ["vpn-users"]
     },
     {
       name         = "deployer"
       aws_policy   = data.aws_iam_policy_document.deployer_access.json
-      k8s_policies = local.k8s_deployer_access
-      k8s_groups   = []
     }
   ]
 
   user_role_mapping = data.terraform_remote_state.shared.outputs.user_role_mapping
   ci_user_name      = data.terraform_remote_state.shared.outputs.ci_user_name
+
+  frontend_domain_prefix = "<% index .Params `productionFrontendSubdomain` %>"
+  backend_domain_prefix = "<% index .Params `productionBackendSubdomain` %>"
+  serverless_enabled = <% if eq (index .Params `backendApplicationHosting`) "serverless" %>true<% else %>false<% end %>
 }

@@ -55,7 +55,7 @@ resource "aws_iam_policy" "external_secrets" {
 data "aws_iam_policy_document" "external_secrets_policy_doc" {
   statement {
     effect    = "Allow"
-    resources = ["arn:aws:secretsmanager:${var.region}:*:secret:${var.project}/kubernetes/${var.environment}/*"]
+    resources = ["arn:aws:secretsmanager:${var.region}:*:secret:${var.project}/application/${var.environment}/*"]
 
     actions = [
       "secretsmanager:GetResourcePolicy",

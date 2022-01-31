@@ -17,17 +17,6 @@ locals {
     for r in var.roles : {
       name         = r.name
       aws_policy   = r.aws_policy
-      k8s_policies = r.k8s_policies
-    }
-  ]
-
-  eks_kubernetes_iam_role_mapping = [
-    for r in module.user_access.eks_iam_role_mapping : {
-      iam_role_arn  = r.arn
-      k8s_role_name = r.name
-      k8s_groups = flatten(concat([r.name], [
-        for o in var.roles : o.k8s_groups if r.name == "${var.project}-kubernetes-${o.name}-${var.environment}"
-      ]))
     }
   ]
 }
@@ -52,8 +41,9 @@ data "aws_caller_identity" "current" {}
 #
 # Provision the EKS cluster
 module "eks" {
+  count = var.serverless_enabled ? 0 : 1
   source  = "commitdev/zero/aws//modules/eks"
-  version = "0.5.1"
+  version = "0.6.0"
   providers = {
     aws = aws.for_eks
   }
@@ -73,8 +63,6 @@ module "eks" {
   vpc_id          = module.vpc.vpc_id
 
   eks_node_groups = var.eks_node_groups
-
-  iam_role_mapping = local.eks_kubernetes_iam_role_mapping
 }
 
 module "assets_domains" {
@@ -116,7 +104,7 @@ module "db" {
   environment               = var.environment
   vpc_id                    = module.vpc.vpc_id
   password_secret_suffix    = var.random_seed
-  allowed_security_group_id = module.eks.worker_security_group_id
+  allowed_security_group_id = !var.serverless_enabled ? module.eks[0].worker_security_group_id : module.serverless_security_group[0].this_security_group_id
   instance_class            = var.db_instance_class
   storage_gb                = var.db_storage_gb
   database_engine           = var.database
@@ -132,7 +120,7 @@ module "logging" {
   environment           = var.environment
   vpc_id                = module.vpc.vpc_id
   elasticsearch_version = var.logging_es_version
-  security_groups       = [module.eks.worker_security_group_id]
+  security_groups       = !var.serverless_enabled ? [module.eks[0].worker_security_group_id] : [module.serverless_security_group[0].this_security_group_id]
   subnet_ids            = slice(module.vpc.private_subnets, 0, var.logging_az_count)
   instance_type         = var.logging_es_instance_type
   instance_count        = var.logging_es_instance_count
@@ -152,7 +140,7 @@ module "sendgrid" {
 
 module "user_access" {
   source  = "commitdev/zero/aws//modules/user_access"
-  version = "0.4.1"
+  version = "0.6.0"
 
   project     = var.project
   environment = var.environment
@@ -178,9 +166,70 @@ module "cache" {
   cluster_size       = var.cache_cluster_size
   instance_type      = var.cache_instance_type
   availability_zones = module.vpc.azs
-  security_groups    = [module.eks.worker_security_group_id]
+  security_groups    = !var.serverless_enabled ? [module.eks[0].worker_security_group_id] : [module.serverless_security_group[0].this_security_group_id]
 
   redis_transit_encryption_enabled = var.cache_redis_transit_encryption_enabled
+}
+
+module "serverless_security_group" {
+  count = var.serverless_enabled ? 1 : 0
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "3.18.0"
+
+  name        = "${var.project}-${var.environment}-serverless-sg"
+  description = "Security group for serverless application"
+  vpc_id      = module.vpc.vpc_id
+
+  egress_rules = ["all-all"]
+
+  tags = {
+    Env = var.environment
+  }
+}
+
+module "sam" {
+  count = var.serverless_enabled ? 1 : 0
+  source = "./sam"
+
+  project = var.project
+  environment = var.environment
+  region = var.region
+  random_seed = var.random_seed
+  backend_domain = "${var.backend_domain_prefix}${var.hosted_domains[0].hosted_zone}"
+  domain_name = var.hosted_domains[0].hosted_zone
+  vpc_subnets = module.vpc.private_subnets
+  security_group_id = module.serverless_security_group[0].this_security_group_id
+
+  depends_on = [ module.user_access ]
+}
+
+<%if eq (index .Params `backendApplicationHosting`) "kubernetes" %>/* <% end %>
+# Auth0 has to be enabled via templating due to the provider declared inside
+# so it cannot use `count/depends_on/for_each` from terraform
+# and even when all the resource counts are 0 it will attempt to use the credentials
+module "auth0" {
+  source = "./auth0"
+
+  project = var.project
+  environment = var.environment
+  frontend_domain = "${var.frontend_domain_prefix}${var.hosted_domains[0].hosted_zone}"
+  backend_domain = "${var.backend_domain_prefix}${var.hosted_domains[0].hosted_zone}"
+  secret_name = "${var.project}-${var.environment}-auth0-api"
+}
+<%if eq (index .Params `backendApplicationHosting`) "kubernetes" %>*/<% end %>
+
+## This lambda function is used to create your database's application user
+## The function cannot be shared across repositories because it must be created in the
+## same subnet and security group as your database, the terraform module
+## creates an image in a private ECR repo `${var.project}-${var.environment}-lambda-db-ops`
+## and the function gets invoked by scripts/create-db-user.sh during `make post-apply`
+module "create_db_user" {
+  source = "./lambda-db-ops"
+
+  project = var.project
+  environment = var.environment
+  subnet_ids = module.vpc.private_subnets
+  security_group_ids = !var.serverless_enabled ? [module.eks[0].worker_security_group_id] : [module.serverless_security_group[0].this_security_group_id]
 }
 
 output "s3_hosting" {

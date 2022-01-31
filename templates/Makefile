@@ -8,7 +8,9 @@ KUBE_CONTEXT := $(PROJECT)-$(ENVIRONMENT)-$(AWS_DEFAULT_REGION)
 
 .EXPORT_ALL_VARIABLES:
 
-apply: apply-remote-state apply-shared-remote-state apply-secrets apply-shared-env apply-env update-k8s-conf pre-k8s apply-k8s-utils post-apply-setup
+apply: apply-remote-state apply-shared-remote-state apply-secrets apply-shared-env apply-env update-k8s-conf-creator pre-k8s apply-k8s-utils post-apply-setup
+
+apply-without-eks: apply-remote-state apply-shared-remote-state apply-secrets apply-shared-env apply-env post-apply-setup
 
 apply-remote-state:
 	aws s3 ls $(PROJECT)-$(ENVIRONMENT)-terraform-state > /dev/null 2>&1 || ( \
@@ -28,7 +30,8 @@ apply-secrets:
 	aws secretsmanager describe-secret --secret-id "$(PROJECT)-$(ENVIRONMENT)-rds-<% index .Params `randomSeed` %>" > /dev/null 2>&1 || ( \
 	cd terraform/bootstrap/secrets && \
 	terraform init && \
-	terraform apply $(AUTO_APPROVE) --var "sendgrid_api_key=${sendgridApiKey}" --var "slack_api_key=${notificationServiceSlackApiKey}" --var "twilio_account_id=${notificationServiceTwilioAccountId}"  --var "twilio_auth_token=${notificationServiceTwilioAuthToken}"&& \
+	terraform apply $(AUTO_APPROVE) --var "sendgrid_api_key=${sendgridApiKey}" --var "slack_api_key=${notificationServiceSlackApiKey}" --var "twilio_account_id=${notificationServiceTwilioAccountId}"  --var "twilio_auth_token=${notificationServiceTwilioAuthToken}" \
+	--var "productionAuth0TenantDoamin=${productionAuth0TenantDoamin}" --var "productionAuth0TenantClientId=${productionAuth0TenantClientId}" --var "productionAuth0TenantClientSecret=${productionAuth0TenantClientSecret}"  --var "stagingAuth0TenantDoamin=${stagingAuth0TenantDoamin}" --var "stagingAuth0TenantClientId=${stagingAuth0TenantClientId}" --var "stagingAuth0TenantClientSecret=${stagingAuth0TenantClientSecret}"&& \
 	rm ./terraform.tfstate )
 
 apply-shared-env:
@@ -45,17 +48,24 @@ pre-k8s:
 	cd scripts && sh pre-k8s.sh
 
 apply-k8s-utils:
+	# Import the aws-auth configmap into the state if it doesn't yet exist. EKS creates this automatically
 	cd kubernetes/terraform/environments/$(ENVIRONMENT) && \
 	terraform init && \
+	(terraform state show module.kubernetes.kubernetes_config_map.aws_auth > /dev/null || (terraform plan && terraform refresh && terraform import module.kubernetes.kubernetes_config_map.aws_auth kube-system/aws-auth)) && \
 	terraform apply $(AUTO_APPROVE)
 
 update-k8s-conf:
 	aws eks --region $(AWS_DEFAULT_REGION) update-kubeconfig --role "arn:aws:iam::<% index .Params `accountId` %>:role/$(PROJECT)-kubernetes-$(ROLE)-$(ENVIRONMENT)" --name $(KUBE_CONTEXT) --alias $(KUBE_CONTEXT)
 
+update-k8s-conf-creator:
+	aws eks --region $(AWS_DEFAULT_REGION) update-kubeconfig --role "arn:aws:iam::<% index .Params `accountId` %>:role/$(PROJECT)-eks-cluster-creator" --name $(KUBE_CONTEXT) --alias $(KUBE_CONTEXT)-creator
+
 post-apply-setup:
 	cd scripts && bash post-apply.sh
 
 teardown: teardown-k8s-utils teardown-env teardown-shared-env teardown-secrets teardown-remote-state teardown-shared-remote-state
+
+teardown-without-eks: teardown-env teardown-shared-env teardown-secrets teardown-remote-state teardown-shared-remote-state
 
 teardown-remote-state:
 	@echo "Deleting remote state is not reversible, are you sure you want to delete the resources? [y/N]:" ; read ans ; [ $${ans:-N} == "y" ] || exit 1
