@@ -17,7 +17,7 @@ resource "aws_s3_bucket" "terraform_remote_state" {
   bucket = "<% .Name %>-${var.environment}-terraform-state"
 }
 
-resource "aws_s3_bucket_acl" "example" {
+resource "aws_s3_bucket_acl" "terraform_remote_state" {
   bucket = aws_s3_bucket.terraform_remote_state.id
   acl    = "private"
 }
