@@ -56,22 +56,17 @@ resource "kubernetes_cluster_role" "external_dns" {
   rule {
     verbs      = ["get", "list", "watch"]
     api_groups = [""]
-    resources  = ["pods", "services"]
+    resources  = ["pods", "services", "endpoints"]
   }
   rule {
     verbs      = ["get", "list", "watch"]
-    api_groups = ["extensions"]
+    api_groups = ["extensions", "networking.k8s.io"]
     resources  = ["ingresses"]
   }
   rule {
-    verbs      = ["list"]
+    verbs      = ["list", "watch"]
     api_groups = [""]
     resources  = ["nodes"]
-  }
-  rule {
-    verbs      = ["get", "list", "watch"]
-    api_groups = [""]
-    resources  = ["endpoints"]
   }
 }
 
