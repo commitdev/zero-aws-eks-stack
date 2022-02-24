@@ -1,3 +1,13 @@
+terraform {
+  required_version = ">= 0.14"
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = ">= 4.0.0"
+    }
+  }
+}
+
 provider "aws" {
   region              = "<% index .Params `region` %>"
   allowed_account_ids = ["<% index .Params `accountId` %>"]
@@ -5,17 +15,26 @@ provider "aws" {
 
 resource "aws_s3_bucket" "terraform_remote_state" {
   bucket = "<% .Name %>-${var.environment}-terraform-state"
+}
+
+resource "aws_s3_bucket_acl" "terraform_remote_state" {
+  bucket = aws_s3_bucket.terraform_remote_state.id
   acl    = "private"
+}
 
-  versioning {
-    enabled = true
+resource "aws_s3_bucket_versioning" "terraform_remote_state" {
+  bucket = aws_s3_bucket.terraform_remote_state.id
+  versioning_configuration {
+    status = "Enabled"
   }
+}
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
+resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_remote_state" {
+  bucket = aws_s3_bucket.terraform_remote_state.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "AES256"
     }
   }
 }

@@ -73,7 +73,7 @@ infrastructure:
 EC2 instance sizing can be configured in [templates/terraform/environments/stage/main.tf](templates/terraform/environments/stage/main.tf)
 
 ## Other links
-Project board: [zenhub][zenhub-board]
+[Project board](https://github.com/orgs/commitdev/projects/6/views/2)
 
 <!-- Links -->
 [zero]: https://github.com/commitdev/zero
@@ -83,6 +83,5 @@ Project board: [zenhub][zenhub-board]
 <!-- External Links -->
 [aws-cli]: https://docs.aws.amazon.com/polly/latest/dg/setup-aws-cli.html
 [aws-route53]: https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html
-[zenhub-board]: https://app.zenhub.com/workspaces/commit-zero-5da8decc7046a60001c6db44/board?filterLogic=any&repos=203630543,247773730,257676371,258369081
 [sendgrid]: https://signup.sendgrid.com
 [sendgrid-apikey]: https://app.sendgrid.com/settings/api_keys
