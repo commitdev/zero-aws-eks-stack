@@ -9,7 +9,7 @@ locals {
 
   # define Kubernetes policy for developer env deployment
   # TODO: given that in a small team, developers are given almost full permissions on Staging here. In the future, may limit the permissions to sub-namepsace per user.
-  k8s_developer_access = [
+  k8s_developer_access =  concat([
     # to support developer environment
     {
       verbs      = ["create", "exec", "list", "get", "delete", "patch", "update", "watch"]
@@ -22,7 +22,7 @@ locals {
         "secrets", "externalsecrets"
       ]
     }
-  ]
+  ], local.auth_deploy_rules)
 
   # define Kubernetes policy for operator
   k8s_operator_access = [
